@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado CEBRASPE - Princípios Fundamentais da CF/88</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            text-align: right;
+        }
+        #next-btn, #restart-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Simulado CEBRASPE</h1>
+            <p>Princípios Fundamentais da Constituição Federal (Arts. 1º a 4º)</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de 90</p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="next-btn" onclick="nextQuestion()">Próxima Questão</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Simulado Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz()">Refazer Simulado</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "A República Federativa do Brasil, formada pela união solúvel dos Estados e Municípios e do Distrito Federal, constitui-se em Estado Democrático de Direito.",
+                answer: "Errado",
+                rationale: "O Art. 1º, caput, afirma que a união é indissolúvel. A troca do termo por 'solúvel' torna a assertiva incorreta e é uma pegadinha comum em provas."
+            },
+            {
+                question: "A soberania, a cidadania e a dignidade da pessoa humana são fundamentos da República Federativa do Brasil.",
+                answer: "Certo",
+                rationale: "A assertiva lista corretamente três dos cinco fundamentos da República, conforme os incisos I, II e III do Art. 1º."
+            },
+            {
+                question: "Os valores sociais do trabalho e da livre iniciativa, bem como o pluralismo político, são considerados objetivos fundamentais da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "Os valores sociais do trabalho, a livre iniciativa (inciso IV) e o pluralismo político (inciso V) são fundamentos (Art. 1º), e não objetivos fundamentais (Art. 3º). A troca de categorias é um erro conceitual."
+            },
+            {
+                question: "Um dos fundamentos da República Federativa do Brasil é a dignidade da pessoa humana.",
+                answer: "Certo",
+                rationale: "A dignidade da pessoa humana está expressamente listada como um dos fundamentos no Art. 1º, inciso III."
+            },
+            {
+                question: "O pluralismo político é um dos princípios que regem as relações internacionais do Brasil.",
+                answer: "Errado",
+                rationale: "O pluralismo político é um fundamento da República (Art. 1º, V) e não um princípio das relações internacionais (Art. 4º)."
+            },
+            {
+                question: "A República Federativa do Brasil é formada pela união indissolúvel dos Estados, Municípios, Distrito Federal e Territórios.",
+                answer: "Errado",
+                rationale: "O Art. 1º, caput, menciona apenas a união dos Estados, Municípios e do Distrito Federal. A inclusão de 'Territórios' na assertiva a torna incorreta, pois eles não estão listados no texto do artigo."
+            },
+            {
+                question: "Todo o poder emana do povo, que o exerce exclusivamente por meio de representantes eleitos.",
+                answer: "Errado",
+                rationale: "O Art. 1º, parágrafo único, estabelece que o poder é exercido por meio de representantes eleitos ou diretamente. A palavra 'exclusivamente' restringe o sentido do texto legal e invalida a questão."
+            },
+            {
+                question: "O poder, segundo a Constituição, emana do povo, que pode exercê-lo de forma direta ou indireta.",
+                answer: "Certo",
+                rationale: "A assertiva reflete corretamente o conteúdo do Art. 1º, parágrafo único, que prevê o exercício do poder de forma indireta (representantes eleitos) ou direta."
+            },
+            {
+                question: "São Poderes da União o Legislativo, o Executivo e o Judiciário, sendo o primeiro subordinado aos demais.",
+                answer: "Errado",
+                rationale: "O Art. 2º estabelece que os Poderes são independentes e harmônicos entre si, não havendo relação de subordinação entre eles."
+            },
+            {
+                question: "Os Poderes da União são independentes, mas não harmônicos entre si.",
+                answer: "Errado",
+                rationale: "O Art. 2º é claro ao afirmar que os Poderes são 'independentes e harmônicos entre si'. A negação da harmonia torna a questão incorreta."
+            },
+            {
+                question: "A independência e a harmonia são características dos Poderes da União: o Legislativo, o Executivo e o Judiciário.",
+                answer: "Certo",
+                rationale: "A questão descreve com precisão as características e a composição dos Poderes da União, conforme o texto literal do Art. 2º."
+            },
+            {
+                question: "Além do Legislativo, Executivo e Judiciário, o Ministério Público também é considerado um dos Poderes da União, conforme o Art. 2º da Constituição.",
+                answer: "Errado",
+                rationale: "O Art. 2º cita apenas três Poderes: Legislativo, Executivo e Judiciário. O Ministério Público, apesar de sua importância, não integra o rol de Poderes da União nesse artigo."
+            },
+            {
+                question: "Garantir o desenvolvimento social é um dos objetivos fundamentais da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "O objetivo fundamental previsto no Art. 3º, II, é 'garantir o desenvolvimento nacional', um conceito mais amplo que apenas o 'desenvolvimento social'."
+            },
+            {
+                question: "Construir uma sociedade livre, justa e solidária é um fundamento da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "Construir uma sociedade livre, justa e solidária é um objetivo fundamental (Art. 3º, I), e não um fundamento (Art. 1º). É crucial não confundir os conceitos."
+            },
+            {
+                question: "Constituem objetivos fundamentais da República Federativa do Brasil, entre outros, erradicar a pobreza e a marginalização.",
+                answer: "Certo",
+                rationale: "A assertiva está em conformidade com o Art. 3º, inciso III, que define 'erradicar a pobreza e a marginalização' como um dos objetivos fundamentais."
+            },
+            {
+                question: "A redução das desigualdades sociais e regionais é um dos objetivos fundamentais listados na Constituição.",
+                answer: "Certo",
+                rationale: "A redução das desigualdades sociais e regionais é a parte final do objetivo listado no Art. 3º, inciso III, e está corretamente apresentada."
+            },
+            {
+                question: "Promover o bem de todos, sem preconceitos de origem, raça, sexo, cor, idade e quaisquer outras formas de discriminação, é um objetivo fundamental da República.",
+                answer: "Certo",
+                rationale: "A questão reproduz fielmente o texto do Art. 3º, inciso IV, que trata da promoção do bem de todos."
+            },
+            {
+                question: "Garantir a segurança nacional é um objetivo fundamental da República Federativa do Brasil, previsto expressamente no Art. 3º.",
+                answer: "Errado",
+                rationale: "Embora a segurança nacional seja um tema constitucional, ela não está listada entre os objetivos fundamentais do Art. 3º. A questão testa a memorização literal dos incisos."
+            },
+            {
+                question: "A construção de uma sociedade livre, justa e solidária é um princípio que rege o Brasil em suas relações internacionais.",
+                answer: "Errado",
+                rationale: "A construção de uma sociedade livre, justa e solidária é um objetivo fundamental (Art. 3º, I), não um princípio das relações internacionais (Art. 4º)."
+            },
+            {
+                question: "A República Federativa do Brasil rege-se nas suas relações internacionais, entre outros, pelo princípio da intervenção.",
+                answer: "Errado",
+                rationale: "O princípio que rege as relações internacionais do Brasil é o da não-intervenção (Art. 4º, IV). A palavra 'intervenção' inverte completamente o sentido."
+            },
+            {
+                question: "A prevalência dos direitos humanos é um princípio orientador das relações internacionais do Brasil.",
+                answer: "Certo",
+                rationale: "A assertiva corresponde exatamente ao princípio listado no Art. 4º, inciso II."
+            },
+            {
+                question: "A solução pacífica dos conflitos e a defesa da paz são princípios que regem o Brasil no âmbito internacional.",
+                answer: "Certo",
+                rationale: "A questão combina corretamente dois princípios das relações internacionais previstos nos incisos VI e VII do Art. 4º."
+            },
+            {
+                question: "O repúdio ao terrorismo e ao racismo são princípios expressos que regem as relações internacionais da República Federativa do Brasil.",
+                answer: "Certo",
+                rationale: "O repúdio ao terrorismo e ao racismo está expressamente previsto como princípio no Art. 4º, inciso VIII."
+            },
+            {
+                question: "A concessão de asilo político é um dos princípios que o Brasil deve observar em suas relações internacionais.",
+                answer: "Certo",
+                rationale: "A concessão de asilo político é o princípio que encerra o rol do Art. 4º, no inciso X."
+            },
+            {
+                question: "A República Federativa do Brasil buscará a integração econômica, política, social e cultural dos povos de todos os continentes.",
+                answer: "Errado",
+                rationale: "O parágrafo único do Art. 4º especifica que a busca pela integração se refere aos povos da América Latina, e não de 'todos os continentes'. A generalização torna a assertiva incorreta."
+            },
+            {
+                question: "A autodeterminação dos povos e a igualdade entre os Estados são princípios das relações internacionais do Brasil.",
+                answer: "Certo",
+                rationale: "A questão cita corretamente dois princípios constantes nos incisos III e V do Art. 4º."
+            },
+            {
+                question: "A cooperação entre os povos para o progresso da humanidade é um dos objetivos fundamentais da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "A cooperação entre os povos para o progresso da humanidade é um princípio das relações internacionais (Art. 4º, IX), e não um objetivo fundamental (Art. 3º)."
+            },
+            {
+                question: "A independência nacional é um dos fundamentos da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "A independência nacional é um princípio das relações internacionais (Art. 4º, I), e não um fundamento da República (Art. 1º)."
+            },
+            {
+                question: "A busca pela formação de uma comunidade latino-americana de nações é uma diretriz da política externa brasileira.",
+                answer: "Certo",
+                rationale: "A assertiva descreve de forma correta o conteúdo do parágrafo único do Art. 4º, que visa à formação de uma comunidade latino-americana de nações."
+            },
+            {
+                question: "A defesa da paz é um princípio que rege as relações internacionais do Brasil, enquanto a solução pacífica dos conflitos é um objetivo fundamental.",
+                answer: "Errado",
+                rationale: "Ambos os conceitos, 'defesa da paz' (inciso VI) e 'solução pacífica dos conflitos' (inciso VII), são princípios que regem as relações internacionais (Art. 4º). A questão tenta confundir ao classificá-los em categorias diferentes."
+            },
+            {
+                question: "De acordo com o parágrafo único do Art. 1º, o poder que emana do povo é exercido unicamente de forma indireta, por meio de representantes eleitos.",
+                answer: "Errado",
+                rationale: "O erro está na palavra 'unicamente'. O parágrafo único do Art. 1º é claro ao dizer que o poder é exercido por meio de representantes eleitos ou diretamente."
+            },
+            {
+                question: "Os valores sociais do trabalho e o pluralismo político são, respectivamente, um fundamento e um objetivo fundamental da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "Ambos são fundamentos da República Federativa do Brasil, previstos no Art. 1º (incisos IV e V). A questão erra ao classificar o pluralismo político como um objetivo fundamental (Art. 3º)."
+            },
+            {
+                question: "A forma de Estado adotada pelo Brasil, conforme se depreende do Art. 1º, é a Federação, formada pela união indissolúvel dos entes mencionados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A menção à 'união indissolúvel dos Estados e Municípios e do Distrito Federal' no Art. 1º, caput, é a base do pacto federativo brasileiro, definindo a forma de Estado."
+            },
+            {
+                question: "O texto constitucional estabelece que o Brasil se constitui em um Estado Democrático de Direito, tendo a soberania como um de seus fundamentos.",
+                answer: "Certo",
+                rationale: "A questão reproduz corretamente a primeira e a última parte do Art. 1º, caput, e um de seus incisos (I), conectando de forma precisa o tipo de Estado e um de seus fundamentos."
+            },
+            {
+                question: "A cidadania e os valores sociais da livre iniciativa são fundamentos da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "A pegadinha está na supressão de um termo. O inciso IV do Art. 1º fala em 'valores sociais do trabalho e da livre iniciativa'. Ao omitir a expressão 'do trabalho', a assertiva se torna uma reprodução incompleta e, portanto, incorreta conforme o estilo literal da banca."
+            },
+            {
+                question: "O exercício direto do poder pelo povo, nos termos da Constituição, é uma exceção à regra do exercício por meio de representantes eleitos.",
+                answer: "Errado",
+                rationale: "A Constituição não estabelece uma hierarquia ou regra/exceção entre as formas de exercício do poder. Ela as apresenta como alternativas ('ou'), ambas legítimas e previstas."
+            },
+            {
+                question: "A união que forma a República Federativa do Brasil é composta pelos Estados, pelo Distrito Federal e pelos Municípios, sendo essa união passível de dissolução por vontade dos entes.",
+                answer: "Errado",
+                rationale: "O Art. 1º afirma que a união é indissolúvel, o que significa que os entes federados não têm o direito de secessão, ou seja, a união não é passível de dissolução."
+            },
+            {
+                question: "A independência e a harmonia entre os Poderes da União significam que eles não podem fiscalizar uns aos outros.",
+                answer: "Errado",
+                rationale: "A independência e a harmonia não excluem o sistema de freios e contrapesos (checks and balances), pelo qual os Poderes se fiscalizam mutuamente para evitar abusos. A afirmação é conceitualmente incorreta."
+            },
+            {
+                question: "O Art. 2º da Constituição Federal define a tripartição dos Poderes como sendo o Legislativo, o Executivo e o Judiciário, sendo estes os únicos poderes existentes no âmbito da União.",
+                answer: "Errado",
+                rationale: "O Art. 2º define os três Poderes da União, mas não afirma que são os 'únicos poderes existentes'. O texto constitucional descreve outras instituições com parcelas de poder, embora não classificadas como um dos três Poderes do Art. 2º. A palavra 'únicos' torna a questão restritiva e incorreta."
+            },
+            {
+                question: "A harmonia entre os Poderes Executivo, Legislativo e Judiciário é uma diretriz constitucional, mas a independência entre eles é relativa.",
+                answer: "Errado",
+                rationale: "O Art. 2º afirma que os Poderes são independentes, sem qualquer relativização. A independência é um postulado tão importante quanto a harmonia."
+            },
+            {
+                question: "Segundo o Art. 2º, a titularidade dos Poderes da União pertence ao Legislativo, ao Executivo e ao Judiciário.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois o Art. 2º estabelece que 'São Poderes da União [...] o Legislativo, o Executivo e o Judiciário', atribuindo-lhes, portanto, a titularidade dessas funções estatais."
+            },
+            {
+                question: "A erradicação da pobreza e a promoção do bem de todos são, ambos, objetivos fundamentais da República Federativa do Brasil.",
+                answer: "Certo",
+                rationale: "A assertiva cita corretamente dois objetivos fundamentais, contidos respectivamente nos incisos III e IV do Art. 3º."
+            },
+            {
+                question: "Constitui um único objetivo fundamental da República Federativa do Brasil garantir o desenvolvimento nacional e erradicar a pobreza.",
+                answer: "Errado",
+                rationale: "São objetivos distintos, previstos em incisos diferentes. 'Garantir o desenvolvimento nacional' está no inciso II do Art. 3º, enquanto 'erradicar a pobreza' está no inciso III."
+            },
+            {
+                question: "A promoção do bem de todos deve ocorrer sem qualquer tipo de preconceito, incluindo os de origem, sexo e idade.",
+                answer: "Certo",
+                rationale: "A questão reproduz corretamente o conteúdo do Art. 3º, IV, citando exemplos de preconceitos que devem ser coibidos na busca pelo bem de todos."
+            },
+            {
+                question: "Reduzir as desigualdades sociais e garantir o desenvolvimento nacional são objetivos fundamentais contidos no mesmo inciso do Art. 3º.",
+                answer: "Errado",
+                rationale: "'Reduzir as desigualdades sociais' está no Art. 3º, inciso III. 'Garantir o desenvolvimento nacional' está no inciso II. Portanto, estão em incisos distintos."
+            },
+            {
+                question: "A solidariedade é um valor presente na construção da sociedade almejada como objetivo fundamental pela Constituição.",
+                answer: "Certo",
+                rationale: "O Art. 3º, I, estabelece como objetivo 'construir uma sociedade livre, justa e solidária'. O valor está expressamente mencionado."
+            },
+            {
+                question: "O combate à marginalização e a redução das desigualdades regionais são partes de um mesmo objetivo fundamental da República.",
+                answer: "Certo",
+                rationale: "Ambos os trechos fazem parte do mesmo inciso. O Art. 3º, III, prevê como objetivo 'erradicar a pobreza e a marginalização e reduzir as desigualdades sociais e regionais'."
+            },
+            {
+                question: "Promover o bem de alguns, desde que sem preconceitos de raça ou cor, está de acordo com os objetivos fundamentais da República.",
+                answer: "Errado",
+                rationale: "O Art. 3º, IV, é claro ao determinar a promoção do bem de todos, e não de 'alguns'. A alteração invalida a assertiva."
+            },
+            {
+                question: "A igualdade entre os Estados e a autodeterminação dos povos são princípios que regem o Brasil em suas relações internacionais.",
+                answer: "Certo",
+                rationale: "A questão lista corretamente dois princípios das relações internacionais do Brasil, previstos nos incisos V e III do Art. 4º, respectively."
+            },
+            {
+                question: "O Brasil repudia o racismo em seu ordenamento interno, mas o Art. 4º não trata desse tema no âmbito das relações internacionais.",
+                answer: "Errado",
+                rationale: "O Art. 4º, VIII, estabelece expressamente o 'repúdio ao terrorismo e ao racismo' como um princípio a ser seguido nas relações internacionais."
+            },
+            {
+                question: "A busca pela integração econômica e política dos povos da América Latina exclui a integração social e cultural.",
+                answer: "Errado",
+                rationale: "O parágrafo único do Art. 4º é explícito ao mencionar a integração econômica, política, social e cultural. A exclusão dos dois últimos campos torna a assertiva incorreta."
+            },
+            {
+                question: "A cooperação entre os povos para o progresso da humanidade é um princípio que rege as relações internacionais do Brasil.",
+                answer: "Certo",
+                rationale: "A assertiva corresponde literalmente ao princípio contido no Art. 4º, inciso IX."
+            },
+            {
+                question: "O Brasil rege-se, em suas relações internacionais, pelo princípio da prevalência dos direitos humanos e pela concessão de asilo político.",
+                answer: "Certo",
+                rationale: "A questão apresenta corretamente dois princípios que regem as relações internacionais do Brasil, conforme os incisos II e X do Art. 4º."
+            },
+            {
+                question: "A busca pela formação de uma comunidade de nações americanas é o objetivo da integração prevista no parágrafo único do Art. 4º.",
+                answer: "Errado",
+                rationale: "A pegadinha está na troca de 'latino-americana' por 'americanas'. O parágrafo único do Art. 4º especifica a busca pela formação de uma 'comunidade latino-americana de nações'."
+            },
+            {
+                question: "A solução pacífica dos conflitos é um fundamento da República, enquanto a defesa da paz é um princípio das relações internacionais.",
+                answer: "Errado",
+                rationale: "Ambos são princípios das relações internacionais (Art. 4º). A 'solução pacífica dos conflitos' (inciso VII) não é um fundamento (Art. 1º)."
+            },
+            {
+                question: "O princípio da não-intervenção se aplica às relações internacionais da República Federativa do Brasil.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e corresponde ao princípio previsto no Art. 4º, inciso IV."
+            },
+            {
+                question: "A independência nacional é listada no Art. 4º como o primeiro dos princípios que regem o Brasil em suas relações internacionais.",
+                answer: "Certo",
+                rationale: "A afirmação está de acordo com a ordem e o texto do Art. 4º, cujo inciso I é, de fato, a 'independência nacional'."
+            },
+            {
+                question: "Entre os princípios que regem as relações internacionais do Brasil, não se inclui a cooperação militar para a defesa da paz.",
+                answer: "Certo",
+                rationale: "O Art. 4º, em seus incisos, não menciona 'cooperação militar'. Ele trata de 'defesa da paz' e 'solução pacífica dos conflitos', que são conceitos distintos. A assertiva está correta ao afirmar que tal princípio não está incluído no rol."
+            },
+            {
+                question: "O parágrafo único do Art. 4º estabelece um mandato de integração regional restrito aos aspectos econômico e político.",
+                answer: "Errado",
+                rationale: "O parágrafo único do Art. 4º estabelece um mandato de integração amplo, incluindo os aspectos social e cultural, além dos econômicos e políticos."
+            },
+            {
+                question: "A prevalência dos direitos humanos é um objetivo fundamental da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "A prevalência dos direitos humanos é um princípio que rege as relações internacionais (Art. 4º, II), e não um objetivo fundamental (Art. 3º)."
+            },
+            {
+                question: "O Estado Democrático de Direito é um fundamento da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "Pegadinha conceitual. O Estado Democrático de Direito é a forma de organização em que a República se constitui. Os fundamentos são os listados nos incisos I a V do Art. 1º (soberania, cidadania, etc.)."
+            },
+            {
+                question: "O poder popular pode ser exercido diretamente ou por meio de representantes eleitos, sendo ambas as formas previstas expressamente e com igual hierarquia no texto constitucional.",
+                answer: "Certo",
+                rationale: "A assertiva reflete com precisão o Art. 1º, parágrafo único. A conjunção 'ou' indica alternatividade, e a Constituição não estabelece uma forma como principal e outra como subsidiária, tratando-as como vias igualmente legítimas para o exercício do poder."
+            },
+            {
+                question: "A dignidade da pessoa humana e os valores sociais do trabalho são fundamentos da República que se aplicam exclusivamente às relações entre cidadãos brasileiros.",
+                answer: "Errado",
+                rationale: "Os fundamentos da República têm aplicação ampla e irradiam efeitos para todas as relações jurídicas, inclusive com estrangeiros no território nacional. A palavra 'exclusivamente' restringe o alcance das normas de forma incorreta."
+            },
+            {
+                question: "A união indissolúvel dos Estados, Municípios e Distrito Federal é o que constitui a República Federativa do Brasil como um Estado Democrático de Direito.",
+                answer: "Certo",
+                rationale: "A assertiva está bem formulada. É a 'união indissolúvel' (característica da Federação) que dá forma à República, e essa estrutura 'constitui-se em Estado Democrático de Direito'. A relação de causa e consequência está correta."
+            },
+            {
+                question: "A livre iniciativa é um fundamento da República, desde que atrelada aos valores sociais do trabalho.",
+                answer: "Certo",
+                rationale: "A redação do Art. 1º, IV, ('os valores sociais do trabalho e da livre iniciativa') indica que esses dois fundamentos devem ser interpretados em conjunto. A livre iniciativa não é absoluta, sendo ponderada pela sua função social e pelos direitos dos trabalhadores."
+            },
+            {
+                question: "O pluralismo político, como fundamento, assegura a existência de diversas ideologias, mas não se confunde com o pluripartidarismo, que é sua consequência no sistema político.",
+                answer: "Certo",
+                rationale: "A questão aborda corretamente a distinção doutrinária. O pluralismo político (Art. 1º, V) é o princípio fundamental (a ideia da diversidade), enquanto o pluripartidarismo (Art. 17) é sua manifestação no sistema de representação política."
+            },
+            {
+                question: "A soberania, como fundamento da República, manifesta-se apenas no plano externo, nas relações com outros países.",
+                answer: "Errado",
+                rationale: "A soberania tem uma dimensão externa (independência perante outros Estados) e uma dimensão interna (supremacia do poder estatal dentro de seu território). A assertiva erra ao restringi-la ao plano externo."
+            },
+            {
+                question: "A harmonia entre os Poderes da União pressupõe a colaboração mútua para a consecução dos objetivos do Estado, dentro dos limites constitucionais de cada um.",
+                answer: "Certo",
+                rationale: "A questão conceitua corretamente o princípio da harmonia, que não significa submissão nem fusão, mas sim cooperação e lealdade institucional para atingir os fins do Estado."
+            },
+            {
+                question: "O Art. 2º da Constituição adota o princípio da separação de Poderes, mas veda expressamente o exercício de funções atípicas por qualquer um deles.",
+                answer: "Errado",
+                rationale: "O sistema de freios e contrapesos (checks and balances) pressupõe que os Poderes exerçam funções atípicas. Por exemplo, o Legislativo julga (impeachment), o Executivo legisla (medidas provisórias) e o Judiciário administra (sua própria estrutura). A Constituição não veda, mas organiza esse exercício."
+            },
+            {
+                question: "A independência dos Poderes Legislativo, Executivo e Judiciário é mitigada pela relação de harmonia entre eles.",
+                answer: "Errado",
+                rationale: "A harmonia não mitiga (diminui) a independência. Ambos os princípios coexistem plenamente. Os Poderes devem colaborar (harmonia) precisamente porque são independentes e não há hierarquia entre eles."
+            },
+            {
+                question: "Os Poderes da União, conforme o Art. 2º, são estruturados de forma hierárquica para garantir a governabilidade.",
+                answer: "Errado",
+                rationale: "O Art. 2º estabelece uma relação de independência e harmonia, que é o oposto de uma estrutura hierárquica. Nenhum Poder é superior ao outro."
+            },
+            {
+                question: "Garantir o desenvolvimento nacional é um objetivo que abrange as esferas econômica, social e cultural do país.",
+                answer: "Certo",
+                rationale: "O conceito de 'desenvolvimento nacional' (Art. 3º, II) é amplo e interpretado como um processo que engloba crescimento econômico com justiça social, desenvolvimento humano, cultural e sustentável."
+            },
+            {
+                question: "A construção de uma sociedade livre e justa é um objetivo fundamental, enquanto a solidariedade é um princípio das relações internacionais.",
+                answer: "Errado",
+                rationale: "A solidariedade está expressa no Art. 3º, I, ('construir uma sociedade livre, justa e solidária'), sendo, portanto, parte de um objetivo fundamental, e não um princípio das relações internacionais."
+            },
+            {
+                question: "A redução das desigualdades sociais e a redução das desigualdades regionais são dois objetivos fundamentais distintos, previstos em incisos separados do Art. 3º.",
+                answer: "Errado",
+                rationale: "Ambos os objetivos estão contidos no mesmo inciso, o Art. 3º, III: 'erradicar a pobreza e a marginalização e reduzir as desigualdades sociais e regionais'."
+            },
+            {
+                question: "O objetivo de promover o bem de todos é incondicional, não admitindo qualquer forma de discriminação, seja por cor, sexo ou origem.",
+                answer: "Certo",
+                rationale: "A assertiva reproduz fielmente a ideia do Art. 3º, IV. A expressão 'quaisquer outras formas de discriminação' torna o rol de preconceitos exemplificativo, reforçando a incondicionalidade do objetivo."
+            },
+            {
+                question: "Os objetivos fundamentais da República Federativa do Brasil, listados no Art. 3º, são normas de eficácia limitada, dependendo de legislação futura para produzirem efeitos.",
+                answer: "Errado",
+                rationale: "Os objetivos fundamentais são normas constitucionais programáticas, que direcionam a atuação do Estado. Eles têm eficácia jurídica imediata, servindo como vetor de interpretação de todas as leis e políticas públicas, não sendo meras promessas."
+            },
+            {
+                question: "A busca por uma sociedade solidária é um dos objetivos fundamentais previstos no Art. 3º.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o Art. 3º, I, menciona expressamente a construção de uma sociedade solidária."
+            },
+            {
+                question: "A erradicação da marginalização é um objetivo fundamental que se conecta diretamente com a promoção da dignidade da pessoa humana, um dos fundamentos da República.",
+                answer: "Certo",
+                rationale: "A questão faz uma correlação correta. Combater a marginalização (Art. 3º, III) é uma forma de concretizar a dignidade da pessoa humana (Art. 1º, III), mostrando a interligação do sistema constitucional."
+            },
+            {
+                question: "O princípio da não-intervenção impede que o Brasil participe de missões de paz ou organismos internacionais.",
+                answer: "Errado",
+                rationale: "O princípio da não-intervenção refere-se à soberania e aos assuntos internos de outros Estados. Ele não impede a cooperação internacional, como a participação em missões de paz (que geralmente ocorrem com o consentimento do Estado envolvido ou por deliberação de organismos como a ONU) ou a participação em blocos e tratados."
+            },
+            {
+                question: "A defesa da paz e a solução pacífica dos conflitos são princípios complementares que orientam a atuação do Brasil no cenário internacional.",
+                answer: "Certo",
+                rationale: "Os dois princípios, listados nos incisos VI e VII do Art. 4º, são de fato complementares. O Brasil deve não apenas defender a paz, mas também agir ativamente para resolver conflitos por meios não violentos."
+            },
+            {
+                question: "O asilo político, previsto como princípio no Art. 4º, será concedido a qualquer estrangeiro que o solicite, independentemente do motivo.",
+                answer: "Errado",
+                rationale: "O asilo político não é concedido de forma automática. A lei (Estatuto do Refugiado e Lei de Migração) estabelece os critérios, geralmente ligados à perseguição por motivos políticos, de opinião, raça, religião, etc. Não é para 'qualquer' motivo."
+            },
+            {
+                question: "O Brasil buscará a integração dos povos da América Latina, visando à formação de uma comunidade de nações, sendo essa uma diretriz facultativa de sua política externa.",
+                answer: "Errado",
+                rationale: "O verbo 'buscará' no parágrafo único do Art. 4º impõe um dever, uma diretriz vinculante para a política externa brasileira, e não uma mera faculdade ou opção do governante."
+            },
+            {
+                question: "A prevalência dos direitos humanos é um princípio que deve nortear tanto a política interna quanto as relações internacionais do Brasil.",
+                answer: "Certo",
+                rationale: "A prevalência dos direitos humanos (Art. 4º, II) é um princípio que irradia para todo o ordenamento jurídico. O Brasil se compromete a respeitá-los tanto internamente (como um dos pilares do Estado) quanto em sua atuação externa."
+            },
+            {
+                question: "O repúdio ao terrorismo como princípio das relações internacionais significa que o Brasil deve se abster de qualquer relação com Estados que patrocinem tal prática.",
+                answer: "Errado",
+                rationale: "O 'repúdio' é um princípio que orienta a política externa, mas não impõe um rompimento automático de relações. A diplomacia pode usar diferentes estratégias. A assertiva cria uma consequência rígida que não está prevista no texto."
+            },
+            {
+                question: "A igualdade entre os Estados é um princípio que se aplica nas relações internacionais, não se confundindo com a forma federativa de Estado adotada internamente.",
+                answer: "Certo",
+                rationale: "A questão diferencia corretamente dois conceitos. A 'igualdade entre os Estados' (Art. 4º, V) é um princípio de direito internacional (nenhum país é soberanamente superior a outro). A 'forma federativa de Estado' (Art. 1º) trata da organização política interna do Brasil."
+            },
+            {
+                question: "A cooperação entre os povos para o progresso da humanidade é um princípio que se opõe à independência nacional.",
+                answer: "Errado",
+                rationale: "Os princípios não são excludentes. A cooperação (Art. 4º, IX) pode ocorrer justamente com base no respeito mútuo à independência nacional (Art. 4º, I) de cada Estado."
+            },
+            {
+                question: "A autodeterminação dos povos significa que o Brasil reconhece o direito de cada nação definir seu próprio sistema político, econômico e social.",
+                answer: "Certo",
+                rationale: "A assertiva conceitua de forma precisa o princípio da autodeterminação dos povos (Art. 4º, III), que é o direito de cada povo de escolher seu destino e sua organização sem interferências externas."
+            },
+            {
+                question: "A busca pela formação de uma comunidade latino-americana de nações tem como escopo apenas a integração econômica.",
+                answer: "Errado",
+                rationale: "O parágrafo único do Art. 4º é explícito ao mencionar a integração econômica, política, social e cultural. A restrição a apenas um aspecto torna a questão incorreta."
+            },
+            {
+                question: "A independência nacional e a soberania são sinônimos, sendo o primeiro aplicado às relações internacionais e o segundo, ao ordenamento interno.",
+                answer: "Errado",
+                rationale: "Embora relacionados, não são sinônimos. A soberania (Art. 1º, I) é o poder supremo do Estado internamente e sua independência no plano externo. A independência nacional (Art. 4º, I) é a manifestação da soberania na relação com outros Estados. A soberania é o fundamento; a independência nacional é o princípio que dela decorre no âmbito internacional."
+            },
+            {
+                question: "O repúdio ao racismo é um princípio aplicável tanto nas relações internacionais do Brasil quanto um mandamento interno, conforme outros dispositivos constitucionais.",
+                answer: "Certo",
+                rationale: "A questão está correta. Além do repúdio ao racismo nas relações internacionais (Art. 4º, VIII), a Constituição o trata como crime inafiançável e imprescritível (Art. 5º, XLII), demonstrando sua dupla aplicação."
+            }
+        ];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            questionTextEl.innerText = currentQuestion.question;
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+            }
+            
+            // Highlight buttons
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${quizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            resultsContainerEl.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        // Start the quiz
+        loadQuestion();
+    </script>
+
+</body>
+</html>
