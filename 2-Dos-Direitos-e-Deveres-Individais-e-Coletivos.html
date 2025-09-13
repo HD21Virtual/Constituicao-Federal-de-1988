@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dos Direitos e Deveres Individais e Coletivos</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            text-align: right;
+        }
+        #next-btn, #restart-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Dos Direitos e Deveres Individais e Coletivos</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de 110</p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="next-btn" onclick="nextQuestion()">Próxima Questão</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Simulado Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz()">Refazer Simulado</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "O direito de reunião em locais abertos ao público depende de autorização da autoridade competente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XVI, estabelece que a reunião em locais abertos ao público 'independentemente de autorização'. A única exigência constitucional é o 'prévio aviso' à autoridade competente, que difere de um pedido de autorização."
+            },
+            {
+                question: "É plena a liberdade de associação, sendo permitida, inclusive, a de caráter paramilitar, desde que tenha fins lícitos.",
+                answer: "Errado",
+                rationale: "O Art. 5º, inciso XVII, embora assegure a plena liberdade de associação para fins lícitos, veda expressa e incondicionalmente a de caráter paramilitar. Portanto, mesmo que os fins alegados sejam lícitos, a natureza paramilitar da associação é proibida pela Constituição."
+            },
+            {
+                question: "Tanto a criação de associações quanto a de cooperativas independem de autorização estatal.",
+                answer: "Certo",
+                rationale: "A questão está correta, refletindo a literalidade do Art. 5º, inciso XVIII. O dispositivo afirma que a criação de associações e a de cooperativas 'independem de autorização'. A única ressalva é que as cooperativas devem ser criadas 'na forma da lei', o que não se confunde com a necessidade de autorização."
+            },
+            {
+                question: "A suspensão das atividades de uma associação exige decisão judicial com trânsito em julgado.",
+                answer: "Errado",
+                rationale: "O erro da questão está em confundir os requisitos para a suspensão e para a dissolução. Conforme o Art. 5º, inciso XIX, a exigência de trânsito em julgado (decisão final e irrecorrível) aplica-se apenas ao caso de dissolução compulsória. Para a simples suspensão das atividades, basta uma decisão judicial, que pode ter caráter liminar."
+            },
+            {
+                question: "Um cidadão pode ser legalmente obrigado a filiar-se a uma associação de moradores de seu bairro.",
+                answer: "Errado",
+                rationale: "A assertiva contraria diretamente o Art. 5º, inciso XX, que estabelece que 'ninguém poderá ser compelido a associar-se'. Esse direito, conhecido como liberdade negativa de associação, garante ao indivíduo a opção de não se filiar a qualquer tipo de associação."
+            },
+            {
+                question: "A realização de uma reunião pacífica e sem armas em local aberto ao público não pode ser impedida pelo poder público sob o argumento de falta de autorização prévia.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois o direito de reunião independe de autorização, conforme o Art. 5º, inciso XVI. A única exigência é o prévio aviso, cuja ausência, segundo o STF, pode, no máximo, levar à responsabilização dos organizadores, mas não justifica, por si só, a proibição da reunião."
+            },
+            {
+                question: "A liberdade de associação não é absoluta, pois não abrange associações cujos fins sejam ilícitos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso XVII, ao assegurar a liberdade de associação 'para fins lícitos', estabelece um limite claro a esse direito. Associações com objetivos contrários à lei não estão sob a proteção dessa garantia constitucional."
+            },
+            {
+                question: "O Estado-juiz pode interferir no funcionamento de uma cooperativa para garantir que ela cumpra a legislação pertinente.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso XVIII, veda expressamente a interferência estatal no funcionamento de associações e cooperativas. A fiscalização da legalidade dos atos pode ocorrer, mas não por meio de uma 'interferência' na gestão ou operação, sendo o controle exercido pelo Poder Judiciário de forma pontual e provocada, como na dissolução compulsória, e não por uma intervenção contínua."
+            },
+            {
+                question: "A dissolução compulsória de uma associação e a suspensão de suas atividades dependem exclusivamente de decisão judicial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso XIX, é categórico ao afirmar que as associações 'só poderão' ser compulsoriamente dissolvidas ou ter suas atividades suspensas por decisão judicial, afastando a possibilidade de tais medidas serem tomadas por ato administrativo."
+            },
+            {
+                question: "Uma vez associado, o indivíduo não pode ser compelido a permanecer vinculado à associação.",
+                answer: "Certo",
+                rationale: "A questão está correta e reflete a segunda parte da garantia prevista no Art. 5º, inciso XX. O dispositivo assegura que ninguém poderá ser compelido a 'permanecer associado', garantindo o direito de desfiliação a qualquer tempo."
+            },
+            {
+                question: "O direito de reunião pode ser exercido mesmo que frustre outra reunião anteriormente convocada para o mesmo local, caso a nova reunião tenha um número maior de participantes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Um dos limites expressos ao direito de reunião, previsto no Art. 5º, inciso XVI, é que a manifestação 'não frustre outra reunião anteriormente convocada para o mesmo local'. O texto não estabelece qualquer exceção a essa regra com base no número de participantes."
+            },
+            {
+                question: "A Constituição proíbe a criação de associações de caráter militar e paramilitar.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por incluir um termo não previsto no dispositivo. O Art. 5º, inciso XVII, veda apenas a associação de caráter paramilitar. A de caráter militar (por exemplo, clubes de oficiais das Forças Armadas) não é objeto da vedação constitucional."
+            },
+            {
+                question: "A criação de cooperativas, diferentemente da criação de associações, exige autorização do poder público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XVIII, tanto associações quanto cooperativas 'independem de autorização'. A diferença é que a criação de cooperativas deve seguir a forma prescrita em lei, o que é um requisito de legalidade, não de autorização."
+            },
+            {
+                question: "Uma associação pode ter suas atividades suspensas por decisão judicial em caráter liminar.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XIX, exige o trânsito em julgado apenas para a dissolução compulsória. Para a suspensão das atividades, basta uma decisão judicial, que pode ser proferida em sede de tutela de urgência (liminar), antes do julgamento final do mérito da causa."
+            },
+            {
+                question: "O direito de não permanecer associado pode ser restringido pelo estatuto da associação, que pode prever um período mínimo de filiação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O direito de se desfiliar de uma associação, garantido pelo Art. 5º, inciso XX, é uma norma constitucional de eficácia plena e não pode ser restringido por norma infraconstitucional ou por disposição estatutária."
+            },
+            {
+                question: "A exigência de prévio aviso à autoridade competente para a realização de uma reunião tem como finalidade permitir que o poder público viabilize o exercício do próprio direito, por exemplo, organizando o trânsito.",
+                answer: "Certo",
+                rationale: "A questão está correta. A finalidade do aviso prévio exigido pelo Art. 5º, inciso XVI, não é obter uma autorização, mas sim informar o poder público para que ele possa tomar as providências necessárias para garantir a segurança dos manifestantes e de terceiros, bem como a fluidez do tráfego, viabilizando o exercício pacífico do direito de reunião."
+            },
+            {
+                question: "A criação de associações e cooperativas independe de autorização, mas o Estado pode interferir em seu funcionamento para coibir desvios de finalidade.",
+                answer: "Errado",
+                rationale: "A questão está incorreta na sua segunda parte. O Art. 5º, inciso XVIII, veda expressamente a interferência estatal no funcionamento de associações e cooperativas. O controle de legalidade e a punição por desvio de finalidade devem ser feitos pelo Poder Judiciário, mediante provocação, o que não se confunde com uma interferência direta do Estado na gestão da entidade."
+            },
+            {
+                question: "A liberdade de associação é plena para fins lícitos, sendo vedada a de caráter paramilitar.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso XVII, da Constituição, descrevendo de forma precisa tanto a regra geral (plena liberdade para fins lícitos) quanto a vedação específica (caráter paramilitar)."
+            },
+            {
+                question: "Um indivíduo que se desfilia de uma cooperativa não pode ser compelido a pagar contribuições referentes ao período posterior à sua desfiliação.",
+                answer: "Certo",
+                rationale: "A questão está correta. A obrigação de pagar contribuições decorre do vínculo associativo. Uma vez que o Art. 5º, inciso XX, garante o direito de não permanecer associado, a formalização da desfiliação rompe o vínculo e, consequentemente, cessa a obrigação de pagar as mensalidades ou contribuições futuras."
+            },
+            {
+                question: "A dissolução compulsória de uma associação pode ocorrer por meio de decisão administrativa ou judicial.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao incluir a via administrativa. O Art. 5º, inciso XIX, estabelece uma reserva de jurisdição, determinando que as associações 'só poderão ser compulsoriamente dissolvidas (...) por decisão judicial', afastando a competência de qualquer outro Poder para tal ato."
+            },
+            {
+                question: "As entidades associativas possuem legitimidade automática para representar seus filiados em juízo, decorrendo essa prerrogativa do simples ato de sua criação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XXI, a legitimidade das associações para representar seus filiados não é automática. Ela depende de uma condição indispensável: que elas sejam 'expressamente autorizadas' para tal fim, seja por deliberação em assembleia, seja por autorização individual."
+            },
+            {
+                question: "O direito de propriedade, embora garantido constitucionalmente, deve atender à sua função social.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois correlaciona adequadamente dois dispositivos constitucionais. O Art. 5º, inciso XXII, garante o direito de propriedade, enquanto o inciso XXIII, logo em seguida, estabelece que 'a propriedade atenderá a sua função social', funcionando como um princípio que condiciona o exercício do direito garantido."
+            },
+            {
+                question: "A desapropriação por interesse social deve ser precedida de indenização justa, paga preferencialmente em títulos da dívida pública.",
+                answer: "Errado",
+                rationale: "A regra geral de indenização para a desapropriação, estabelecida no Art. 5º, inciso XXIV, é que ela seja 'justa e prévia (...) em dinheiro'. O pagamento em títulos é uma exceção, prevista em outros artigos da Constituição (como na desapropriação para fins de reforma agrária), e não a regra geral ou preferencial."
+            },
+            {
+                question: "Em caso de iminente perigo público, a autoridade competente pode tomar para si a propriedade de um bem particular, indenizando o proprietário posteriormente.",
+                answer: "Errado",
+                rationale: "O erro da questão está em confundir requisição administrativa com desapropriação. No caso de iminente perigo público, o Art. 5º, inciso XXV, autoriza a autoridade a 'usar de propriedade particular', o que implica uma restrição temporária ao uso pelo proprietário, e não a perda da propriedade (desapropriação)."
+            },
+            {
+                question: "A representação dos filiados por suas associações restringe-se à esfera judicial.",
+                answer: "Errado",
+                rationale: "A assertiva limita indevidamente o alcance da norma. O Art. 5º, inciso XXI, é explícito ao prever que as entidades associativas, quando autorizadas, têm legitimidade para representar seus filiados 'judicial ou extrajudicialmente', abrangendo, portanto, também a esfera administrativa."
+            },
+            {
+                question: "O direito de propriedade é absoluto, não podendo sofrer qualquer tipo de limitação ou restrição pelo poder público.",
+                answer: "Errado",
+                rationale: "Nenhum direito fundamental é absoluto. O direito de propriedade, garantido pelo Art. 5º, inciso XXII, é expressamente limitado pelo inciso XXIII (função social), pelo inciso XXIV (desapropriação) e pelo inciso XXV (requisição administrativa), demonstrando sua relatividade."
+            },
+            {
+                question: "A função social da propriedade é um princípio aplicável tanto à propriedade urbana quanto à rural.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XXIII, ao estabelecer que 'a propriedade atenderá a sua função social', o faz de forma genérica, sem qualquer distinção. A própria Constituição, em outros artigos (182 e 186), detalha o cumprimento da função social para propriedades urbanas e rurais, respectivamente, confirmando a ampla aplicação do princípio."
+            },
+            {
+                question: "O procedimento para a desapropriação por necessidade pública será estabelecido por lei, devendo a indenização ser justa e paga em dinheiro.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve com precisão a regra geral da desapropriação prevista no Art. 5º, inciso XXIV. A norma exige que a lei defina o procedimento e que a indenização cumpra o tripé de requisitos: ser justa, prévia e em dinheiro."
+            },
+            {
+                question: "Na hipótese de requisição administrativa, a indenização ao proprietário é sempre devida, independentemente da ocorrência de dano.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta porque a indenização na requisição administrativa é condicional. O Art. 5º, inciso XXV, assegura ao proprietário 'indenização ulterior, se houver dano'. Logo, se o uso do bem pela autoridade pública não resultar em qualquer prejuízo ou dano ao proprietário, a indenização não será devida."
+            },
+            {
+                question: "Para que uma entidade associativa represente seus filiados, é necessária autorização expressa, que pode constar do próprio estatuto da associação.",
+                answer: "Certo",
+                rationale: "A questão está correta. A exigência de autorização 'expressa' (Art. 5º, inciso XXI) pode ser satisfeita tanto por autorizações individuais quanto por uma deliberação coletiva da categoria, como a aprovação em assembleia geral de uma cláusula estatutária que preveja essa possibilidade de representação."
+            },
+            {
+                question: "A garantia constitucional ao direito de propriedade é um dos fundamentos da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "A questão comete um erro de classificação de institutos constitucionais. O direito de propriedade (Art. 5º, XXII) é um direito fundamental, enquanto os fundamentos da República estão listados no Art. 1º (soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e da livre iniciativa, e pluralismo político)."
+            },
+            {
+                question: "O cumprimento da função social é uma faculdade do proprietário, e não uma obrigação imposta pela Constituição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O verbo no futuro do presente ('atenderá') usado no Art. 5º, inciso XXIII, tem caráter impositivo, estabelecendo um dever, uma obrigação, e não uma mera faculdade. O não cumprimento da função social sujeita o proprietário a sanções previstas na própria Constituição."
+            },
+            {
+                question: "A indenização na desapropriação por utilidade pública deve ser sempre prévia ao ato de expropriação.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por absolutizar a regra. Embora a indenização prévia seja a norma, o próprio Art. 5º, inciso XXIV, ressalva 'os casos previstos nesta Constituição'. Existem hipóteses constitucionais de desapropriação-sanção (como a de glebas com culturas ilegais de psicotrópicos) que não preveem qualquer indenização, afastando a regra de ser prévia, justa e em dinheiro."
+            },
+            {
+                question: "A utilização de propriedade particular pela autoridade competente em caso de iminente perigo público é chamada de requisição administrativa.",
+                answer: "Certo",
+                rationale: "A questão está correta. O instituto descrito no Art. 5º, inciso XXV, corresponde ao que a doutrina do Direito Administrativo denomina 'requisição administrativa', que é o uso transitório de bens ou serviços particulares pelo Poder Público em situações de perigo público iminente."
+            },
+            {
+                question: "A autorização para que uma entidade associativa represente seus membros deve ser tácita, presumindo-se a concordância pelo ato de filiação.",
+                answer: "Errado",
+                rationale: "A questão contraria diretamente o texto constitucional. O Art. 5º, inciso XXI, exige que a autorização seja 'expressamente' concedida, afastando a possibilidade de autorização tácita ou presumida."
+            },
+            {
+                question: "O direito de propriedade garantido na Constituição é incompatível com a desapropriação.",
+                answer: "Errado",
+                rationale: "A afirmativa está incorreta. Longe de serem incompatíveis, os institutos coexistem harmonicamente no texto constitucional. A própria Constituição que garante o direito de propriedade (inciso XXII) é a que prevê a possibilidade de sua supressão via desapropriação (inciso XXIV), desde que observados os requisitos constitucionais (necessidade/utilidade pública ou interesse social e justa e prévia indenização)."
+            },
+            {
+                question: "A indenização devida na desapropriação por utilidade pública, por necessidade pública ou por interesse social será sempre justa, prévia e em dinheiro.",
+                answer: "Errado",
+                rationale: "O erro da questão está na palavra 'sempre'. O Art. 5º, inciso XXIV, ao estabelecer a regra da indenização (justa, prévia e em dinheiro), faz uma ressalva importante: 'ressalvados os casos previstos nesta Constituição'. Isso significa que a própria Constituição pode prever exceções a essa regra, o que de fato ocorre."
+            },
+            {
+                question: "O uso de propriedade particular por autoridade pública em caso de iminente perigo prescinde de autorização judicial.",
+                answer: "Certo",
+                rationale: "A questão está correta. A requisição administrativa (Art. 5º, inciso XXV) é um ato de natureza autoexecutória. Diante do 'iminente perigo público', a 'autoridade competente' pode agir de imediato, usando o bem particular sem a necessidade de prévia autorização do Poder Judiciário."
+            },
+            {
+                question: "As associações podem representar judicialmente os interesses de toda uma categoria, independentemente de autorização expressa dos substituídos.",
+                answer: "Errado",
+                rationale: "A questão descreve a figura da 'substituição processual', que é diferente da 'representação processual' prevista no Art. 5º, inciso XXI. A representação do inciso XXI exige autorização expressa dos filiados. A substituição processual (agir em nome próprio na defesa de direito alheio), como a que ocorre no mandado de segurança coletivo (Art. 5º, LXX), é uma hipótese distinta e não se confunde com a regra geral da representação associativa."
+            },
+            {
+                question: "A desapropriação e a requisição administrativa são formas de intervenção do Estado na propriedade privada, sendo que, na primeira, a indenização é, em regra, prévia e, na segunda, é sempre ulterior e condicionada à existência de dano.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois compara adequadamente os dois institutos conforme previsto na Constituição. Na desapropriação (inciso XXIV), a regra é a indenização prévia. Na requisição (inciso XXV), a indenização é sempre posterior ao uso ('ulterior') e só será paga se houver dano."
+            },
+            {
+                question: "Toda pequena propriedade rural trabalhada pela família é impenhorável, independentemente da natureza do débito que originou a cobrança.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta porque a impenhorabilidade é restrita. O Art. 5º, inciso XXVI, garante a impenhorabilidade da pequena propriedade rural familiar apenas para o pagamento de 'débitos decorrentes de sua atividade produtiva'. Dívidas de outra natureza (como um empréstimo pessoal para fins não produtivos) não estão abrangidas por essa garantia."
+            },
+            {
+                question: "O direito exclusivo do autor sobre a utilização de sua obra é intransmissível, extinguindo-se com a sua morte.",
+                answer: "Errado",
+                rationale: "O Art. 5º, inciso XXVII, estabelece expressamente que o direito autoral é 'transmissível aos herdeiros pelo tempo que a lei fixar'. Portanto, o direito não se extingue com a morte do autor, sendo incorporado ao patrimônio de seus sucessores."
+            },
+            {
+                question: "A proteção à reprodução da imagem e da voz humanas, inclusive em atividades desportivas, é assegurada nos termos da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta e em plena conformidade com o Art. 5º, inciso XXVIII, alínea 'a'. O dispositivo constitucional garante, sob a forma da lei, a proteção à reprodução da imagem e voz, mencionando especificamente as atividades desportivas como um dos âmbitos de aplicação dessa proteção."
+            },
+            {
+                question: "A lei assegurará aos autores de inventos industriais um privilégio permanente para sua utilização.",
+                answer: "Errado",
+                rationale: "O erro da questão está no prazo do privilégio. O Art. 5º, inciso XXIX, fala em privilégio 'temporário', e não permanente. A proteção à patente tem um prazo de validade definido em lei, após o qual a invenção cai em domínio público."
+            },
+            {
+                question: "O direito de herança é uma garantia fundamental prevista na Constituição Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso XXX, garante de forma direta e concisa o direito de herança ('é garantido o direito de herança;'), inserindo-o no rol dos direitos e garantias fundamentais."
+            },
+            {
+                question: "A impenhorabilidade da pequena propriedade rural depende de dois requisitos cumulativos: ser definida em lei como pequena e ser trabalhada pela família.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois aponta precisamente os dois requisitos que o Art. 5º, inciso XXVI, exige para a concessão da proteção: 'a pequena propriedade rural, assim definida em lei, desde que trabalhada pela família...'."
+            },
+            {
+                question: "O prazo de proteção dos direitos autorais após a morte do autor é definido na própria Constituição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXVII, delega à legislação infraconstitucional a definição do prazo de proteção, ao afirmar que o direito é transmissível aos herdeiros 'pelo tempo que a lei fixar'. Trata-se, portanto, de uma norma de eficácia limitada."
+            },
+            {
+                question: "Apenas os criadores das obras têm o direito de fiscalizar seu aproveitamento econômico.",
+                answer: "Errado",
+                rationale: "A questão restringe indevidamente o rol de legitimados. O Art. 5º, inciso XXVIII, alínea 'b', assegura o direito de fiscalização 'aos criadores, aos intérpretes e às respectivas representações sindicais e associativas', incluindo, portanto, outras figuras além do autor original."
+            },
+            {
+                question: "A proteção à propriedade das marcas e aos nomes de empresas é garantida pela Constituição, visando ao interesse social e ao desenvolvimento do país.",
+                answer: "Certo",
+                rationale: "A afirmativa está correta e literal. O Art. 5º, inciso XXIX, estabelece que a lei assegurará proteção, entre outros, 'à propriedade das marcas, aos nomes de empresas', e justifica essa proteção 'tendo em vista o interesse social e o desenvolvimento tecnológico e econômico do País'."
+            },
+            {
+                question: "O direito de herança, por ser uma garantia fundamental, não pode ser objeto de tributação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A garantia do direito de herança (Art. 5º, XXX) não impede a sua tributação. A própria Constituição, em seu Art. 155, I, 'a', prevê a competência dos Estados e do Distrito Federal para instituir o imposto sobre transmissão causa mortis e doação (ITCMD), que incide diretamente sobre a herança."
+            },
+            {
+                question: "A proteção constitucional contra a penhora da pequena propriedade rural abrange débitos de natureza fiscal decorrentes da atividade produtiva.",
+                answer: "Certo",
+                rationale: "A questão está correta. A expressão 'débitos decorrentes de sua atividade produtiva' (Art. 5º, inciso XXVI) é ampla e abrange tanto dívidas com fornecedores e instituições financeiras quanto dívidas fiscais (impostos, taxas e contribuições) relacionadas à produção e comercialização agrícola."
+            },
+            {
+                question: "Aos autores pertence o direito exclusivo de utilização, publicação ou reprodução de suas obras.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta da primeira parte do Art. 5º, inciso XXVII, que estabelece o núcleo do direito autoral como um direito de exclusividade."
+            },
+            {
+                question: "A proteção às participações individuais em obras coletivas é garantida diretamente pela Constituição, não dependendo de regulamentação legal.",
+                answer: "Errado",
+                rationale: "A afirmativa está incorreta. O caput do Art. 5º, inciso XXVIII, estabelece que os direitos previstos em suas alíneas são assegurados 'nos termos da lei'. Portanto, a proteção às participações individuais em obras coletivas (alínea 'a') depende de disciplina em legislação infraconstitucional."
+            },
+            {
+                question: "A proteção aos inventos industriais é assegurada pela Constituição independentemente do interesse social.",
+                answer: "Errado",
+                rationale: "A questão contraria a parte final do dispositivo. O Art. 5º, inciso XXIX, condiciona a proteção legal aos inventos e criações industriais à persecução de dois objetivos: o 'interesse social e o desenvolvimento tecnológico e econômico do País'."
+            },
+            {
+                question: "O direito de herança abrange apenas os bens materiais deixados pelo falecido.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O direito de herança, garantido no Art. 5º, XXX, é amplo e abrange todo o patrimônio transmissível do falecido, o que inclui bens materiais (imóveis, veículos), bens imateriais (direitos autorais, cotas de empresas) e também obrigações, nos limites das forças da herança."
+            },
+            {
+                question: "Para que a pequena propriedade rural seja impenhorável, basta que seja trabalhada pela família, ainda que a dívida não tenha relação com a atividade produtiva.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por ignorar um dos requisitos cumulativos. O Art. 5º, inciso XXVI, exige não só que a propriedade seja trabalhada pela família, mas também que a dívida seja 'decorrente de sua atividade produtiva'. A proteção não se aplica a débitos de outra natureza."
+            },
+            {
+                question: "O direito do autor sobre sua obra é um direito de propriedade, sendo, portanto, perpétuo.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. Embora o direito autoral tenha natureza de propriedade, ele não é perpétuo. O Art. 5º, inciso XXVII, estabelece que sua duração será definida em lei ('pelo tempo que a lei fixar'), o que o diferencia da propriedade sobre bens corpóreos, que é, em regra, perpétua."
+            },
+            {
+                question: "O direito de fiscalização do aproveitamento econômico das obras é extensível às representações sindicais e associativas dos criadores e intérpretes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com o Art. 5º, inciso XXVIII, alínea 'b'. O dispositivo constitucional é explícito ao listar as 'respectivas representações sindicais e associativas' como titulares desse direito de fiscalização, ao lado dos próprios criadores e intérpretes."
+            },
+            {
+                question: "A lei assegurará proteção a outros signos distintivos, além das criações industriais, da propriedade das marcas e dos nomes de empresas.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XXIX, contém uma lista que se encerra com a expressão 'e a outros signos distintivos', indicando que o rol de bens imateriais protegidos no âmbito da propriedade industrial é exemplificativo, podendo a lei abranger outros sinais não expressamente mencionados."
+            },
+            {
+                question: "A garantia constitucional do direito de herança impede que a lei estabeleça uma ordem de sucessão ou exclua herdeiros da linha sucessória.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A garantia do direito de herança (Art. 5º, XXX) não é absoluta. O direito é exercido 'nos termos da lei', cabendo à legislação infraconstitucional (no caso, o Código Civil) definir a ordem de vocação hereditária, as regras de sucessão e as hipóteses de exclusão da herança (por indignidade ou deserdação)."
+            },
+            {
+                question: "O mandado de injunção é o remédio cabível para os casos em que a existência de uma norma regulamentadora se mostra ineficaz para viabilizar o exercício de direitos constitucionais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXI, estabelece que o mandado de injunção será concedido sempre que a 'falta de norma regulamentadora' torne inviável o exercício de um direito, e não quando a norma existe e é ineficaz."
+            },
+            {
+                question: "O habeas data pode ser utilizado para assegurar o conhecimento de informações relativas à pessoa do impetrante que constem de bancos de dados de empresas privadas.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXXII, alínea 'a', restringe o cabimento do habeas data para o conhecimento de informações constantes de registros ou bancos de dados de 'entidades governamentais ou de caráter público', não se aplicando, em regra, a bancos de dados de natureza estritamente privada."
+            },
+            {
+                question: "Qualquer pessoa, nacional ou estrangeira, é parte legítima para propor ação popular que vise a anular ato lesivo ao patrimônio público.",
+                answer: "Errado",
+                rationale: "O erro da questão está no termo 'qualquer pessoa'. O Art. 5º, inciso LXXIII, confere legitimidade para a propositura da ação popular a 'qualquer cidadão', conceito que, para fins jurídicos, se refere ao brasileiro no gozo de seus direitos políticos."
+            },
+            {
+                question: "O Estado prestará assistência jurídica integral e gratuita a todos que a solicitarem, independentemente de sua condição financeira.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIV, condiciona a prestação de assistência jurídica integral e gratuita àqueles 'que comprovarem insuficiência de recursos'. Não é um serviço universal, mas sim destinado aos necessitados."
+            },
+            {
+                question: "O Estado tem o dever de indenizar o condenado por erro judiciário e também aquele que ficar preso por tempo superior ao fixado na sentença.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve exatamente as duas hipóteses de indenização obrigatória pelo Estado previstas no Art. 5º, inciso LXXV: o erro judiciário e a prisão além do tempo determinado."
+            },
+            {
+                question: "O mandado de injunção destina-se a viabilizar o exercício de direitos e liberdades constitucionais, bem como de prerrogativas inerentes à nacionalidade, à soberania e à cidadania.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com a parte final do Art. 5º, inciso LXXI, que detalha o amplo espectro de direitos e prerrogativas protegidos pelo mandado de injunção."
+            },
+            {
+                question: "É cabível habeas data para a retificação de dados, mesmo que o impetrante prefira realizar tal retificação por meio de um processo administrativo sigiloso.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXXII, alínea 'b', estabelece o cabimento do habeas data para retificação 'quando não se prefira fazê-lo por processo sigiloso, judicial ou administrativo'. Portanto, a existência de preferência por outra via afasta a utilização do remédio constitucional."
+            },
+            {
+                question: "O autor de ação popular ficará isento de custas judiciais e do ônus da sucumbência, mesmo que tenha agido com comprovada má-fé.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao ignorar a exceção. O Art. 5º, inciso LXXIII, garante a isenção de custas e sucumbência, 'salvo comprovada má-fé'. A litigância de má-fé afasta a gratuidade e impõe ao autor a responsabilidade pelos custos processuais."
+            },
+            {
+                question: "A assistência jurídica prestada pelo Estado aos que comprovarem insuficiência de recursos é integral, abrangendo tanto a esfera judicial quanto a extrajudicial.",
+                answer: "Certo",
+                rationale: "A questão está correta. O termo 'integral', utilizado no Art. 5º, inciso LXXIV, significa que a assistência jurídica deve ser completa, incluindo a orientação e a defesa em todos os graus, judicial e extrajudicialmente."
+            },
+            {
+                question: "O dever de indenizar do Estado restringe-se ao condenado que ficar preso além do tempo fixado na sentença, não alcançando o erro judiciário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser restritiva. O Art. 5º, inciso LXXV, prevê as duas hipóteses de forma cumulativa, e não excludente: 'o Estado indenizará o condenado por erro judiciário, assim como o que ficar preso além do tempo...'."
+            },
+            {
+                question: "Conceder-se-á mandado de injunção sempre que a falta de norma regulamentadora torne inviável o exercício dos direitos e liberdades constitucionais.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição direta e correta da primeira parte do Art. 5º, inciso LXXI, definindo o pressuposto de cabimento do mandado de injunção."
+            },
+            {
+                question: "O habeas data é o remédio adequado para assegurar o conhecimento de informações relativas à pessoa do impetrante.",
+                answer: "Errado",
+                rationale: "A questão está incompleta e, por isso, incorreta. Falta o requisito essencial do Art. 5º, inciso LXXII, alínea 'a': que as informações constem de registros ou bancos de dados de 'entidades governamentais ou de caráter público'."
+            },
+            {
+                question: "A ação popular pode ser proposta para anular ato lesivo ao meio ambiente e ao patrimônio histórico e cultural.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois cita dois dos bens jurídicos difusos protegidos pela ação popular, conforme a lista expressa no Art. 5º, inciso LXXIII, da Constituição."
+            },
+            {
+                question: "O Estado prestará assistência jurídica integral e gratuita aos que comprovarem insuficiência de recursos.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LXXIV, que consagra o dever do Estado de garantir o acesso à justiça aos hipossuficientes."
+            },
+            {
+                question: "A indenização por erro judiciário só é devida se o condenado tiver ficado preso.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXV, não condiciona a indenização por erro judiciário à prisão. Pode haver um erro judiciário que resulte em outros danos (como a perda de bens ou danos morais) sem que tenha havido prisão, e a indenização, nesse caso, também será devida."
+            },
+            {
+                question: "O mandado de injunção e o mandado de segurança são instrumentos idênticos para a proteção de direitos constitucionais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. São remédios com pressupostos distintos. O mandado de injunção (inciso LXXI) pressupõe a omissão do poder público em regulamentar uma norma constitucional. Já o mandado de segurança (inciso LXIX) pressupõe a ação ou omissão ilegal de uma autoridade que fira direito líquido e certo."
+            },
+            {
+                question: "Qualquer cidadão é parte legítima para propor ação popular que vise a anular ato lesivo à moralidade administrativa.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve uma das hipóteses de cabimento da ação popular, nos exatos termos do Art. 5º, inciso LXXIII, que inclui a proteção à 'moralidade administrativa'."
+            },
+            {
+                question: "O direito à assistência jurídica gratuita depende de comprovação de insuficiência de recursos, que deve ser feita exclusivamente por meio de declaração de imposto de renda.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIV, exige a comprovação, mas não especifica o meio. A legislação e a jurisprudência admitem diversos meios de prova, sendo a declaração de próprio punho (declaração de hipossuficiência) o mais comum, gozando de presunção relativa de veracidade."
+            },
+            {
+                question: "Conceder-se-á habeas data para a retificação de dados, quando não se prefira fazê-lo por processo sigiloso, judicial ou administrativo.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LXXII, alínea 'b', estabelecendo o caráter subsidiário do habeas data para a finalidade de retificação de dados."
+            },
+            {
+                question: "A responsabilidade do Estado por erro judiciário ou prisão além do tempo é de natureza subjetiva, exigindo a comprovação de dolo ou culpa do magistrado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A responsabilidade do Estado prevista no Art. 5º, inciso LXXV, é de natureza objetiva, ou seja, independe da comprovação de dolo ou culpa do agente público. Basta a ocorrência do dano (o erro judiciário ou a prisão indevida) e o nexo de causalidade para que surja o dever de indenizar."
+            },
+            {
+                question: "O registro civil de nascimento e a certidão de óbito são gratuitos para todas as pessoas, independentemente de sua condição financeira.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXVI, condiciona a gratuidade desses atos aos 'reconhecidamente pobres, na forma da lei'. Não se trata de uma gratuidade universal."
+            },
+            {
+                question: "As ações de habeas corpus e habeas data são gratuitas, assim como os atos necessários ao exercício da cidadania.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por uma imprecisão. O Art. 5º, inciso LXXVII, estabelece que habeas corpus e habeas data são gratuitas, mas os atos necessários ao exercício da cidadania são gratuitos 'na forma da lei', o que significa que a gratuidade destes últimos depende de regulamentação legal."
+            },
+            {
+                question: "A garantia da razoável duração do processo aplica-se tanto ao âmbito judicial quanto ao administrativo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reflete a literalidade do Art. 5º, inciso LXXVIII, que assegura a todos, 'no âmbito judicial e administrativo', a razoável duração do processo e a celeridade de sua tramitação."
+            },
+            {
+                question: "As normas que definem os direitos e garantias fundamentais dependem de lei regulamentadora para terem aplicação.",
+                answer: "Errado",
+                rationale: "A assertiva contraria frontalmente o texto constitucional. O Art. 5º, § 1º, estabelece que as normas definidoras dos direitos e garantias fundamentais têm 'aplicação imediata', não sendo, em regra, condicionadas à edição de legislação posterior."
+            },
+            {
+                question: "Os tratados e convenções internacionais sobre direitos humanos que forem aprovados em rito de lei ordinária não produzem qualquer efeito no ordenamento jurídico interno.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme a jurisprudência do STF, que interpreta o Art. 5º, § 2º e § 3º, os tratados de direitos humanos aprovados sem o quórum qualificado (rito de lei ordinária) ingressam no ordenamento com status supralegal, ou seja, abaixo da Constituição, mas acima das leis comuns."
+            },
+            {
+                question: "A certidão de óbito é gratuita para os reconhecidamente pobres, na forma da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta e em total conformidade com o Art. 5º, inciso LXXVI, alínea 'b', que prevê expressamente a gratuidade da certidão de óbito para os hipossuficientes."
+            },
+            {
+                question: "O direito à proteção dos dados pessoais é assegurado pela Constituição, mas restringe-se aos dados armazenados em meios físicos, não alcançando os meios digitais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXXIX, é explícito ao garantir o direito à proteção dos dados pessoais, 'inclusive nos meios digitais', reconhecendo a importância da proteção na era da informação."
+            },
+            {
+                question: "O rol de direitos e garantias fundamentais expresso na Constituição é taxativo, não admitindo a existência de outros.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, § 2º, estabelece uma cláusula de abertura, afirmando que os direitos e garantias expressos na Constituição 'não excluem outros' decorrentes do regime, dos princípios ou dos tratados internacionais. O rol é, portanto, exemplificativo."
+            },
+            {
+                question: "Para que um tratado internacional sobre direitos humanos seja equivalente a uma emenda constitucional, ele deve ser aprovado, em cada Casa do Congresso Nacional, em dois turnos, por três quintos dos votos dos respectivos membros.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve com exatidão o quórum qualificado e o rito de aprovação exigidos pelo Art. 5º, § 3º, para que um tratado de direitos humanos tenha status de emenda constitucional."
+            },
+            {
+                question: "O Brasil somente se submeterá à jurisdição de um Tribunal Penal Internacional se a sua criação tiver sido objeto de manifestação de adesão pelo Estado brasileiro.",
+                answer: "Certo",
+                rationale: "A questão está correta e reflete a literalidade do Art. 5º, § 4º. A submissão à jurisdição do TPI não é automática, dependendo da manifestação de adesão do Brasil à sua criação, o que ocorreu com a ratificação do Estatuto de Roma."
+            },
+            {
+                question: "São gratuitas as ações de habeas corpus e habeas data.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da primeira parte do Art. 5º, inciso LXXVII, que estabelece a gratuidade incondicional desses dois remédios constitucionais."
+            },
+            {
+                question: "A razoável duração do processo é um direito assegurado a todos, mas restrito ao âmbito judicial.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao restringir o alcance da garantia. O Art. 5º, inciso LXXVIII, estende o direito à razoável duração do processo ao âmbito 'judicial e administrativo'."
+            },
+            {
+                question: "O direito à proteção dos dados pessoais, inclusive nos meios digitais, independe de regulamentação legal para ser exercido.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIX, estabelece que o direito é assegurado 'nos termos da lei'. Isso significa que se trata de uma norma de eficácia limitada, que depende de legislação (como a Lei Geral de Proteção de Dados - LGPD) para disciplinar seu exercício."
+            },
+            {
+                question: "A aplicação das normas definidoras dos direitos e garantias fundamentais é mediata, condicionada à vontade do legislador ordinário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, § 1º, determina que a aplicação é 'imediata', conferindo máxima efetividade a esses direitos e garantias, que devem ser aplicados diretamente pela administração e pelo judiciário."
+            },
+            {
+                question: "Os direitos e garantias fundamentais incluem os expressos na Constituição e os decorrentes dos tratados internacionais em que o Brasil seja parte.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reflete o conteúdo do Art. 5º, § 2º, que funciona como uma cláusula de abertura material, reconhecendo que o catálogo de direitos fundamentais não se esgota no texto constitucional, incluindo também aqueles previstos em tratados internacionais."
+            },
+            {
+                question: "Qualquer tratado internacional, para ser equivalente a uma emenda constitucional, deve ser aprovado por três quintos dos votos em cada Casa do Congresso Nacional, em dois turnos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por generalizar a regra. O rito especial do Art. 5º, § 3º, aplica-se exclusivamente aos tratados e convenções internacionais sobre direitos humanos, e não a qualquer tratado internacional."
+            },
+            {
+                question: "A submissão do Brasil à jurisdição do Tribunal Penal Internacional representa uma violação à soberania nacional.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. A previsão expressa no Art. 5º, § 4º, constitucionaliza a adesão ao TPI, demonstrando que a submissão à sua jurisdição é um exercício da própria soberania, e não uma violação a ela. A Constituição autoriza essa delegação de jurisdição."
+            },
+            {
+                question: "O registro civil de nascimento é gratuito para todos, mas a certidão de óbito é gratuita apenas para os reconhecidamente pobres.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXVI, estabelece a mesma condição para ambos os atos: tanto o registro de nascimento (alínea 'a') quanto a certidão de óbito (alínea 'b') são gratuitos para os 'reconhecidamente pobres'."
+            },
+            {
+                question: "Todos, no âmbito judicial e administrativo, têm assegurados a razoável duração do processo e os meios que garantam a celeridade de sua tramitação.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LXXVIII, consagrando o direito fundamental a uma tutela jurisdicional e administrativa prestada em tempo razoável."
+            },
+            {
+                question: "Um tratado internacional sobre direitos humanos, aprovado pelo rito do Art. 5º, § 3º, pode ser alterado ou revogado por lei ordinária posterior.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Ao ser aprovado com o quórum qualificado, o tratado adquire status de emenda constitucional. Sendo assim, ele se situa no mesmo nível hierárquico da Constituição e não pode ser modificado por uma lei ordinária, que lhe é hierarquicamente inferior."
+            }
+        ];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            questionTextEl.innerText = currentQuestion.question;
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+            }
+            
+            // Highlight buttons
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${quizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            resultsContainerEl.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        // Start the quiz
+        loadQuestion();
+    </script>
+
+</body>
+</html>
