@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dos Direitos e Deveres Individais e Coletivos</title>
+    <title>Dos Direitos e Deveres Individuais e Coletivos</title>
     <style>
         :root {
             --primary-bg: #f4f7f9;
@@ -147,11 +147,11 @@
     <div class="quiz-container">
         <div class="quiz-header">
             <h1>Constituição Federal de 1988</h1>
-            <p>Dos Direitos e Deveres Individais e Coletivos</p>
+            <p>Dos Direitos e Deveres Individuais e Coletivos</p>
         </div>
 
         <div id="quiz-body">
-            <p><span id="question-number"></span> de 110</p>
+            <p><span id="question-number"></span> de 260</p>
             <div id="question-text"></div>
             <div class="answer-options">
                 <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
@@ -164,10 +164,10 @@
         </div>
 
         <div id="results-container" style="display: none;">
-            <h2>Simulado Concluído!</h2>
+            <h2>Caderno Concluído!</h2>
             <p id="score"></p>
             <p id="score-message"></p>
-            <button id="restart-btn" onclick="restartQuiz()">Refazer Simulado</button>
+            <button id="restart-btn" onclick="restartQuiz()">Refazer Questões</button>
         </div>
 
     </div>
@@ -175,9 +175,309 @@
     <script>
         const quizData = [
             {
+                question: "A Constituição Federal garante a inviolabilidade de direitos como a vida e a liberdade apenas aos brasileiros, sejam eles natos ou naturalizados.",
+                answer: "Errado",
+                rationale: "O caput do Art. 5º é explícito ao estender a garantia de inviolabilidade dos direitos fundamentais \"aos brasileiros e aos estrangeiros residentes no País\", não se restringindo, portanto, apenas aos nacionais."
+            },
+            {
+                question: "De acordo com o princípio da legalidade, ninguém poderá ser compelido a praticar uma conduta senão em virtude de lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incompleta e, por isso, incorreta. O Art. 5º, inciso II, estabelece que \"ninguém será obrigado a fazer ou deixar de fazer alguma coisa senão em virtude de lei\". O princípio da legalidade abrange tanto as ações (condutas comissivas) quanto as omissões (condutas omissivas)."
+            },
+            {
+                question: "A manifestação do pensamento é livre, sendo, contudo, vedado o anonimato.",
+                answer: "Certo",
+                rationale: "A questão reproduz fielmente a norma contida no Art. 5º, inciso IV, da Constituição. O dispositivo consagra a liberdade de expressão como um direito, mas impõe como condição a identificação do autor, proibindo o anonimato."
+            },
+            {
+                question: "O direito de resposta, assegurado constitucionalmente, deve ser exercido de forma proporcional ao agravo sofrido.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com a redação do Art. 5º, inciso V. O texto constitucional estabelece expressamente a proporcionalidade como um requisito para o exercício do direito de resposta: \"é assegurado o direito de resposta, proporcional ao agravo\"."
+            },
+            {
+                question: "A igualdade de direitos e obrigações entre homens e mulheres é absoluta, não admitindo exceções nem mesmo no texto constitucional.",
+                answer: "Errado",
+                rationale: "O erro reside na afirmação de que a igualdade é absoluta. O Art. 5º, inciso I, estabelece a isonomia entre homens e mulheres \"nos termos desta Constituição\", o que significa que a própria Constituição pode prever distinções, como as que existem nas regras para aposentadoria ou no serviço militar obrigatório."
+            },
+            {
+                question: "O direito à segurança, previsto no texto constitucional, é um dos direitos cuja inviolabilidade é garantida a brasileiros e estrangeiros residentes no Brasil.",
+                answer: "Certo",
+                rationale: "A questão está correta. O caput do Art. 5º lista um rol de cinco direitos invioláveis, entre os quais se encontra o direito à segurança: \"...garantindo-se (...) a inviolabilidade do direito à vida, à liberdade, à igualdade, à segurança e à propriedade...\"."
+            },
+            {
+                question: "A submissão de um indivíduo a tratamento desumano ou degradante é vedada, exceto em situações de estado de defesa ou estado de sítio.",
+                answer: "Errado",
+                rationale: "A proibição da tortura e do tratamento desumano ou degradante, conforme o Art. 5º, inciso III, é um direito absoluto, que não admite exceções. Mesmo em situações de anormalidade institucional, como o estado de defesa ou de sítio, essa garantia permanece inabalável."
+            },
+            {
+                question: "Aquele que sofre um agravo pode optar entre exercer o direito de resposta ou pleitear indenização por danos, sendo vedada a cumulação dos dois pedidos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso V, é claro ao afirmar que o direito de resposta é assegurado \"além da indenização por dano material, moral ou à imagem\". A expressão \"além da\" significa que os direitos são cumuláveis, e não excludentes."
+            },
+            {
+                question: "O princípio da legalidade estrita determina que uma pessoa só pode ser obrigada a agir ou a se omitir se houver uma lei que assim o determine.",
+                answer: "Certo",
+                rationale: "A afirmativa traduz corretamente a essência do Art. 5º, inciso II, da Constituição. Este dispositivo consagra o princípio da legalidade, segundo o qual a imposição de uma obrigação de fazer ou de não fazer a um particular depende da existência de lei em sentido formal."
+            },
+            {
+                question: "A Constituição Federal assegura a igualdade entre homens e mulheres apenas na esfera de direitos, sendo omissa quanto à esfera de obrigações.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso I, é expresso ao afirmar que \"homens e mulheres são iguais em direitos e obrigações\", abrangendo, portanto, as duas esferas."
+            },
+            {
+                question: "A inviolabilidade do direito à propriedade é garantida constitucionalmente a todos os brasileiros, mas não se estende aos estrangeiros, ainda que residentes no País.",
+                answer: "Errado",
+                rationale: "A assertiva contraria diretamente a literalidade do caput do Art. 5º, que garante a inviolabilidade do direito à propriedade tanto aos brasileiros quanto \"aos estrangeiros residentes no País\"."
+            },
+            {
+                question: "A livre manifestação do pensamento é um direito que pode ser exercido de forma anônima para proteger a identidade do manifestante.",
+                answer: "Errado",
+                rationale: "O Art. 5º, inciso IV, embora assegure a liberdade de manifestação do pensamento, veda expressamente o anonimato. A liberdade de se expressar vem acompanhada da responsabilidade pelo que é dito, o que exige a identificação do autor."
+            },
+            {
+                question: "Ninguém será submetido a tortura, a tratamento desumano ou a tratamento degradante.",
+                answer: "Certo",
+                rationale: "A assertiva é uma reprodução fiel e correta do conteúdo do Art. 5º, inciso III, da Constituição Federal, que proíbe taxativamente as referidas práticas."
+            },
+            {
+                question: "A indenização por danos decorrentes de um agravo, prevista na Constituição, abrange apenas as modalidades de dano material e moral.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por ser incompleta. O Art. 5º, inciso V, prevê a indenização por dano \"material, moral ou à imagem\", incluindo, portanto, uma terceira modalidade de dano que foi omitida na assertiva."
+            },
+            {
+                question: "O princípio da isonomia, previsto no caput do Art. 5º, estabelece que todos são iguais perante a lei, sem qualquer tipo de distinção.",
+                answer: "Certo",
+                rationale: "A afirmativa descreve corretamente o princípio da isonomia ou igualdade formal, conforme expresso na parte inicial do caput do Art. 5º: \"Todos são iguais perante a lei, sem distinção de qualquer natureza...\"."
+            },
+            {
+                question: "Qualquer pessoa, nacional ou estrangeira, que esteja em território brasileiro, mesmo que de passagem, é titular dos direitos e garantias fundamentais previstos no caput do artigo 5º.",
+                answer: "Errado",
+                rationale: "A questão está errada com base na literalidade do texto constitucional. O caput do Art. 5º garante a inviolabilidade dos direitos aos \"brasileiros e aos estrangeiros residentes no País\". Embora a jurisprudência do STF estenda muitos desses direitos aos estrangeiros não residentes, uma análise estrita e literal do dispositivo, comum no estilo da banca, torna a assertiva incorreta."
+            },
+            {
+                question: "O direito de resposta é assegurado, porém a indenização por dano moral sofrido dependerá de previsão em lei específica.",
+                answer: "Errado",
+                rationale: "A indenização por dano moral em caso de agravo não depende de lei específica, pois já está garantida diretamente pela Constituição. O Art. 5º, inciso V, assegura a indenização por dano \"material, moral ou à imagem\" como uma garantia fundamental."
+            },
+            {
+                question: "Um cidadão não pode ser obrigado por uma autoridade administrativa a apresentar um documento, a menos que uma lei exija tal apresentação.",
+                answer: "Certo",
+                rationale: "A assertiva aplica corretamente o princípio da legalidade (Art. 5º, inciso II). A obrigação de \"fazer alguma coisa\" (no caso, apresentar um documento) só pode ser imposta \"em virtude de lei\". Uma ordem administrativa sem respaldo legal não pode criar tal obrigação para o particular."
+            },
+            {
+                question: "A igualdade perante a lei, garantida no texto constitucional, impede que sejam criadas leis que concedam tratamentos distintos a pessoas em situações desiguais.",
+                answer: "Errado",
+                rationale: "A assertiva descreve incorretamente o alcance do princípio da isonomia. A igualdade prevista no Art. 5º, caput, deve ser entendida também em seu aspecto material, que consiste em \"tratar os iguais de forma igual e os desiguais de forma desigual, na medida de suas desigualdades\". Portanto, a criação de leis com tratamento distinto para situações desiguais (como as ações afirmativas) é compatível com o princípio da isonomia."
+            },
+            {
+                question: "Homens e mulheres possuem os mesmos direitos e as mesmas obrigações, conforme as disposições da Constituição.",
+                answer: "Certo",
+                rationale: "A questão é uma paráfrase correta do Art. 5º, inciso I. A expressão \"conforme as disposições da Constituição\" equivale à locução \"nos termos desta Constituição\", mantendo o sentido original do dispositivo de que a igualdade se dá no marco estabelecido pelo próprio texto constitucional."
+            },
+            {
+                question: "A liberdade de crença é inviolável, mas o exercício dos cultos religiosos depende de autorização prévia do poder público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso VI, assegura o livre exercício dos cultos religiosos, o que significa que ele não está sujeito à autorização ou licença prévia do Estado. A única ressalva no inciso é que a proteção aos locais de culto e liturgias se dará \"na forma da lei\"."
+            },
+            {
+                question: "A prestação de assistência religiosa em hospitais públicos e presídios é um direito assegurado pela Constituição, nos termos da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta. Hospitais públicos e presídios são exemplos de \"entidades civis de internação coletiva\", locais onde o Art. 5º, inciso VII, garante a prestação de assistência religiosa, desde que regulamentada por lei (\"nos termos da lei\")."
+            },
+            {
+                question: "Qualquer cidadão pode invocar sua convicção filosófica para se eximir de obrigação legal imposta a todos, sem que isso acarrete a perda de seus direitos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta porque omite a condição final para a manutenção dos direitos. Conforme o Art. 5º, inciso VIII, para não ser privado de direitos, o cidadão que invoca a \"escusa de consciência\" não pode se recusar a cumprir a prestação alternativa fixada em lei. A recusa em cumprir a alternativa legal acarreta, sim, a sanção de privação de direitos."
+            },
+            {
+                question: "A expressão da atividade artística e científica é livre, independentemente de censura, mas depende de licença prévia do órgão competente.",
+                answer: "Errado",
+                rationale: "O Art. 5º, inciso IX, é explícito ao garantir a liberdade de expressão dessas atividades \"independentemente de censura ou licença\". A exigência de licença prévia constitui uma barreira incompatível com a liberdade plena assegurada pelo texto constitucional."
+            },
+            {
+                question: "A violação da honra de uma pessoa assegura o direito à indenização por dano material ou moral.",
+                answer: "Certo",
+                rationale: "A afirmativa está em total conformidade com o Art. 5º, inciso X. O dispositivo declara a honra como um bem inviolável e garante o direito à correspondente indenização (seja material, seja moral) caso essa proteção seja violada."
+            },
+            {
+                question: "A proteção aos locais de culto e a suas liturgias é um direito fundamental que independe de regulamentação legal.",
+                answer: "Errado",
+                rationale: "O erro reside na parte final da assertiva. O Art. 5º, inciso VI, garante a referida proteção, mas ressalva que ela se dará \"na forma da lei\". Isso significa que a proteção é um mandamento constitucional, mas sua aplicação prática deve ser disciplinada por legislação infraconstitucional."
+            },
+            {
+                question: "A assistência religiosa é assegurada apenas nas entidades militares de internação coletiva.",
+                answer: "Errado",
+                rationale: "A questão restringe indevidamente o alcance da norma. O Art. 5º, inciso VII, assegura a assistência religiosa nas \"entidades civis e militares de internação coletiva\", abrangendo, portanto, os dois tipos de instituição."
+            },
+            {
+                question: "Um indivíduo que se recuse a cumprir prestação alternativa fixada em lei poderá ser privado de direitos, mesmo que não tenha invocado motivo de crença ou convicção para se eximir da obrigação principal.",
+                answer: "Errado",
+                rationale: "A sanção de privação de direitos prevista no Art. 5º, inciso VIII, exige o cumprimento de dois requisitos cumulativos: 1) invocar a crença ou convicção para se eximir da obrigação legal e 2) recusar-se a cumprir a prestação alternativa. A mera recusa da prestação alternativa, desvinculada do primeiro requisito, não atrai a sanção específica deste inciso."
+            },
+            {
+                question: "A intimidade, a vida privada, a honra e a imagem das pessoas são invioláveis.",
+                answer: "Certo",
+                rationale: "A assertiva reproduz literalmente a primeira parte do Art. 5º, inciso X, que elenca os quatro direitos da personalidade e lhes atribui a característica da inviolabilidade."
+            },
+            {
+                question: "É livre a expressão da atividade de comunicação, desde que não haja conteúdo crítico às instituições governamentais.",
+                answer: "Errado",
+                rationale: "A liberdade de expressão da atividade de comunicação, prevista no Art. 5º, inciso IX, não comporta a restrição mencionada. A norma veda a censura de forma ampla, o que inclui a censura de natureza política. A crítica às instituições é um elemento essencial da democracia e está protegida por essa garantia."
+            },
+            {
+                question: "É inviolável a liberdade de consciência e de crença.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde exatamente ao trecho inicial do Art. 5º, inciso VI, que estabelece a inviolabilidade de ambas as liberdades, de consciência (foro íntimo) e de crença (adesão a uma fé)."
+            },
+            {
+                question: "A violação da imagem de uma pessoa garante a ela o direito à indenização por dano material, mas não por dano moral, que se aplica apenas à violação da honra.",
+                answer: "Errado",
+                rationale: "A afirmativa está incorreta. O Art. 5º, inciso X, assegura o direito à indenização por dano material ou moral como consequência da violação de qualquer um dos bens ali protegidos: intimidade, vida privada, honra e imagem."
+            },
+            {
+                question: "É livre a expressão da atividade intelectual, artística, científica e de comunicação, independentemente de censura ou licença.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso IX, da Constituição Federal, que veda a censura prévia e a exigência de licença para as atividades mencionadas."
+            },
+            {
+                question: "Ninguém será privado de direitos por motivo de crença religiosa, ainda que a invoque para eximir-se de obrigação legal a todos imposta.",
+                answer: "Errado",
+                rationale: "A questão apresenta a regra, mas omite a exceção que a condiciona, tornando-a falsa. O Art. 5º, inciso VIII, estabelece que a pessoa não será privada de direitos, salvo se, além de invocar a crença para se eximir da obrigação, também se recusar a cumprir a prestação alternativa."
+            },
+            {
+                question: "A assistência religiosa em estabelecimentos de internação coletiva é garantida pela Constituição, mas sua efetivação depende de regulamentação em lei.",
+                answer: "Certo",
+                rationale: "A assertiva descreve com precisão o status da norma do Art. 5º, inciso VII. Trata-se de uma norma de eficácia limitada, que assegura o direito, mas condiciona seu exercício à edição de uma lei que o regulamente (\"nos termos da lei\")."
+            },
+            {
+                question: "A liberdade de crença protege o direito de aderir a uma religião, enquanto a liberdade de consciência protege o direito de não aderir a nenhuma.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois apresenta uma interpretação doutrinária consolidada sobre o alcance do Art. 5º, inciso VI. A liberdade de crença abrange a fé positiva (ter uma religião), enquanto a liberdade de consciência, mais ampla, inclui o direito à convicção filosófica, à ausência de fé (ateísmo) e ao ceticismo (agnosticismo)."
+            },
+            {
+                question: "A prestação alternativa, que impede a perda de direitos por escusa de consciência, deve ser fixada por lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e literal. O Art. 5º, inciso VIII, em sua parte final, condiciona a sanção pela recusa ao cumprimento de \"prestação alternativa, fixada em lei\", o que confirma a necessidade de previsão legal para tal prestação."
+            },
+            {
+                question: "A inviolabilidade da intimidade e da vida privada é um direito que, se violado, gera o dever de indenizar o dano moral, mas não o dano material.",
+                answer: "Errado",
+                rationale: "A questão limita indevidamente o tipo de indenização. O Art. 5º, inciso X, assegura o direito a indenização \"pelo dano material ou moral\", deixando claro que ambas as modalidades são cabíveis a depender do caso concreto."
+            },
+            {
+                question: "A liberdade de expressão da atividade de comunicação não impede a responsabilização civil ou penal por eventuais abusos cometidos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A vedação do Art. 5º, inciso IX, é à censura e à licença prévias. A Constituição não exclui a possibilidade de responsabilização posterior (ulterior) por danos ou crimes cometidos no exercício dessa liberdade, como calúnia, injúria ou difamação."
+            },
+            {
+                question: "A garantia de proteção aos locais de culto se estende às suas liturgias.",
+                answer: "Certo",
+                rationale: "A questão reflete com exatidão a parte final do Art. 5º, inciso VI, que garante, na forma da lei, a proteção \"aos locais de culto e a suas liturgias\", protegendo não apenas o espaço físico, mas também os ritos e cerimônias que nele se realizam."
+            },
+            {
+                question: "O ingresso em domicílio alheio para prestar socorro em caso de desastre depende de determinação judicial a ser cumprida durante o dia.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XI, estabelece que prestar socorro e o caso de desastre são exceções autônomas à inviolabilidade do domicílio, que não exigem consentimento do morador nem determinação judicial. A exigência de ordem judicial a ser cumprida durante o dia é uma hipótese distinta das demais."
+            },
+            {
+                question: "O sigilo das comunicações de dados pode ser violado por ordem judicial para fins de investigação criminal.",
+                answer: "Errado",
+                rationale: "Com base na estrita literalidade do Art. 5º, inciso XII, a exceção à inviolabilidade do sigilo se aplica apenas ao \"último caso\" mencionado, qual seja, o das \"comunicações telefônicas\". Portanto, o texto constitucional não prevê, nesse dispositivo, a mesma exceção para o sigilo de dados, que permanece inviolável."
+            },
+            {
+                question: "O exercício de qualquer profissão é livre, desde que atendidas as qualificações profissionais que a lei estabelecer.",
+                answer: "Certo",
+                rationale: "A questão reproduz fielmente a norma de eficácia contida do Art. 5º, inciso XIII. A liberdade de exercício profissional é a regra, mas ela pode ser restringida pela lei, que tem competência para estabelecer as qualificações necessárias para determinadas profissões."
+            },
+            {
+                question: "É assegurado a todos o acesso à informação, sendo o sigilo da fonte uma garantia absoluta e incondicional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta porque o sigilo da fonte não é um direito absoluto. Conforme o Art. 5º, inciso XIV, o resguardo do sigilo da fonte é garantido apenas \"quando necessário ao exercício profissional\". Portanto, é uma prerrogativa condicionada à sua necessidade para a prática de uma profissão."
+            },
+            {
+                question: "A liberdade de locomoção no território nacional é garantida a qualquer pessoa em tempo de paz.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 5º, inciso XV. O dispositivo garante a livre locomoção a \"qualquer pessoa\" (brasileiros ou estrangeiros), tendo como pressuposto a situação de \"tempo de paz\"."
+            },
+            {
+                question: "A casa de um indivíduo pode ser penetrada, durante a noite, para o cumprimento de mandado judicial de busca e apreensão.",
+                answer: "Errado",
+                rationale: "O Art. 5º, inciso XI, é taxativo ao permitir a entrada por determinação judicial apenas \"durante o dia\". O cumprimento de mandado judicial no período noturno, sem consentimento do morador, constitui violação de domicílio."
+            },
+            {
+                question: "O sigilo da correspondência é inviolável, não havendo no texto constitucional exceção expressa a essa regra.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A ressalva prevista na parte final do Art. 5º, inciso XII, que permite a quebra do sigilo por ordem judicial para fins penais, refere-se expressamente ao \"último caso\", ou seja, às comunicações telefônicas. O texto não estende essa exceção à correspondência."
+            },
+            {
+                question: "Qualquer pessoa pode exercer o ofício ou a profissão que desejar, sendo inconstitucional a exigência de inscrição em conselhos profissionais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. A parte final do Art. 5º, inciso XIII, prevê que devem ser \"atendidas as qualificações profissionais que a lei estabelecer\". A exigência de inscrição em um conselho profissional, quando prevista em lei, é uma forma de qualificação profissional constitucionalmente válida."
+            },
+            {
+                question: "O direito ao sigilo da fonte é garantido a qualquer pessoa que preste uma informação, independentemente de exercer uma profissão.",
+                answer: "Errado",
+                rationale: "A assertiva amplia indevidamente o alcance da norma. O Art. 5º, inciso XIV, vincula a garantia do sigilo da fonte à sua necessidade para o exercício profissional. Não é um direito de qualquer informante, mas uma prerrogativa de profissionais (como jornalistas, por exemplo) para proteger suas fontes."
+            },
+            {
+                question: "O direito de ir e vir pode ser restringido por lei, mesmo em tempo de paz.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois a liberdade de locomoção não é um direito absoluto. O próprio Art. 5º, inciso XV, estabelece que o direito de entrar, permanecer ou sair do território nacional se dá \"nos termos da lei\". Isso significa que a lei pode impor certas restrições, como a exigência de passaporte para sair do país ou a proibição de acesso a áreas de segurança nacional."
+            },
+            {
+                question: "O consentimento do morador é sempre necessário para que alguém possa penetrar em sua casa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta porque ignora as exceções constitucionais. O Art. 5º, inciso XI, lista situações em que é possível penetrar na casa sem o consentimento do morador, como em caso de flagrante delito, desastre, para prestar socorro ou, durante o dia, por determinação judicial."
+            },
+            {
+                question: "A interceptação das comunicações telefônicas pode ser determinada por autoridade policial para fins de instrução processual penal.",
+                answer: "Errado",
+                rationale: "A quebra do sigilo telefônico depende, obrigatoriamente, de ordem judicial, conforme determina o Art. 5º, inciso XII. A autoridade policial pode representar pela medida, mas não pode determiná-la de ofício."
+            },
+            {
+                question: "A liberdade de trabalho, ofício ou profissão é a regra, e qualquer restrição a essa liberdade deve ser estabelecida por lei.",
+                answer: "Certo",
+                rationale: "A assertiva interpreta corretamente o Art. 5º, inciso XIII. A liberdade é o princípio, e a restrição (exigência de qualificações) é a exceção, que só pode ser criada por meio de lei em sentido formal."
+            },
+            {
+                question: "O acesso à informação é assegurado a todos, mas o sigilo da fonte deve ser resguardado em qualquer hipótese.",
+                answer: "Errado",
+                rationale: "A questão erra ao absolutizar o sigilo da fonte. O Art. 5º, inciso XIV, impõe uma condição clara para essa garantia: ela se aplica apenas \"quando necessário ao exercício profissional\". Fora dessa hipótese, o sigilo não tem a proteção constitucional prevista nesse dispositivo."
+            },
+            {
+                question: "É livre a saída do território nacional em tempo de paz, não podendo a pessoa ser impedida de levar consigo seus bens.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve uma das facetas do direito de locomoção previsto no Art. 5º, inciso XV, que expressamente garante a qualquer pessoa o direito de \"dele sair com seus bens\", sempre na forma da lei e em tempo de paz."
+            },
+            {
+                question: "A ocorrência de um flagrante delito autoriza o ingresso forçado em uma residência a qualquer hora do dia ou da noite.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O estado de flagrância é uma das exceções à inviolabilidade de domicílio (Art. 5º, inciso XI) que não se submete à restrição de horário. Diferentemente da determinação judicial, o flagrante delito permite a entrada na casa a qualquer momento."
+            },
+            {
+                question: "O sigilo de dados e o sigilo das comunicações telefônicas podem ser violados nas mesmas hipóteses.",
+                answer: "Errado",
+                rationale: "De acordo com a literalidade do Art. 5º, inciso XII, as hipóteses de violação por ordem judicial para fins penais aplicam-se exclusivamente às comunicações telefônicas (\"no último caso\"). O texto constitucional não estabelece as mesmas regras para a quebra do sigilo de dados."
+            },
+            {
+                question: "A liberdade de profissão impede que a lei exija diploma de curso superior para o exercício de atividades intelectuais, como o jornalismo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XIII, autoriza a lei a fixar qualificações profissionais. A exigência de diploma é uma forma de qualificação. A decisão sobre a necessidade ou não de um diploma para uma profissão específica (como o jornalismo, tema de debates no STF) é uma questão de mérito legislativo e de interpretação constitucional, mas o dispositivo, em si, não proíbe tal exigência."
+            },
+            {
+                question: "O direito à liberdade de locomoção se aplica somente a pessoas, não abrangendo os bens que elas transportam.",
+                answer: "Errado",
+                rationale: "A questão contraria a parte final do Art. 5º, inciso XV, que garante expressamente o direito de entrar, permanecer ou sair do território nacional \"com seus bens\". A proteção, portanto, abrange tanto a pessoa quanto seu patrimônio."
+            },
+            {
+                question: "O acesso à informação é um direito assegurado a todos, sem restrições.",
+                answer: "Errado",
+                rationale: "A afirmativa está incorreta ao dizer que o direito é \"sem restrições\". O próprio Art. 5º da Constituição prevê direitos que podem colidir e limitar o acesso à informação, como o direito à intimidade e à vida privada (inciso X). Além disso, a legislação (como a Lei de Acesso à Informação) prevê hipóteses de sigilo para informações consideradas imprescindíveis à segurança da sociedade e do Estado."
+            },
+            {
                 question: "O direito de reunião em locais abertos ao público depende de autorização da autoridade competente.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso XVI, estabelece que a reunião em locais abertos ao público 'independentemente de autorização'. A única exigência constitucional é o 'prévio aviso' à autoridade competente, que difere de um pedido de autorização."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XVI, estabelece que a reunião em locais abertos ao público \"independentemente de autorização\". A única exigência constitucional é o \"prévio aviso\" à autoridade competente, que difere de um pedido de autorização."
             },
             {
                 question: "É plena a liberdade de associação, sendo permitida, inclusive, a de caráter paramilitar, desde que tenha fins lícitos.",
@@ -187,7 +487,7 @@
             {
                 question: "Tanto a criação de associações quanto a de cooperativas independem de autorização estatal.",
                 answer: "Certo",
-                rationale: "A questão está correta, refletindo a literalidade do Art. 5º, inciso XVIII. O dispositivo afirma que a criação de associações e a de cooperativas 'independem de autorização'. A única ressalva é que as cooperativas devem ser criadas 'na forma da lei', o que não se confunde com a necessidade de autorização."
+                rationale: "A questão está correta, refletindo a literalidade do Art. 5º, inciso XVIII. O dispositivo afirma que a criação de associações e a de cooperativas \"independem de autorização\". A única ressalva é que as cooperativas devem ser criadas \"na forma da lei\", o que não se confunde com a necessidade de autorização."
             },
             {
                 question: "A suspensão das atividades de uma associação exige decisão judicial com trânsito em julgado.",
@@ -197,7 +497,7 @@
             {
                 question: "Um cidadão pode ser legalmente obrigado a filiar-se a uma associação de moradores de seu bairro.",
                 answer: "Errado",
-                rationale: "A assertiva contraria diretamente o Art. 5º, inciso XX, que estabelece que 'ninguém poderá ser compelido a associar-se'. Esse direito, conhecido como liberdade negativa de associação, garante ao indivíduo a opção de não se filiar a qualquer tipo de associação."
+                rationale: "A assertiva contraria diretamente o Art. 5º, inciso XX, que estabelece que \"ninguém poderá ser compelido a associar-se\". Esse direito, conhecido como liberdade negativa de associação, garante ao indivíduo a opção de não se filiar a qualquer tipo de associação."
             },
             {
                 question: "A realização de uma reunião pacífica e sem armas em local aberto ao público não pode ser impedida pelo poder público sob o argumento de falta de autorização prévia.",
@@ -207,27 +507,27 @@
             {
                 question: "A liberdade de associação não é absoluta, pois não abrange associações cujos fins sejam ilícitos.",
                 answer: "Certo",
-                rationale: "A assertiva está correta. O Art. 5º, inciso XVII, ao assegurar a liberdade de associação 'para fins lícitos', estabelece um limite claro a esse direito. Associações com objetivos contrários à lei não estão sob a proteção dessa garantia constitucional."
+                rationale: "A assertiva está correta. O Art. 5º, inciso XVII, ao assegurar a liberdade de associação \"para fins lícitos\", estabelece um limite claro a esse direito. Associações com objetivos contrários à lei não estão sob a proteção dessa garantia constitucional."
             },
             {
                 question: "O Estado-juiz pode interferir no funcionamento de uma cooperativa para garantir que ela cumpra a legislação pertinente.",
                 answer: "Errado",
-                rationale: "A questão está incorreta. O Art. 5º, inciso XVIII, veda expressamente a interferência estatal no funcionamento de associações e cooperativas. A fiscalização da legalidade dos atos pode ocorrer, mas não por meio de uma 'interferência' na gestão ou operação, sendo o controle exercido pelo Poder Judiciário de forma pontual e provocada, como na dissolução compulsória, e não por uma intervenção contínua."
+                rationale: "A questão está incorreta. O Art. 5º, inciso XVIII, veda expressamente a interferência estatal no funcionamento de associações e cooperativas. A fiscalização da legalidade dos atos pode ocorrer, mas não por meio de uma \"interferência\" na gestão ou operação, sendo o controle exercido pelo Poder Judiciário de forma pontual e provocada, como na dissolução compulsória, e não por uma intervenção contínua."
             },
             {
                 question: "A dissolução compulsória de uma associação e a suspensão de suas atividades dependem exclusivamente de decisão judicial.",
                 answer: "Certo",
-                rationale: "A assertiva está correta. O Art. 5º, inciso XIX, é categórico ao afirmar que as associações 'só poderão' ser compulsoriamente dissolvidas ou ter suas atividades suspensas por decisão judicial, afastando a possibilidade de tais medidas serem tomadas por ato administrativo."
+                rationale: "A assertiva está correta. O Art. 5º, inciso XIX, é categórico ao afirmar que as associações \"só poderão\" ser compulsoriamente dissolvidas ou ter suas atividades suspensas por decisão judicial, afastando a possibilidade de tais medidas serem tomadas por ato administrativo."
             },
             {
                 question: "Uma vez associado, o indivíduo não pode ser compelido a permanecer vinculado à associação.",
                 answer: "Certo",
-                rationale: "A questão está correta e reflete a segunda parte da garantia prevista no Art. 5º, inciso XX. O dispositivo assegura que ninguém poderá ser compelido a 'permanecer associado', garantindo o direito de desfiliação a qualquer tempo."
+                rationale: "A questão está correta e reflete a segunda parte da garantia prevista no Art. 5º, inciso XX. O dispositivo assegura que ninguém poderá ser compelido a \"permanecer associado\", garantindo o direito de desfiliação a qualquer tempo."
             },
             {
                 question: "O direito de reunião pode ser exercido mesmo que frustre outra reunião anteriormente convocada para o mesmo local, caso a nova reunião tenha um número maior de participantes.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. Um dos limites expressos ao direito de reunião, previsto no Art. 5º, inciso XVI, é que a manifestação 'não frustre outra reunião anteriormente convocada para o mesmo local'. O texto não estabelece qualquer exceção a essa regra com base no número de participantes."
+                rationale: "A assertiva está incorreta. Um dos limites expressos ao direito de reunião, previsto no Art. 5º, inciso XVI, é que a manifestação \"não frustre outra reunião anteriormente convocada para o mesmo local\". O texto não estabelece qualquer exceção a essa regra com base no número de participantes."
             },
             {
                 question: "A Constituição proíbe a criação de associações de caráter militar e paramilitar.",
@@ -237,7 +537,7 @@
             {
                 question: "A criação de cooperativas, diferentemente da criação de associações, exige autorização do poder público.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XVIII, tanto associações quanto cooperativas 'independem de autorização'. A diferença é que a criação de cooperativas deve seguir a forma prescrita em lei, o que é um requisito de legalidade, não de autorização."
+                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XVIII, tanto associações quanto cooperativas \"independem de autorização\". A diferença é que a criação de cooperativas deve seguir a forma prescrita em lei, o que é um requisito de legalidade, não de autorização."
             },
             {
                 question: "Uma associação pode ter suas atividades suspensas por decisão judicial em caráter liminar.",
@@ -260,7 +560,7 @@
                 rationale: "A questão está incorreta na sua segunda parte. O Art. 5º, inciso XVIII, veda expressamente a interferência estatal no funcionamento de associações e cooperativas. O controle de legalidade e a punição por desvio de finalidade devem ser feitos pelo Poder Judiciário, mediante provocação, o que não se confunde com uma interferência direta do Estado na gestão da entidade."
             },
             {
-                question: "A liberdade de associação é plena para fins lícitos, sendo vedada a de caráter paramilitar.",
+                question: "É plena a liberdade de associação para fins lícitos, sendo vedada a de caráter paramilitar.",
                 answer: "Certo",
                 rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso XVII, da Constituição, descrevendo de forma precisa tanto a regra geral (plena liberdade para fins lícitos) quanto a vedação específica (caráter paramilitar)."
             },
@@ -272,32 +572,32 @@
             {
                 question: "A dissolução compulsória de uma associação pode ocorrer por meio de decisão administrativa ou judicial.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta ao incluir a via administrativa. O Art. 5º, inciso XIX, estabelece uma reserva de jurisdição, determinando que as associações 'só poderão ser compulsoriamente dissolvidas (...) por decisão judicial', afastando a competência de qualquer outro Poder para tal ato."
+                rationale: "A assertiva está incorreta ao incluir a via administrativa. O Art. 5º, inciso XIX, estabelece uma reserva de jurisdição, determinando que as associações \"só poderão ser compulsoriamente dissolvidas (...) por decisão judicial\", afastando a competência de qualquer outro Poder para tal ato."
             },
             {
                 question: "As entidades associativas possuem legitimidade automática para representar seus filiados em juízo, decorrendo essa prerrogativa do simples ato de sua criação.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XXI, a legitimidade das associações para representar seus filiados não é automática. Ela depende de uma condição indispensável: que elas sejam 'expressamente autorizadas' para tal fim, seja por deliberação em assembleia, seja por autorização individual."
+                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XXI, a legitimidade das associações para representar seus filiados não é automática. Ela depende de uma condição indispensável: que elas sejam \"expressamente autorizadas\" para tal fim, seja por deliberação em assembleia, seja por autorização individual."
             },
             {
                 question: "O direito de propriedade, embora garantido constitucionalmente, deve atender à sua função social.",
                 answer: "Certo",
-                rationale: "A questão está correta, pois correlaciona adequadamente dois dispositivos constitucionais. O Art. 5º, inciso XXII, garante o direito de propriedade, enquanto o inciso XXIII, logo em seguida, estabelece que 'a propriedade atenderá a sua função social', funcionando como um princípio que condiciona o exercício do direito garantido."
+                rationale: "A questão está correta, pois correlaciona adequadamente dois dispositivos constitucionais. O Art. 5º, inciso XXII, garante o direito de propriedade, enquanto o inciso XXIII, logo em seguida, estabelece que \"a propriedade atenderá a sua função social\", funcionando como um princípio que condiciona o exercício do direito garantido."
             },
             {
                 question: "A desapropriação por interesse social deve ser precedida de indenização justa, paga preferencialmente em títulos da dívida pública.",
                 answer: "Errado",
-                rationale: "A regra geral de indenização para a desapropriação, estabelecida no Art. 5º, inciso XXIV, é que ela seja 'justa e prévia (...) em dinheiro'. O pagamento em títulos é uma exceção, prevista em outros artigos da Constituição (como na desapropriação para fins de reforma agrária), e não a regra geral ou preferencial."
+                rationale: "A regra geral de indenização para a desapropriação, estabelecida no Art. 5º, inciso XXIV, é que ela seja \"justa e prévia (...) em dinheiro\". O pagamento em títulos é uma exceção, prevista em outros artigos da Constituição (como na desapropriação para fins de reforma agrária), e não a regra geral ou preferencial."
             },
             {
                 question: "Em caso de iminente perigo público, a autoridade competente pode tomar para si a propriedade de um bem particular, indenizando o proprietário posteriormente.",
                 answer: "Errado",
-                rationale: "O erro da questão está em confundir requisição administrativa com desapropriação. No caso de iminente perigo público, o Art. 5º, inciso XXV, autoriza a autoridade a 'usar de propriedade particular', o que implica uma restrição temporária ao uso pelo proprietário, e não a perda da propriedade (desapropriação)."
+                rationale: "O erro da questão está em confundir requisição administrativa com desapropriação. No caso de iminente perigo público, o Art. 5º, inciso XXV, autoriza a autoridade a \"usar de propriedade particular\", o que implica uma restrição temporária ao uso pelo proprietário, e não a perda da propriedade (desapropriação)."
             },
             {
                 question: "A representação dos filiados por suas associações restringe-se à esfera judicial.",
                 answer: "Errado",
-                rationale: "A assertiva limita indevidamente o alcance da norma. O Art. 5º, inciso XXI, é explícito ao prever que as entidades associativas, quando autorizadas, têm legitimidade para representar seus filiados 'judicial ou extrajudicialmente', abrangendo, portanto, também a esfera administrativa."
+                rationale: "A assertiva limita indevidamente o alcance da norma. O Art. 5º, inciso XXI, é explícito ao prever que as entidades associativas, quando autorizadas, têm legitimidade para representar seus filiados \"judicial ou extrajudicialmente\", abrangendo, portanto, também a esfera administrativa."
             },
             {
                 question: "O direito de propriedade é absoluto, não podendo sofrer qualquer tipo de limitação ou restrição pelo poder público.",
@@ -307,7 +607,7 @@
             {
                 question: "A função social da propriedade é um princípio aplicável tanto à propriedade urbana quanto à rural.",
                 answer: "Certo",
-                rationale: "A questão está correta. O Art. 5º, inciso XXIII, ao estabelecer que 'a propriedade atenderá a sua função social', o faz de forma genérica, sem qualquer distinção. A própria Constituição, em outros artigos (182 e 186), detalha o cumprimento da função social para propriedades urbanas e rurais, respectivamente, confirmando a ampla aplicação do princípio."
+                rationale: "A questão está correta. O Art. 5º, inciso XXIII, ao estabelecer que \"a propriedade atenderá a sua função social\", o faz de forma genérica, sem qualquer distinção. A própria Constituição, em outros artigos (182 e 186), detalha o cumprimento da função social para propriedades urbanas e rurais, respectivamente, confirmando a ampla aplicação do princípio."
             },
             {
                 question: "O procedimento para a desapropriação por necessidade pública será estabelecido por lei, devendo a indenização ser justa e paga em dinheiro.",
@@ -317,12 +617,12 @@
             {
                 question: "Na hipótese de requisição administrativa, a indenização ao proprietário é sempre devida, independentemente da ocorrência de dano.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta porque a indenização na requisição administrativa é condicional. O Art. 5º, inciso XXV, assegura ao proprietário 'indenização ulterior, se houver dano'. Logo, se o uso do bem pela autoridade pública não resultar em qualquer prejuízo ou dano ao proprietário, a indenização não será devida."
+                rationale: "A assertiva está incorreta porque a indenização na requisição administrativa é condicional. O Art. 5º, inciso XXV, assegura ao proprietário \"indenização ulterior, se houver dano\". Logo, se o uso do bem pela autoridade pública não resultar em qualquer prejuízo ou dano ao proprietário, a indenização não será devida."
             },
             {
                 question: "Para que uma entidade associativa represente seus filiados, é necessária autorização expressa, que pode constar do próprio estatuto da associação.",
                 answer: "Certo",
-                rationale: "A questão está correta. A exigência de autorização 'expressa' (Art. 5º, inciso XXI) pode ser satisfeita tanto por autorizações individuais quanto por uma deliberação coletiva da categoria, como a aprovação em assembleia geral de uma cláusula estatutária que preveja essa possibilidade de representação."
+                rationale: "A questão está correta. A exigência de autorização \"expressa\" (Art. 5º, inciso XXI) pode ser satisfeita tanto por autorizações individuais quanto por uma deliberação coletiva da categoria, como a aprovação em assembleia geral de uma cláusula estatutária que preveja essa possibilidade de representação."
             },
             {
                 question: "A garantia constitucional ao direito de propriedade é um dos fundamentos da República Federativa do Brasil.",
@@ -332,22 +632,22 @@
             {
                 question: "O cumprimento da função social é uma faculdade do proprietário, e não uma obrigação imposta pela Constituição.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O verbo no futuro do presente ('atenderá') usado no Art. 5º, inciso XXIII, tem caráter impositivo, estabelecendo um dever, uma obrigação, e não uma mera faculdade. O não cumprimento da função social sujeita o proprietário a sanções previstas na própria Constituição."
+                rationale: "A assertiva está incorreta. O verbo no futuro do presente (\"atenderá\") usado no Art. 5º, inciso XXIII, tem caráter impositivo, estabelecendo um dever, uma obrigação, e não uma mera faculdade. O não cumprimento da função social sujeita o proprietário a sanções previstas na própria Constituição."
             },
             {
                 question: "A indenização na desapropriação por utilidade pública deve ser sempre prévia ao ato de expropriação.",
                 answer: "Errado",
-                rationale: "A questão está incorreta por absolutizar a regra. Embora a indenização prévia seja a norma, o próprio Art. 5º, inciso XXIV, ressalva 'os casos previstos nesta Constituição'. Existem hipóteses constitucionais de desapropriação-sanção (como a de glebas com culturas ilegais de psicotrópicos) que não preveem qualquer indenização, afastando a regra de ser prévia, justa e em dinheiro."
+                rationale: "A questão está incorreta por absolutizar a regra. Embora a indenização prévia seja a norma, o próprio Art. 5º, inciso XXIV, ressalva \"os casos previstos nesta Constituição\". Existem hipóteses constitucionais de desapropriação-sanção (como a de glebas com culturas ilegais de psicotrópicos) que não preveem qualquer indenização, afastando a regra de ser prévia, justa e em dinheiro."
             },
             {
                 question: "A utilização de propriedade particular pela autoridade competente em caso de iminente perigo público é chamada de requisição administrativa.",
                 answer: "Certo",
-                rationale: "A questão está correta. O instituto descrito no Art. 5º, inciso XXV, corresponde ao que a doutrina do Direito Administrativo denomina 'requisição administrativa', que é o uso transitório de bens ou serviços particulares pelo Poder Público em situações de perigo público iminente."
+                rationale: "A questão está correta. O instituto descrito no Art. 5º, inciso XXV, corresponde ao que a doutrina do Direito Administrativo denomina \"requisição administrativa\", que é o uso transitório de bens ou serviços particulares pelo Poder Público em situações de perigo público iminente."
             },
             {
                 question: "A autorização para que uma entidade associativa represente seus membros deve ser tácita, presumindo-se a concordância pelo ato de filiação.",
                 answer: "Errado",
-                rationale: "A questão contraria diretamente o texto constitucional. O Art. 5º, inciso XXI, exige que a autorização seja 'expressamente' concedida, afastando a possibilidade de autorização tácita ou presumida."
+                rationale: "A questão contraria diretamente o texto constitucional. O Art. 5º, inciso XXI, exige que a autorização seja \"expressamente\" concedida, afastando a possibilidade de autorização tácita ou presumida."
             },
             {
                 question: "O direito de propriedade garantido na Constituição é incompatível com a desapropriação.",
@@ -357,32 +657,32 @@
             {
                 question: "A indenização devida na desapropriação por utilidade pública, por necessidade pública ou por interesse social será sempre justa, prévia e em dinheiro.",
                 answer: "Errado",
-                rationale: "O erro da questão está na palavra 'sempre'. O Art. 5º, inciso XXIV, ao estabelecer a regra da indenização (justa, prévia e em dinheiro), faz uma ressalva importante: 'ressalvados os casos previstos nesta Constituição'. Isso significa que a própria Constituição pode prever exceções a essa regra, o que de fato ocorre."
+                rationale: "O erro da questão está na palavra \"sempre\". O Art. 5º, inciso XXIV, ao estabelecer a regra da indenização (justa, prévia e em dinheiro), faz uma ressalva importante: \"ressalvados os casos previstos nesta Constituição\". Isso significa que a própria Constituição pode prever exceções a essa regra, o que de fato ocorre."
             },
             {
                 question: "O uso de propriedade particular por autoridade pública em caso de iminente perigo prescinde de autorização judicial.",
                 answer: "Certo",
-                rationale: "A questão está correta. A requisição administrativa (Art. 5º, inciso XXV) é um ato de natureza autoexecutória. Diante do 'iminente perigo público', a 'autoridade competente' pode agir de imediato, usando o bem particular sem a necessidade de prévia autorização do Poder Judiciário."
+                rationale: "A questão está correta. A requisição administrativa (Art. 5º, inciso XXV) é um ato de natureza autoexecutória. Diante do \"iminente perigo público\", a \"autoridade competente\" pode agir de imediato, usando o bem particular sem a necessidade de prévia autorização do Poder Judiciário."
             },
             {
                 question: "As associações podem representar judicialmente os interesses de toda uma categoria, independentemente de autorização expressa dos substituídos.",
                 answer: "Errado",
-                rationale: "A questão descreve a figura da 'substituição processual', que é diferente da 'representação processual' prevista no Art. 5º, inciso XXI. A representação do inciso XXI exige autorização expressa dos filiados. A substituição processual (agir em nome próprio na defesa de direito alheio), como a que ocorre no mandado de segurança coletivo (Art. 5º, LXX), é uma hipótese distinta e não se confunde com a regra geral da representação associativa."
+                rationale: "A questão descreve a figura da \"substituição processual\", que é diferente da \"representação processual\" prevista no Art. 5º, inciso XXI. A representação do inciso XXI exige autorização expressa dos filiados. A substituição processual (agir em nome próprio na defesa de direito alheio), como a que ocorre no mandado de segurança coletivo (Art. 5º, LXX), é uma hipótese distinta e não se confunde com a regra geral da representação associativa."
             },
             {
                 question: "A desapropriação e a requisição administrativa são formas de intervenção do Estado na propriedade privada, sendo que, na primeira, a indenização é, em regra, prévia e, na segunda, é sempre ulterior e condicionada à existência de dano.",
                 answer: "Certo",
-                rationale: "A assertiva está correta, pois compara adequadamente os dois institutos conforme previsto na Constituição. Na desapropriação (inciso XXIV), a regra é a indenização prévia. Na requisição (inciso XXV), a indenização é sempre posterior ao uso ('ulterior') e só será paga se houver dano."
+                rationale: "A assertiva está correta, pois compara adequadamente os dois institutos conforme previsto na Constituição. Na desapropriação (inciso XXIV), a regra é a indenização prévia. Na requisição (inciso XXV), a indenização é sempre posterior ao uso (\"ulterior\") e só será paga se houver dano."
             },
             {
                 question: "Toda pequena propriedade rural trabalhada pela família é impenhorável, independentemente da natureza do débito que originou a cobrança.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta porque a impenhorabilidade é restrita. O Art. 5º, inciso XXVI, garante a impenhorabilidade da pequena propriedade rural familiar apenas para o pagamento de 'débitos decorrentes de sua atividade produtiva'. Dívidas de outra natureza (como um empréstimo pessoal para fins não produtivos) não estão abrangidas por essa garantia."
+                rationale: "A assertiva está incorreta porque a impenhorabilidade é restrita. O Art. 5º, inciso XXVI, garante a impenhorabilidade da pequena propriedade rural familiar apenas para o pagamento de \"débitos decorrentes de sua atividade produtiva\". Dívidas de outra natureza (como um empréstimo pessoal para fins não produtivos) não estão abrangidas por essa garantia."
             },
             {
                 question: "O direito exclusivo do autor sobre a utilização de sua obra é intransmissível, extinguindo-se com a sua morte.",
                 answer: "Errado",
-                rationale: "O Art. 5º, inciso XXVII, estabelece expressamente que o direito autoral é 'transmissível aos herdeiros pelo tempo que a lei fixar'. Portanto, o direito não se extingue com a morte do autor, sendo incorporado ao patrimônio de seus sucessores."
+                rationale: "O Art. 5º, inciso XXVII, estabelece expressamente que o direito autoral é \"transmissível aos herdeiros pelo tempo que a lei fixar\". Portanto, o direito não se extingue com a morte do autor, sendo incorporado ao patrimônio de seus sucessores."
             },
             {
                 question: "A proteção à reprodução da imagem e da voz humanas, inclusive em atividades desportivas, é assegurada nos termos da lei.",
@@ -392,32 +692,32 @@
             {
                 question: "A lei assegurará aos autores de inventos industriais um privilégio permanente para sua utilização.",
                 answer: "Errado",
-                rationale: "O erro da questão está no prazo do privilégio. O Art. 5º, inciso XXIX, fala em privilégio 'temporário', e não permanente. A proteção à patente tem um prazo de validade definido em lei, após o qual a invenção cai em domínio público."
+                rationale: "O erro da questão está no prazo do privilégio. O Art. 5º, inciso XXIX, fala em privilégio \"temporário\", e não permanente. A proteção à patente tem um prazo de validade definido em lei, após o qual a invenção cai em domínio público."
             },
             {
                 question: "O direito de herança é uma garantia fundamental prevista na Constituição Federal.",
                 answer: "Certo",
-                rationale: "A assertiva está correta. O Art. 5º, inciso XXX, garante de forma direta e concisa o direito de herança ('é garantido o direito de herança;'), inserindo-o no rol dos direitos e garantias fundamentais."
+                rationale: "A assertiva está correta. O Art. 5º, inciso XXX, garante de forma direta e concisa o direito de herança (\"é garantido o direito de herança;\"), inserindo-o no rol dos direitos e garantias fundamentais."
             },
             {
                 question: "A impenhorabilidade da pequena propriedade rural depende de dois requisitos cumulativos: ser definida em lei como pequena e ser trabalhada pela família.",
                 answer: "Certo",
-                rationale: "A questão está correta, pois aponta precisamente os dois requisitos que o Art. 5º, inciso XXVI, exige para a concessão da proteção: 'a pequena propriedade rural, assim definida em lei, desde que trabalhada pela família...'."
+                rationale: "A questão está correta, pois aponta precisamente os dois requisitos que o Art. 5º, inciso XXVI, exige para a concessão da proteção: \"a pequena propriedade rural, assim definida em lei, desde que trabalhada pela família...\". Ambos devem estar presentes."
             },
             {
                 question: "O prazo de proteção dos direitos autorais após a morte do autor é definido na própria Constituição.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXVII, delega à legislação infraconstitucional a definição do prazo de proteção, ao afirmar que o direito é transmissível aos herdeiros 'pelo tempo que a lei fixar'. Trata-se, portanto, de uma norma de eficácia limitada."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXVII, delega à legislação infraconstitucional a definição do prazo de proteção, ao afirmar que o direito é transmissível aos herdeiros \"pelo tempo que a lei fixar\". Trata-se, portanto, de uma norma de eficácia limitada."
             },
             {
                 question: "Apenas os criadores das obras têm o direito de fiscalizar seu aproveitamento econômico.",
                 answer: "Errado",
-                rationale: "A questão restringe indevidamente o rol de legitimados. O Art. 5º, inciso XXVIII, alínea 'b', assegura o direito de fiscalização 'aos criadores, aos intérpretes e às respectivas representações sindicais e associativas', incluindo, portanto, outras figuras além do autor original."
+                rationale: "A questão restringe indevidamente o rol de legitimados. O Art. 5º, inciso XXVIII, alínea 'b', assegura o direito de fiscalização \"aos criadores, aos intérpretes e às respectivas representações sindicais e associativas\", incluindo, portanto, outras figuras além do autor original."
             },
             {
                 question: "A proteção à propriedade das marcas e aos nomes de empresas é garantida pela Constituição, visando ao interesse social e ao desenvolvimento do país.",
                 answer: "Certo",
-                rationale: "A afirmativa está correta e literal. O Art. 5º, inciso XXIX, estabelece que a lei assegurará proteção, entre outros, 'à propriedade das marcas, aos nomes de empresas', e justifica essa proteção 'tendo em vista o interesse social e o desenvolvimento tecnológico e econômico do País'."
+                rationale: "A afirmativa está correta e literal. O Art. 5º, inciso XXIX, estabelece que a lei assegurará proteção, entre outros, \"à propriedade das marcas, aos nomes de empresas\", e justifica essa proteção \"tendo em vista o interesse social e o desenvolvimento tecnológico e econômico do País\"."
             },
             {
                 question: "O direito de herança, por ser uma garantia fundamental, não pode ser objeto de tributação.",
@@ -427,7 +727,7 @@
             {
                 question: "A proteção constitucional contra a penhora da pequena propriedade rural abrange débitos de natureza fiscal decorrentes da atividade produtiva.",
                 answer: "Certo",
-                rationale: "A questão está correta. A expressão 'débitos decorrentes de sua atividade produtiva' (Art. 5º, inciso XXVI) é ampla e abrange tanto dívidas com fornecedores e instituições financeiras quanto dívidas fiscais (impostos, taxas e contribuições) relacionadas à produção e comercialização agrícola."
+                rationale: "A questão está correta. A expressão \"débitos decorrentes de sua atividade produtiva\" (Art. 5º, inciso XXVI) é ampla e abrange tanto dívidas com fornecedores e instituições financeiras quanto dívidas fiscais (impostos, taxas e contribuições) relacionadas à produção e comercialização agrícola."
             },
             {
                 question: "Aos autores pertence o direito exclusivo de utilização, publicação ou reprodução de suas obras.",
@@ -437,12 +737,12 @@
             {
                 question: "A proteção às participações individuais em obras coletivas é garantida diretamente pela Constituição, não dependendo de regulamentação legal.",
                 answer: "Errado",
-                rationale: "A afirmativa está incorreta. O caput do Art. 5º, inciso XXVIII, estabelece que os direitos previstos em suas alíneas são assegurados 'nos termos da lei'. Portanto, a proteção às participações individuais em obras coletivas (alínea 'a') depende de disciplina em legislação infraconstitucional."
+                rationale: "A afirmativa está incorreta. O caput do Art. 5º, inciso XXVIII, estabelece que os direitos previstos em suas alíneas são assegurados \"nos termos da lei\". Portanto, a proteção às participações individuais em obras coletivas (alínea 'a') depende de disciplina em legislação infraconstitucional."
             },
             {
                 question: "A proteção aos inventos industriais é assegurada pela Constituição independentemente do interesse social.",
                 answer: "Errado",
-                rationale: "A questão contraria a parte final do dispositivo. O Art. 5º, inciso XXIX, condiciona a proteção legal aos inventos e criações industriais à persecução de dois objetivos: o 'interesse social e o desenvolvimento tecnológico e econômico do País'."
+                rationale: "A questão contraria a parte final do dispositivo. O Art. 5º, inciso XXIX, condiciona a proteção legal aos inventos e criações industriais à persecução de dois objetivos: o \"interesse social e o desenvolvimento tecnológico e econômico do País\"."
             },
             {
                 question: "O direito de herança abrange apenas os bens materiais deixados pelo falecido.",
@@ -452,47 +752,847 @@
             {
                 question: "Para que a pequena propriedade rural seja impenhorável, basta que seja trabalhada pela família, ainda que a dívida não tenha relação com a atividade produtiva.",
                 answer: "Errado",
-                rationale: "A questão está incorreta por ignorar um dos requisitos cumulativos. O Art. 5º, inciso XXVI, exige não só que a propriedade seja trabalhada pela família, mas também que a dívida seja 'decorrente de sua atividade produtiva'. A proteção não se aplica a débitos de outra natureza."
+                rationale: "A questão está incorreta por ignorar um dos requisitos cumulativos. O Art. 5º, inciso XXVI, exige não só que a propriedade seja trabalhada pela família, mas também que a dívida seja \"decorrente de sua atividade produtiva\". A proteção não se aplica a débitos de outra natureza."
             },
             {
                 question: "O direito do autor sobre sua obra é um direito de propriedade, sendo, portanto, perpétuo.",
                 answer: "Errado",
-                rationale: "A questão está incorreta. Embora o direito autoral tenha natureza de propriedade, ele não é perpétuo. O Art. 5º, inciso XXVII, estabelece que sua duração será definida em lei ('pelo tempo que a lei fixar'), o que o diferencia da propriedade sobre bens corpóreos, que é, em regra, perpétua."
+                rationale: "A questão está incorreta. Embora o direito autoral tenha natureza de propriedade, ele não é perpétuo. O Art. 5º, inciso XXVII, estabelece que sua duração será definida em lei (\"pelo tempo que a lei fixar\"), o que o diferencia da propriedade sobre bens corpóreos, que é, em regra, perpétua."
             },
             {
                 question: "O direito de fiscalização do aproveitamento econômico das obras é extensível às representações sindicais e associativas dos criadores e intérpretes.",
                 answer: "Certo",
-                rationale: "A assertiva está correta e em conformidade com o Art. 5º, inciso XXVIII, alínea 'b'. O dispositivo constitucional é explícito ao listar as 'respectivas representações sindicais e associativas' como titulares desse direito de fiscalização, ao lado dos próprios criadores e intérpretes."
+                rationale: "A assertiva está correta e em conformidade com o Art. 5º, inciso XXVIII, alínea 'b'. O dispositivo constitucional é explícito ao listar as \"respectivas representações sindicais e associativas\" como titulares desse direito de fiscalização, ao lado dos próprios criadores e intérpretes."
             },
             {
                 question: "A lei assegurará proteção a outros signos distintivos, além das criações industriais, da propriedade das marcas e dos nomes de empresas.",
                 answer: "Certo",
-                rationale: "A questão está correta. O Art. 5º, inciso XXIX, contém uma lista que se encerra com a expressão 'e a outros signos distintivos', indicando que o rol de bens imateriais protegidos no âmbito da propriedade industrial é exemplificativo, podendo a lei abranger outros sinais não expressamente mencionados."
+                rationale: "A questão está correta. O Art. 5º, inciso XXIX, contém uma lista que se encerra com a expressão \"e a outros signos distintivos\", indicando que o rol de bens imateriais protegidos no âmbito da propriedade industrial é exemplificativo, podendo a lei abranger outros sinais não expressamente mencionados."
             },
             {
                 question: "A garantia constitucional do direito de herança impede que a lei estabeleça uma ordem de sucessão ou exclua herdeiros da linha sucessória.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. A garantia do direito de herança (Art. 5º, XXX) não é absoluta. O direito é exercido 'nos termos da lei', cabendo à legislação infraconstitucional (no caso, o Código Civil) definir a ordem de vocação hereditária, as regras de sucessão e as hipóteses de exclusão da herança (por indignidade ou deserdação)."
+                rationale: "A assertiva está incorreta. A garantia do direito de herança (Art. 5º, XXX) não é absoluta. O direito é exercido \"nos termos da lei\", cabendo à legislação infraconstitucional (no caso, o Código Civil) definir a ordem de vocação hereditária, as regras de sucessão e as hipóteses de exclusão da herança (por indignidade ou deserdação)."
+            },
+            {
+                question: "Na sucessão de bens de estrangeiros situados no Brasil, aplicar-se-á sempre a lei brasileira.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXXI, estabelece uma regra de prevalência da norma mais favorável. A lei brasileira será aplicada se for mais benéfica ao cônjuge ou aos filhos brasileiros; caso contrário, aplicar-se-á a lei pessoal do falecido (\"de cujus\"), se esta lhes for mais favorável."
+            },
+            {
+                question: "A defesa do consumidor é uma norma constitucional de eficácia plena, que independe de regulamentação legal para ser aplicada.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso XXXII, determina que o Estado promoverá a defesa do consumidor \"na forma da lei\". Isso classifica a norma como de eficácia limitada, ou seja, ela depende da edição de leis (como o Código de Defesa do Consumidor) para ter plena aplicabilidade."
+            },
+            {
+                question: "O direito de receber informações dos órgãos públicos abrange apenas aquelas de interesse particular do solicitante.",
+                answer: "Errado",
+                rationale: "A assertiva restringe indevidamente o alcance do direito. O Art. 5º, inciso XXXIII, é claro ao garantir o direito a informações \"de seu interesse particular, ou de interesse coletivo ou geral\", abrangendo as três esferas de interesse."
+            },
+            {
+                question: "O exercício do direito de petição aos Poderes Públicos é isento do pagamento de taxas.",
+                answer: "Certo",
+                rationale: "A questão está correta e em total conformidade com o Art. 5º, inciso XXXIV, que assegura a todos, \"independentemente do pagamento de taxas\", o direito de petição (alínea 'a') e a obtenção de certidões (alínea 'b')."
+            },
+            {
+                question: "O princípio da inafastabilidade da jurisdição assegura que a lei não pode impedir a apreciação, pelo Poder Judiciário, de uma lesão a direito.",
+                answer: "Errado",
+                rationale: "A questão está incompleta e, por isso, incorreta. O Art. 5º, inciso XXXV, estabelece que \"a lei não excluirá da apreciação do Poder Judiciário lesão ou ameaça a direito\". O princípio abrange não apenas a lesão já consumada, mas também a simples ameaça, permitindo a tutela preventiva de direitos."
+            },
+            {
+                question: "A sucessão de bens de um estrangeiro falecido, que possuía imóveis no Brasil, será regulada pela lei pessoal do \"de cujus\", ainda que a lei brasileira seja mais favorável ao cônjuge brasileiro.",
+                answer: "Errado",
+                rationale: "A assertiva contraria a regra constitucional. O Art. 5º, inciso XXXI, determina que a lei brasileira será aplicada \"sempre que\" for mais favorável ao cônjuge ou aos filhos brasileiros. Portanto, se a lei brasileira é mais benéfica, ela prevalecerá sobre a lei pessoal do falecido."
+            },
+            {
+                question: "O direito à informação perante órgãos públicos é absoluto, não admitindo sigilo em nenhuma hipótese.",
+                answer: "Errado",
+                rationale: "O direito à informação não é absoluto. O próprio Art. 5º, inciso XXXIII, estabelece uma exceção expressa, ressalvando as informações \"cujo sigilo seja imprescindível à segurança da sociedade e do Estado\"."
+            },
+            {
+                question: "A obtenção de certidões em repartições públicas para a defesa de direitos é assegurada, mas depende do pagamento das taxas correspondentes.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso XXXIV, garante que tanto o direito de petição quanto a obtenção de certidões são assegurados \"independentemente do pagamento de taxas\". A gratuidade é uma característica essencial dessas garantias."
+            },
+            {
+                question: "O Poder Judiciário só pode ser acionado após o esgotamento das vias administrativas para a solução de um conflito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O princípio da inafastabilidade da jurisdição (Art. 5º, inciso XXXV) estabelece, como regra geral, que não é necessário o prévio esgotamento da via administrativa para acessar o Judiciário. A exceção a essa regra (contencioso administrativo) precisa estar expressa na Constituição, como ocorre nas causas relativas à disciplina e às competições desportivas."
+            },
+            {
+                question: "A defesa do consumidor deve ser promovida pelo Estado, na forma da lei.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do Art. 5º, inciso XXXII, que estabelece o dever do Estado de promover a defesa do consumidor, condicionando essa promoção à existência de lei."
+            },
+            {
+                question: "O direito de petição pode ser exercido para a defesa de direitos, mas não para relatar uma ilegalidade.",
+                answer: "Errado",
+                rationale: "A questão restringe indevidamente o objeto do direito de petição. O Art. 5º, inciso XXXIV, alínea 'a', assegura o direito \"em defesa de direitos ou contra ilegalidade ou abuso de poder\", permitindo seu uso para as três finalidades."
+            },
+            {
+                question: "A lei não excluirá da apreciação do Poder Judiciário lesão ou ameaça a direito.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso XXXV, que consagra o princípio do acesso à justiça ou da inafastabilidade da jurisdição."
+            },
+            {
+                question: "A recusa de um órgão público em prestar informações no prazo legal pode acarretar a responsabilização dos agentes públicos envolvidos.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XXXIII, estabelece que as informações serão prestadas no prazo da lei, \"sob pena de responsabilidade\", indicando que a omissão ou o atraso injustificado sujeita o agente público a sanções."
+            },
+            {
+                question: "A obtenção de certidões em repartições públicas é gratuita apenas para o esclarecimento de situações de interesse pessoal.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao restringir a finalidade da certidão. O Art. 5º, inciso XXXIV, alínea 'b', garante a gratuidade para duas finalidades: \"defesa de direitos e esclarecimento de situações de interesse pessoal\"."
+            },
+            {
+                question: "A sucessão de bens de estrangeiros situados no país será regulada pela lei brasileira, exceto se a lei pessoal do falecido for mais favorável aos herdeiros brasileiros.",
+                answer: "Certo",
+                rationale: "A questão interpreta corretamente a regra do Art. 5º, inciso XXXI. A norma estabelece a aplicação da lei brasileira como regra geral, mas essa regra é afastada (exceção) caso a lei do país de origem do estrangeiro seja mais benéfica para o cônjuge ou os filhos brasileiros."
+            },
+            {
+                question: "A promoção da defesa do consumidor é uma atribuição exclusiva do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXXII, atribui o dever ao \"Estado\" de forma genérica, o que engloba a atuação dos três Poderes: o Legislativo, ao criar as leis de proteção; o Executivo, ao fiscalizar as relações de consumo por meio de órgãos como o PROCON; e o Judiciário, ao julgar as causas consumeristas."
+            },
+            {
+                question: "O direito de receber informações de órgãos públicos não se aplica a informações de interesse coletivo ou geral.",
+                answer: "Errado",
+                rationale: "A questão contraria a literalidade do dispositivo. O Art. 5º, inciso XXXIII, assegura expressamente o direito de receber informações de interesse particular, \"ou de interesse coletivo ou geral\"."
+            },
+            {
+                question: "O direito de petição e o direito de obter certidões são garantias asseguradas a todos, independentemente do pagamento de taxas.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois resume o conteúdo do caput do Art. 5º, inciso XXXIV, que estabelece a gratuidade como característica comum às garantias previstas nas alíneas 'a' (petição) e 'b' (certidão)."
+            },
+            {
+                question: "O princípio da inafastabilidade da jurisdição significa que toda e qualquer controvérsia, sem exceção, deve ser submetida à apreciação do Poder Judiciário.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao usar o termo \"sem exceção\". Embora a regra seja o amplo acesso, a própria Constituição estabelece exceções, como a necessidade de esgotamento da via administrativa para ingressar com ação judicial relativa à justiça desportiva (Art. 217, § 1º)."
+            },
+            {
+                question: "Na sucessão de bens de estrangeiro, a aplicação da lei brasileira em benefício do cônjuge ou dos filhos brasileiros é obrigatória.",
+                answer: "Errado",
+                rationale: "A aplicação da lei brasileira não é incondicionalmente obrigatória. Conforme o Art. 5º, inciso XXXI, ela só será aplicada se for mais favorável que a lei pessoal do falecido. Se a lei estrangeira for mais benéfica aos herdeiros brasileiros, será ela a aplicada, afastando a lei nacional."
+            },
+            {
+                question: "Uma nova lei processual, por ser de aplicação imediata, pode prejudicar a coisa julgada material formada sob a égide da lei anterior.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXXVI, estabelece de forma categórica que \"a lei não prejudicará (...) a coisa julgada\". A coisa julgada é uma garantia constitucional que protege a decisão de mérito transitada em julgado da incidência de lei posterior, garantindo a segurança jurídica."
+            },
+            {
+                question: "É vedada a criação de juízos ou tribunais de exceção, que são aqueles instituídos após a ocorrência do fato a ser julgado.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XXXVII, proíbe a existência de juízos ou tribunais de exceção. A definição apresentada na assertiva corresponde ao conceito doutrinário desses tribunais ad hoc, criados para julgar um caso específico, o que viola o princípio do juiz natural."
+            },
+            {
+                question: "No âmbito do Tribunal do Júri, é assegurada a ampla defesa, mas não a plenitude de defesa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXXVIII, alínea 'a', assegura especificamente a \"plenitude de defesa\" no júri. Esse princípio é mais abrangente que a ampla defesa (assegurada a todos os acusados), pois no júri permite-se o uso de argumentos não apenas técnicos-jurídicos, mas também de natureza sentimental, social e moral."
+            },
+            {
+                question: "O princípio da anterioridade da lei penal estabelece que não há crime sem lei anterior que o defina.",
+                answer: "Errado",
+                rationale: "A questão está incompleta e, portanto, incorreta. O Art. 5º, inciso XXXIX, estabelece que \"não há crime sem lei anterior que o defina, nem pena sem prévia cominação legal\". O princípio da anterioridade abrange tanto o crime (preceito primário) quanto a pena (preceito secundário)."
+            },
+            {
+                question: "Uma nova lei penal mais severa retroagirá para alcançar um crime cometido antes de sua vigência, caso o julgamento ainda não tenha ocorrido.",
+                answer: "Errado",
+                rationale: "A assertiva contraria frontalmente a regra constitucional. O Art. 5º, inciso XL, dispõe que \"a lei penal não retroagirá, salvo para beneficiar o réu\". Uma lei mais severa (lex gravior) nunca pode retroagir para prejudicar o réu, independentemente da fase em que o processo se encontre."
+            },
+            {
+                question: "O direito adquirido, o ato jurídico perfeito e a coisa julgada são protegidos contra a incidência de qualquer lei posterior, sem exceções.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por conta da expressão \"sem exceções\". A proteção do Art. 5º, inciso XXXVI, é contra leis infraconstitucionais. Uma nova Constituição (poder constituinte originário) ou uma Emenda Constitucional (poder constituinte derivado) podem, em tese, atingir tais institutos, relativizando a proteção."
+            },
+            {
+                question: "A instituição do júri é reconhecida, sendo sua organização definida na própria Constituição Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XXXVIII, reconhece a instituição do júri, mas estabelece que ele terá \"a organização que lhe der a lei\", delegando a disciplina de sua estrutura e funcionamento para a legislação infraconstitucional (o Código de Processo Penal)."
+            },
+            {
+                question: "Entre os princípios assegurados à instituição do júri estão o sigilo das votações e a soberania dos veredictos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois cita literalmente dois dos quatro princípios basilares do júri, conforme previsto no Art. 5º, inciso XXXVIII, alíneas 'b' (o sigilo das votações) e 'c' (a soberania dos veredictos)."
+            },
+            {
+                question: "O Tribunal do Júri é competente para o julgamento de todos os crimes contra a vida, sejam eles dolosos ou culposos.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao incluir os crimes culposos. A competência mínima do júri, fixada pelo Art. 5º, inciso XXXVIII, alínea 'd', restringe-se aos crimes dolosos contra a vida (homicídio, infanticídio, aborto e instigação/auxílio ao suicídio)."
+            },
+            {
+                question: "Uma lei que descriminaliza uma conduta retroagirá para beneficiar pessoas que já foram condenadas com trânsito em julgado pelo crime que deixou de existir.",
+                answer: "Certo",
+                rationale: "A questão está correta. A retroatividade da lei penal benéfica, prevista no Art. 5º, inciso XL, é a mais ampla possível. Uma abolitio criminis (lei que deixa de considerar um fato como criminoso) retroage para extinguir a punibilidade, alcançando inclusive aqueles que já cumprem pena, cessando a execução e todos os efeitos penais da condenação."
+            },
+            {
+                question: "A garantia constitucional que veda a existência de tribunal de exceção impede a criação de varas judiciais especializadas, como as varas de violência doméstica.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A vedação do Art. 5º, inciso XXXVII, é ao tribunal de exceção (criado pós-fato). As varas especializadas são criadas por lei, de forma prévia e abstrata, para julgar matérias específicas, o que é perfeitamente compatível com o princípio do juiz natural."
+            },
+            {
+                question: "A soberania dos veredictos do júri é absoluta, não podendo uma decisão dos jurados ser revista em nenhuma hipótese pelo tribunal de segunda instância.",
+                answer: "Errado",
+                rationale: "A soberania dos veredictos (Art. 5º, XXXVIII, 'c') não é absoluta. Ela significa que o tribunal técnico não pode substituir a decisão de mérito dos jurados por outra. Contudo, a lei permite que o tribunal, em sede de apelação, anule o julgamento e determine a realização de um novo júri, caso a decisão dos jurados seja manifestamente contrária à prova dos autos."
+            },
+            {
+                question: "Ninguém pode ser punido por um fato, a menos que uma lei, vigente à época da conduta, o defina como crime e estabeleça a respectiva pena.",
+                answer: "Certo",
+                rationale: "A questão traduz de forma correta e completa a essência do princípio da legalidade e da anterioridade penal, consagrado no Art. 5º, inciso XXXIX, que exige lei prévia tanto para a definição do crime quanto para a cominação da sanção."
+            },
+            {
+                question: "A lei penal não retroagirá, mesmo que seja para beneficiar o réu.",
+                answer: "Errado",
+                rationale: "A assertiva inverte a exceção à regra. O Art. 5º, inciso XL, estabelece como regra a irretroatividade da lei penal, mas prevê uma exceção expressa: a lei penal \"retroagirá (...) para beneficiar o réu\"."
+            },
+            {
+                question: "O ato jurídico perfeito é aquele que já consumou todos os seus efeitos sob a vigência da lei sob a qual foi celebrado.",
+                answer: "Errado",
+                rationale: "A questão apresenta um conceito incorreto. Ato jurídico perfeito, protegido pelo Art. 5º, inciso XXXVI, é aquele já consumado segundo a lei vigente ao tempo em que se efetuou, independentemente de já ter produzido todos os seus efeitos. A proteção visa garantir a validade do ato contra mudanças legislativas posteriores."
+            },
+            {
+                question: "O sigilo das votações no Tribunal do Júri visa proteger a imparcialidade e a livre convicção dos jurados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A garantia do sigilo das votações, prevista no Art. 5º, inciso XXXVIII, alínea 'b', tem como finalidade assegurar que os jurados possam decidir de acordo com sua consciência, livres de qualquer tipo de pressão externa, coação ou constrangimento."
+            },
+            {
+                question: "É competência do Tribunal do Júri o julgamento do crime de latrocínio.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora o latrocínio (roubo seguido de morte) tenha como resultado a morte, ele é classificado como um crime contra o patrimônio, e não como um crime doloso contra a vida. Portanto, sua competência de julgamento é do juiz singular, e não do Tribunal do Júri (Art. 5º, XXXVIII, 'd')."
+            },
+            {
+                question: "O princípio da reserva legal, contido na Constituição, impede que um crime seja criado por meio de medida provisória.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XXXIX, exige \"lei\" para definir crimes e cominar penas. O Art. 62, § 1º, 'b', da Constituição, veda expressamente a edição de medidas provisórias sobre matéria de direito penal. Assim, a criação ou o agravamento de penas só pode ocorrer por meio de lei em sentido estrito."
+            },
+            {
+                question: "Lei penal temporária, mesmo após o fim de sua vigência, continua a ser aplicada aos fatos praticados durante seu período de validade, ainda que seja mais gravosa ao réu.",
+                answer: "Certo",
+                rationale: "A questão está correta e aborda uma exceção doutrinária e jurisprudencial ao princípio da retroatividade da lei benéfica (Art. 5º, XL). As leis penais temporárias e excepcionais são ultrativas, ou seja, continuam a reger os fatos praticados sob sua vigência mesmo após sua revogação, para não frustrar o objetivo do legislador."
+            },
+            {
+                question: "A garantia de que \"não haverá juízo ou tribunal de exceção\" é sinônima da garantia do duplo grau de jurisdição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. São garantias distintas. A vedação ao tribunal de exceção (Art. 5º, XXXVII) refere-se ao princípio do juiz natural. O duplo grau de jurisdição, por sua vez, é a garantia (implícita na Constituição e explícita em tratados de direitos humanos) de que uma decisão judicial possa ser reexaminada por um órgão hierarquicamente superior."
+            },
+            {
+                question: "A Constituição Federal estabelece um mandado de criminalização ao determinar que a lei deverá punir qualquer forma de discriminação que atente contra os direitos e as liberdades fundamentais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso XLI, ao dispor que \"a lei punirá...\", impõe ao legislador ordinário um dever, uma ordem (mandado) para que elabore normas penais que sancionem as condutas discriminatórias ali descritas."
+            },
+            {
+                question: "A prática do racismo é um crime afiançável, porém imprescritível, sujeito à pena de reclusão.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao afirmar que o crime é afiançável. O Art. 5º, inciso XLII, define o racismo como crime inafiançável e imprescritível. A ausência de fiança é uma de suas características constitucionais expressas."
+            },
+            {
+                question: "A prática da tortura e o terrorismo são crimes inafiançáveis e imprescritíveis.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o Art. 5º, inciso XLIII, a tortura e o terrorismo são inafiançáveis e insuscetíveis de graça ou anistia. O texto constitucional, no entanto, não lhes atribui a característica da imprescritibilidade, que é reservada apenas ao racismo (inciso XLII) e à ação de grupos armados (inciso XLIV)."
+            },
+            {
+                question: "A ação de grupos armados, apenas de natureza civil, contra a ordem constitucional e o Estado Democrático constitui crime inafiançável e imprescritível.",
+                answer: "Errado",
+                rationale: "O erro da questão está em restringir o sujeito do crime. O Art. 5º, inciso XLIV, é explícito ao abranger a ação de grupos armados, \"civis ou militares\", tornando a proteção ao Estado Democrático aplicável a ambos os casos."
+            },
+            {
+                question: "A obrigação de reparar o dano causado por um ilícito penal pode ser estendida aos sucessores do condenado, até o limite do valor do patrimônio transferido.",
+                answer: "Certo",
+                rationale: "A questão está correta e descreve com precisão a exceção ao princípio da pessoalidade da pena. O Art. 5º, inciso XLV, veda que a pena ultrapasse a pessoa do condenado, mas permite que os efeitos civis, como a \"obrigação de reparar o dano\", sejam executados contra os herdeiros, nos limites da herança."
+            },
+            {
+                question: "A Constituição determina a punição apenas para a discriminação atentatória dos direitos fundamentais, excluindo as liberdades fundamentais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XLI, determina que a lei punirá qualquer discriminação atentatória \"dos direitos e liberdades fundamentais\", incluindo ambas as categorias de forma expressa no mandado de criminalização."
+            },
+            {
+                question: "O crime de racismo é sujeito à pena de detenção ou reclusão, a critério do legislador.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso XLII, especifica que a prática do racismo é sujeita à pena de reclusão, não abrindo margem para que o legislador ordinário estabeleça a pena de detenção, que é um regime prisional mais brando."
+            },
+            {
+                question: "Os mandantes e os executores de crimes hediondos respondem por eles, mas não aqueles que, podendo evitá-los, se omitiram.",
+                answer: "Errado",
+                rationale: "A assertiva contraria a parte final do dispositivo. O Art. 5º, inciso XLIII, estende a responsabilidade penal pelos crimes ali listados (incluindo os hediondos) \"aos mandantes, os executores e os que, podendo evitá-los, se omitirem\"."
+            },
+            {
+                question: "A ação de grupos armados contra a ordem constitucional é crime inafiançável, mas prescritível.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso XLIV, estabelece que tal crime é inafiançável e imprescritível. A imprescritibilidade é uma de suas duas características constitucionais expressas."
+            },
+            {
+                question: "Pelo princípio da intranscendência da pena, a multa aplicada a um condenado não pode ser cobrada de seus herdeiros após sua morte.",
+                answer: "Certo",
+                rationale: "A questão está correta. A multa é uma espécie de \"pena\" e, como tal, está sujeita ao princípio da pessoalidade ou intranscendência (Art. 5º, inciso XLV), não passando da pessoa do condenado. Diferentemente da obrigação de reparar o dano (de natureza civil), a pena de multa extingue-se com a morte do agente."
+            },
+            {
+                question: "Os crimes de tortura e tráfico ilícito de entorpecentes admitem a concessão de graça ou anistia.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XLIII, classifica expressamente a tortura e o tráfico ilícito de entorpecentes como crimes inafiançáveis e insuscetíveis de graça ou anistia."
+            },
+            {
+                question: "A pena de perdimento de bens, decretada em sentença penal condenatória, pode ser executada contra os sucessores do condenado, até o limite do patrimônio transferido.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XLV, prevê expressamente que \"a decretação do perdimento de bens\" é uma das obrigações de caráter patrimonial que podem ser estendidas aos sucessores e contra eles executadas, respeitando-se o limite do valor da herança."
+            },
+            {
+                question: "O crime de racismo e a ação de grupos armados contra o Estado Democrático são os dois únicos crimes que a Constituição Federal define como imprescritíveis.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A imprescritibilidade é uma característica excepcional no ordenamento jurídico brasileiro, e a Constituição a prevê expressamente em apenas duas hipóteses: a prática do racismo (inciso XLII) e a ação de grupos armados, civis ou militares, contra a ordem constitucional e o Estado Democrático (inciso XLIV)."
+            },
+            {
+                question: "A lei poderá prever punição para atos de discriminação que não atentem contra direitos e liberdades fundamentais.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso XLI, obriga (manda) que a lei puna a discriminação contra direitos fundamentais, mas não proíbe (veda) que o legislador, em sua discricionariedade, puna outras formas de discriminação que considere socialmente reprováveis."
+            },
+            {
+                question: "A responsabilidade penal pela prática do terrorismo, segundo a Constituição, alcança os mandantes e os executores, mas não os partícipes que se omitiram.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XLIII, é claro ao estender a responsabilidade pelos crimes ali previstos (incluindo o terrorismo) também àqueles \"que, podendo evitá-los, se omitirem\", configurando a responsabilidade do garantidor omisso."
+            },
+            {
+                question: "A ação de grupos armados contra o Estado Democrático constitui crime afiançável e imprescritível.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao classificar o crime como afiançável. O Art. 5º, inciso XLIV, define tal conduta como crime inafiançável e imprescritível."
+            },
+            {
+                question: "O princípio da pessoalidade da pena impede que os herdeiros do condenado sejam obrigados a reparar o dano causado pelo crime, ainda que o falecido tenha deixado bens.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O princípio da pessoalidade (ou intranscendência) aplica-se à \"pena\" (sanção penal), mas o próprio Art. 5º, inciso XLV, excepciona a \"obrigação de reparar o dano\", que tem natureza civil e pode ser executada contra os sucessores, nos limites da herança."
+            },
+            {
+                question: "Os crimes hediondos, o tráfico de drogas e o terrorismo são insuscetíveis de graça ou anistia.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois lista crimes que, de acordo com o Art. 5º, inciso XLIII, são considerados pela lei como inafiançáveis e, de fato, \"insuscetíveis de graça ou anistia\"."
+            },
+            {
+                question: "Os sucessores do condenado respondem pela obrigação de reparar o dano com seu patrimônio pessoal, caso o valor da herança não seja suficiente para cobrir todo o prejuízo.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso XLV, estabelece um limite claro para a responsabilidade dos sucessores: ela se dá \"até o limite do valor do patrimônio transferido\". Isso significa que os herdeiros não respondem com seus próprios bens (responsabilidade ultra vires hereditatis), mas apenas com as forças da herança."
+            },
+            {
+                question: "A lei que define um crime como hediondo pode prever a possibilidade de fiança, graça ou anistia.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XLIII, é uma norma de aplicabilidade imediata que impõe vedações ao legislador ordinário. Uma vez que a lei defina um crime como hediondo, ele será automaticamente considerado inafiançável e insuscetível de graça ou anistia por força da própria Constituição, não podendo a lei dispor em sentido contrário."
+            },
+            {
+                question: "O rol de penas previsto na Constituição Federal é taxativo, não podendo a lei ordinária criar modalidades de pena diversas daquelas expressamente listadas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 5º, inciso XLVI, afirma que a lei adotará, \"entre outras\", as penas listadas em suas alíneas. A expressão \"entre outras\" indica que o rol é exemplificativo (numerus apertus), permitindo que a lei crie outras modalidades de pena, desde que não contrariem as vedações do inciso XLVII."
+            },
+            {
+                question: "A pena de morte é absolutamente vedada no ordenamento jurídico brasileiro.",
+                answer: "Errado",
+                rationale: "A vedação à pena de morte não é absoluta. O Art. 5º, inciso XLVII, alínea 'a', proíbe a pena de morte, \"salvo em caso de guerra declarada\". Nessa hipótese excepcional, prevista no Código Penal Militar, a pena capital é admitida."
+            },
+            {
+                question: "A pena privativa de liberdade será cumprida em estabelecimentos distintos, de acordo com a natureza do delito, a idade e o sexo do apenado.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz literalmente o texto do Art. 5º, inciso XLVIII. Esses são os três critérios constitucionais para a separação dos apenados em estabelecimentos prisionais distintos."
+            },
+            {
+                question: "É assegurado aos presos o respeito à sua integridade física, mas não à sua integridade moral, que pode ser relativizada em função da disciplina prisional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XLIX, é explícito ao assegurar aos presos o respeito \"à integridade física e moral\", sem qualquer ressalva. Ambas as dimensões da integridade da pessoa humana são protegidas constitucionalmente."
+            },
+            {
+                question: "Às presidiárias serão asseguradas condições para que possam permanecer com seus filhos durante todo o período de cumprimento da pena.",
+                answer: "Errado",
+                rationale: "O erro da questão está na extensão do período. O Art. 5º, inciso L, garante o direito de permanência com os filhos \"durante o período de amamentação\", e não durante toda a pena."
+            },
+            {
+                question: "A lei regulará a individualização da pena, podendo adotar, entre outras, a pena de prestação social alternativa.",
+                answer: "Certo",
+                rationale: "A questão está correta e em plena conformidade com o Art. 5º, inciso XLVI, que estabelece o princípio da individualização da pena a ser regulado por lei e lista, em sua alínea 'd', a \"prestação social alternativa\" como uma das modalidades de pena possíveis."
+            },
+            {
+                question: "A pena de banimento e a de trabalhos forçados são expressamente vedadas pela Constituição Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso XLVII, em suas alíneas 'c' e 'd', proíbe de forma taxativa as penas \"de trabalhos forçados\" e \"de banimento\"."
+            },
+            {
+                question: "O grau de instrução e a condição financeira do apenado são critérios constitucionais para a separação dos presos em estabelecimentos distintos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora a legislação infraconstitucional (como a Lei de Execução Penal) possa prever celas especiais para portadores de diploma de curso superior, os únicos critérios constitucionais para a separação, previstos no Art. 5º, inciso XLVIII, são a natureza do delito, a idade e o sexo."
+            },
+            {
+                question: "A garantia de respeito à integridade física e moral dos presos é um direito fundamental que não pode ser suspenso nem mesmo durante a vigência do estado de defesa ou do estado de sítio.",
+                answer: "Certo",
+                rationale: "A questão está correta. O respeito à integridade física e moral (Art. 5º, XLIX) e a proibição de penas cruéis (Art. 5º, XLVII, 'e') são considerados parte do núcleo essencial dos direitos humanos (cláusulas pétreas), não sendo passíveis de restrição nem mesmo em situações de anormalidade institucional."
+            },
+            {
+                question: "O direito de a presidiária permanecer com seu filho durante a amamentação visa garantir o melhor interesse da criança e fortalecer o vínculo materno.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois apresenta a finalidade (ratio) da norma prevista no Art. 5º, inciso L. Embora o texto seja sucinto, a interpretação teleológica e sistemática da Constituição, alinhada com o princípio da proteção integral da criança (Art. 227), confirma que o objetivo é proteger tanto a mãe quanto, e principalmente, o lactente."
+            },
+            {
+                question: "A pena de perda de bens é uma modalidade de sanção expressamente prevista na Constituição Federal.",
+                answer: "Certo",
+                rationale: "A afirmativa está correta. O Art. 5º, inciso XLVI, em sua alínea 'b', elenca a \"perda de bens\" como uma das penas que a lei poderá adotar."
+            },
+            {
+                question: "A Constituição proíbe as penas de caráter perpétuo e as penas cruéis.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois cita duas vedações expressas e absolutas contidas no Art. 5º, inciso XLVII, nas alíneas 'b' (caráter perpétuo) e 'e' (cruéis)."
+            },
+            {
+                question: "A individualização da pena ocorre apenas na fase de aplicação da pena pelo juiz na sentença.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O princípio da individualização da pena (Art. 5º, XLVI) se desdobra em três fases: a legislativa (quando o legislador cria o tipo penal com penas mínima e máxima), a judicial (quando o juiz fixa a pena no caso concreto) e a executória (quando a pena é adaptada durante seu cumprimento, com a progressão de regime, por exemplo)."
+            },
+            {
+                question: "A proibição de penas de trabalhos forçados impede que o preso seja obrigado a trabalhar durante o cumprimento da pena.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. A vedação do Art. 5º, inciso XLVII, 'c', refere-se à pena de trabalhos forçados como sanção autônoma (pena-trabalho). Ela não se confunde com o trabalho do condenado, que, segundo a Lei de Execução Penal, é um dever e um direito, com finalidade educativa e produtiva, não possuindo caráter aflitivo ou de tortura."
+            },
+            {
+                question: "A separação dos apenados em estabelecimentos distintos é uma faculdade do administrador do sistema prisional, e não uma obrigação constitucional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso XLVIII, utiliza o verbo no futuro do presente (\"a pena será cumprida\"), que tem natureza impositiva, estabelecendo um dever, uma obrigação, e não uma mera faculdade ou recomendação."
+            },
+            {
+                question: "A multa e a suspensão ou interdição de direitos são espécies de pena admitidas pela Constituição Federal.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois menciona literalmente duas das modalidades de pena previstas nas alíneas do Art. 5º, inciso XLVI: \"multa\" (alínea 'c') e \"suspensão ou interdição de direitos\" (alínea 'e')."
+            },
+            {
+                question: "A pena de prisão perpétua poderá ser instituída no Brasil por meio de emenda constitucional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Os direitos e garantias individuais, como a vedação à pena de caráter perpétuo (Art. 5º, XLVII, 'b'), são considerados cláusulas pétreas (Art. 60, § 4º, IV, da CF), não podendo ser abolidos nem mesmo por emenda constitucional."
+            },
+            {
+                question: "A separação de presos por sexo nos presídios é uma determinação constitucional.",
+                answer: "Certo",
+                rationale: "A questão está correta. O \"sexo do apenado\" é um dos três critérios expressamente listados no Art. 5º, inciso XLVIII, para a separação dos detentos em estabelecimentos distintos."
+            },
+            {
+                question: "As garantias constitucionais asseguradas aos presos, como o respeito à integridade, aplicam-se tanto a condenados com sentença transitada em julgado quanto a presos provisórios.",
+                answer: "Certo",
+                rationale: "A questão está correta. A Constituição, no Art. 5º, XLIX, utiliza o termo genérico \"presos\", que abrange tanto os que cumprem pena definitiva quanto os que aguardam julgamento (presos provisórios). As garantias de tratamento digno se estendem a todos que estão sob a custódia do Estado."
+            },
+            {
+                question: "As presidiárias têm o direito de permanecer com seus filhos em qualquer fase da infância, desde que dentro do estabelecimento prisional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O direito assegurado pelo Art. 5º, inciso L, é específico e limitado ao \"período de amamentação\", não se estendendo a outras fases da infância."
+            },
+            {
+                question: "O brasileiro nato, em nenhuma hipótese, poderá ser extraditado pelo governo brasileiro.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso LI, estabelece a regra de que nenhum brasileiro será extraditado, abrindo exceção apenas para o naturalizado, em duas hipóteses específicas. O brasileiro nato, portanto, goza de uma proteção absoluta contra a extradição passiva."
+            },
+            {
+                question: "É vedada a extradição de estrangeiro por crime de opinião ou por crime comum conexo a crime político.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso LII, proíbe a extradição por crime político ou de opinião. A jurisprudência do Supremo Tribunal Federal (STF) estende essa vedação aos crimes comuns que sejam conexos a crimes políticos, ou seja, que tenham sido praticados com a mesma motivação política."
+            },
+            {
+                question: "O princípio do juiz natural determina que ninguém será processado ou sentenciado senão pela autoridade competente.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve com precisão o princípio do juiz natural, consagrado no Art. 5º, inciso LIII. Esse princípio garante que o julgamento seja realizado por um órgão do Judiciário cuja competência tenha sido previamente estabelecida por lei."
+            },
+            {
+                question: "A garantia do devido processo legal aplica-se apenas na hipótese de privação da liberdade, não alcançando a privação de bens.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LIV, é explícito ao determinar que \"ninguém será privado da liberdade ou de seus bens sem o devido processo legal\", protegendo ambos os direitos de forma equânime."
+            },
+            {
+                question: "O direito ao contraditório e à ampla defesa é assegurado aos litigantes apenas em processos judiciais, não se aplicando aos processos administrativos.",
+                answer: "Errado",
+                rationale: "A questão contraria a literalidade do dispositivo. O Art. 5º, inciso LV, garante o contraditório e a ampla defesa \"aos litigantes, em processo judicial ou administrativo\", estendendo a garantia a ambas as esferas."
+            },
+            {
+                question: "O brasileiro naturalizado poderá ser extraditado pela prática de crime comum, ainda que o delito tenha sido cometido após a naturalização.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. Para o caso de crime comum, o Art. 5º, inciso LI, impõe uma condição temporal clara: a extradição do naturalizado só é possível se o crime foi \"praticado antes da naturalização\"."
+            },
+            {
+                question: "A extradição de estrangeiro por crime de homicídio é vedada pela Constituição Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A vedação constitucional à extradição de estrangeiro, prevista no Art. 5º, inciso LII, restringe-se a \"crime político ou de opinião\". O homicídio, sendo um crime comum, não se enquadra nessa proibição e, preenchidos os demais requisitos legais, pode ensejar a extradição."
+            },
+            {
+                question: "O processamento e o sentenciamento de um indivíduo devem ser realizados pela autoridade competente.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz a garantia fundamental do Art. 5º, inciso LIII, que assegura que ninguém será \"processado nem sentenciado\" senão pela autoridade definida em lei como competente para a causa."
+            },
+            {
+                question: "Ninguém será privado da liberdade ou de seus bens sem o devido processo legal.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LIV, que consagra a cláusula do devido processo legal (due process of law) como pilar do Estado de Direito."
+            },
+            {
+                question: "Aos acusados em geral é assegurada a ampla defesa, mas o contraditório é garantido apenas aos litigantes em processos judiciais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LV, assegura ambas as garantias — contraditório e ampla defesa — tanto aos litigantes (em processos judiciais e administrativos) quanto aos acusados em geral. Não há a distinção sugerida na assertiva."
+            },
+            {
+                question: "O brasileiro naturalizado que comprovadamente se envolver com o tráfico ilícito de entorpecentes poderá ser extraditado, independentemente do momento da prática do crime.",
+                answer: "Certo",
+                rationale: "A questão está correta. A segunda hipótese de extradição do naturalizado, prevista no Art. 5º, inciso LI, é o \"comprovado envolvimento em tráfico ilícito de entorpecentes e drogas afins\". Para essa hipótese, a Constituição não faz a ressalva temporal de o crime ter sido praticado antes da naturalização, podendo, portanto, ocorrer a qualquer tempo."
+            },
+            {
+                question: "A garantia do devido processo legal impede que o Estado prive um indivíduo de seus bens em qualquer hipótese.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A garantia do devido processo legal (Art. 5º, inciso LIV) não proíbe a privação de bens, mas sim a condiciona à observância de um processo justo, com respeito às regras e garantias legais, como ocorre na desapropriação ou na execução de uma dívida."
+            },
+            {
+                question: "O princípio da ampla defesa assegura ao acusado o direito de utilizar todos os meios e recursos legais para provar sua inocência.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve o conteúdo do princípio da ampla defesa, que, conforme a parte final do Art. 5º, inciso LV, inclui \"os meios e recursos a ela inerentes\", o que abrange o direito à defesa técnica por advogado, à autodefesa e à produção de todas as provas admitidas em direito."
+            },
+            {
+                question: "Ninguém será processado por uma autoridade e sentenciado por outra, salvo se esta última for a competente para o julgamento da causa.",
+                answer: "Certo",
+                rationale: "A questão está correta. A garantia do Art. 5º, inciso LIII, veda que o processo e a sentença sejam proferidos por autoridade incompetente. Mudanças de competência durante o processo (por exemplo, desaforamento no júri) são permitidas, desde que a autoridade que profira a sentença seja, naquele momento, a legalmente competente."
+            },
+            {
+                question: "A garantia do contraditório e da ampla defesa aplica-se também aos inquéritos policiais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. Segundo o entendimento pacífico do STF, o inquérito policial, por ser um procedimento administrativo de natureza inquisitorial e pré-processual, não é regido pelo contraditório e pela ampla defesa em sua plenitude. A aplicação integral dessas garantias é exigida na fase processual (judicial ou administrativa)."
+            },
+            {
+                question: "A Constituição Federal proíbe a extradição de estrangeiros por crimes comuns.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A proibição constitucional de extradição de estrangeiro (Art. 5º, LII) é específica para \"crime político ou de opinião\". A extradição por crimes comuns é a regra geral, permitida na forma da lei e dos tratados internacionais."
+            },
+            {
+                question: "Um brasileiro naturalizado pode ser extraditado por qualquer crime, desde que praticado antes da naturalização.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao usar o termo \"qualquer crime\". A primeira hipótese de extradição do naturalizado, prevista no Art. 5º, inciso LI, refere-se a \"crime comum\", excluindo-se, portanto, os crimes políticos."
+            },
+            {
+                question: "O princípio do devido processo legal possui um duplo aspecto: o procedimental, que garante o direito a um processo justo, e o substantivo, que impede a edição de leis arbitrárias e irrazoáveis.",
+                answer: "Certo",
+                rationale: "A questão está correta e reflete a construção doutrinária e jurisprudencial sobre a garantia do Art. 5º, inciso LIV. O devido processo legal não é apenas uma garantia formal (procedimental), mas também material (substantiva), servindo como um controle sobre a razoabilidade e a proporcionalidade das leis que restringem a liberdade e a propriedade."
+            },
+            {
+                question: "O direito ao contraditório garante que a parte seja informada dos atos processuais e tenha a oportunidade de reagir a eles.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve a essência do princípio do contraditório, assegurado no Art. 5º, inciso LV. Ele se manifesta no binômio \"informação + reação\", ou seja, o direito de conhecer o que se alega em seu desfavor e o direito de se manifestar em resposta."
+            },
+            {
+                question: "A garantia constitucional do contraditório e da ampla defesa não se aplica aos processos em tramitação nos tribunais de contas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Os tribunais de contas exercem funções de natureza administrativa e judicante. Nos processos que podem resultar em sanção para os jurisdicionados (como a aplicação de multa ou a condenação a ressarcir o erário), é pacífico o entendimento de que as garantias do contraditório e da ampla defesa (Art. 5º, inciso LV) devem ser plenamente observadas."
+            },
+            {
+                question: "As provas obtidas por meios ilícitos são, em regra, inadmissíveis no processo, mas podem ser aceitas caso beneficiem o réu.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LVI, estabelece a inadmissibilidade das provas obtidas por meios ilícitos de forma categórica, sem prever exceções. A chamada \"prova ilícita pro reo\" é uma construção doutrinária e jurisprudencial, mas não consta da literalidade do texto constitucional, que veda a utilização de forma absoluta."
+            },
+            {
+                question: "Uma pessoa só pode ser considerada culpada após o trânsito em julgado de uma sentença penal condenatória.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz com exatidão o princípio da presunção de inocência (ou da não culpabilidade), consagrado no Art. 5º, inciso LVII. A culpabilidade em sentido jurídico-formal só se consolida após o esgotamento de todos os recursos cabíveis."
+            },
+            {
+                question: "A pessoa que já foi civilmente identificada, por exemplo, por meio de sua carteira de identidade, não poderá, em nenhuma hipótese, ser submetida à identificação criminal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao afirmar que a vedação é absoluta. O Art. 5º, inciso LVIII, estabelece a regra de não submissão, mas prevê uma exceção: \"salvo nas hipóteses previstas em lei\". Portanto, a legislação pode criar situações em que a identificação criminal será obrigatória mesmo para quem porta documento civil."
+            },
+            {
+                question: "Nos crimes de ação pública, a ação privada poderá ser intentada se o Ministério Público não oferecer a denúncia no prazo legal.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve a ação penal privada subsidiária da pública, prevista no Art. 5º, inciso LIX. A inércia do Ministério Público (titular da ação penal pública) em não intentar a ação no prazo legal abre a possibilidade para que a vítima (ou seu representante) o faça."
+            },
+            {
+                question: "A publicidade dos atos processuais é a regra, mas a lei poderá restringi-la para proteger a intimidade das partes ou quando o interesse social assim o exigir.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com o Art. 5º, inciso LX. O dispositivo estabelece o princípio da publicidade, mas o relativiza ao permitir que a lei crie restrições, desde que fundamentadas na defesa da intimidade ou no interesse social."
+            },
+            {
+                question: "A vedação de provas obtidas por meios ilícitos aplica-se exclusivamente ao processo penal.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LVI, utiliza a expressão genérica \"no processo\", sem restringir sua aplicação. Dessa forma, a garantia se estende a todos os tipos de processo, sejam eles judiciais (cíveis, trabalhistas, etc.) ou administrativos."
+            },
+            {
+                question: "O princípio da presunção de inocência impede a decretação de prisão preventiva antes do trânsito em julgado da sentença.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O STF entende que a presunção de inocência (Art. 5º, inciso LVII) convive com a possibilidade de prisões cautelares (como a preventiva e a temporária). Isso porque a prisão antes do trânsito em julgado não tem caráter de pena, mas de medida processual necessária para garantir a ordem pública, a instrução criminal ou a aplicação da lei penal."
+            },
+            {
+                question: "Qualquer pessoa, mesmo que portadora de documento de identificação civil, pode ser submetida à identificação criminal por mera conveniência da autoridade policial.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. A regra do Art. 5º, inciso LVIII, é a de que o civilmente identificado não seja submetido à identificação criminal. A exceção não é a conveniência da autoridade, mas sim a existência de uma hipótese expressamente \"prevista em lei\"."
+            },
+            {
+                question: "A vítima de um crime de ação pública pode escolher entre aguardar a denúncia do Ministério Público ou ingressar diretamente com uma ação privada.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A titularidade da ação penal pública é do Ministério Público. A vítima não tem a faculdade de escolher. A possibilidade de ingressar com a ação privada (Art. 5º, inciso LIX) é subsidiária e só nasce se e quando o titular da ação (MP) permanecer inerte e não cumprir seu dever no prazo legal."
+            },
+            {
+                question: "A lei poderá restringir a publicidade dos atos processuais para proteger o interesse público, mas não o interesse social.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LX, menciona expressamente o \"interesse social\" como um dos fundamentos para a restrição da publicidade, ao lado da defesa da intimidade."
+            },
+            {
+                question: "São inadmissíveis no processo as provas obtidas por meios ilícitos.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LVI, da Constituição Federal, que consagra a regra da inadmissibilidade das provas ilícitas."
+            },
+            {
+                question: "A presunção de não culpabilidade cessa com a condenação proferida por órgão colegiado em segunda instância.",
+                answer: "Errado",
+                rationale: "A questão está incorreta com base na literalidade do texto constitucional. O Art. 5º, inciso LVII, é taxativo ao vincular o fim da presunção de inocência ao \"trânsito em julgado de sentença penal condenatória\", o que ocorre apenas após o esgotamento de todos os recursos cabíveis, e não com a decisão de segunda instância."
+            },
+            {
+                question: "A identificação criminal do civilmente identificado é a regra, e a não submissão é a exceção.",
+                answer: "Errado",
+                rationale: "A questão inverte a lógica da norma. O Art. 5º, inciso LVIII, estabelece como regra que \"o civilmente identificado não será submetido a identificação criminal\". A submissão é a exceção, aplicável somente \"nas hipóteses previstas em lei\"."
+            },
+            {
+                question: "Será admitida ação privada nos crimes de ação pública, se esta não for intentada no prazo legal.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LIX, que prevê a ação penal privada subsidiária da pública."
+            },
+            {
+                question: "A decisão de restringir a publicidade de um ato processual é ato discricionário do juiz, não necessitando de previsão legal que a autorize.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LX, afirma que \"a lei só poderá restringir a publicidade\". Isso significa que o juiz não age com total discricionariedade, mas sim aplica uma restrição que deve estar prevista em lei (como no Código de Processo Civil e no Código de Processo Penal) e fundamentada em um dos dois motivos constitucionais (defesa da intimidade ou interesse social)."
+            },
+            {
+                question: "A prova derivada de uma prova ilícita é admissível no processo, desde que relevante para o deslinde da causa.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. Segundo a \"teoria dos frutos da árvore envenenada\" (fruits of the poisonous tree), que decorre da garantia do Art. 5º, inciso LVI, a ilicitude da prova originária contamina as provas que dela derivarem. Portanto, tanto a prova obtida por meio ilícito quanto as provas dela decorrentes são, em regra, inadmissíveis."
+            },
+            {
+                question: "Ninguém será considerado culpado até o trânsito em julgado de sentença penal condenatória.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LVII, que positiva o princípio da presunção de inocência."
+            },
+            {
+                question: "Mesmo que a lei preveja hipóteses para a identificação criminal do civilmente identificado, tal procedimento é vedado pela Constituição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do Art. 5º, inciso LVIII, expressamente ressalva a possibilidade de a lei criar exceções à regra geral (\"salvo nas hipóteses previstas em lei\"). Portanto, a lei pode, sim, prever tais hipóteses, e o procedimento, nesse caso, será constitucionalmente válido."
+            },
+            {
+                question: "Decorrido o prazo legal para a propositura da ação pública, a vítima perde o direito de ver o autor do crime processado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A inércia do Ministério Público não extingue a punibilidade do crime. Pelo contrário, ela abre uma nova possibilidade de persecução penal para a vítima, que passa a ter a legitimidade para propor a ação penal privada subsidiária da pública, conforme o Art. 5º, inciso LIX."
+            },
+            {
+                question: "A publicidade dos atos processuais é um princípio absoluto, não admitindo restrições.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Nenhum direito fundamental é absoluto. O próprio Art. 5º, inciso LX, que estabelece a publicidade como regra, prevê expressamente as exceções, permitindo que a lei restrinja a publicidade para a defesa da intimidade ou quando o interesse social o exigir."
+            },
+            {
+                question: "Qualquer pessoa pode ser presa por ordem verbal de autoridade judiciária competente, desde que a ordem seja posteriormente reduzida a termo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXI, exige que a ordem de prisão seja \"escrita e fundamentada\". A forma verbal não é admitida pela Constituição, que preza pela formalidade e pela motivação do ato que restringe a liberdade."
+            },
+            {
+                question: "A comunicação da prisão de uma pessoa deve ser feita imediatamente ao juiz competente e à família do preso ou à pessoa por ele indicada.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz com exatidão os termos do Art. 5º, inciso LXII. A norma estabelece a dupla e imediata comunicação da prisão: uma à autoridade judicial e outra a uma pessoa da confiança do detido."
+            },
+            {
+                question: "Entre os direitos do preso, está o de ser informado sobre o direito de permanecer em silêncio e de ter a assistência de um advogado, mas não de sua família.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por excluir a assistência familiar. O Art. 5º, inciso LXIII, assegura ao preso a assistência \"da família e de advogado\", garantindo o amparo em ambas as esferas."
+            },
+            {
+                question: "O preso tem o direito de saber a identidade dos responsáveis por seu interrogatório policial, mas não a dos responsáveis por sua prisão em flagrante.",
+                answer: "Errado",
+                rationale: "A questão restringe indevidamente o alcance da norma. O Art. 5º, inciso LXIV, garante ao preso o direito à identificação dos responsáveis \"por sua prisão ou por seu interrogatório policial\", abrangendo, portanto, as duas situações."
+            },
+            {
+                question: "A prisão ilegal, uma vez constatada pela autoridade judiciária, deverá ser imediatamente relaxada.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com o Art. 5º, inciso LXV. A norma determina que, diante de uma prisão ilegal, a autoridade judiciária competente tem o dever de determinar a soltura imediata do indivíduo."
+            },
+            {
+                question: "A prisão em flagrante delito é uma exceção à regra da necessidade de prévia ordem judicial escrita para a privação da liberdade.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso LXI, estabelece que ninguém será preso, exceto em duas hipóteses principais: \"em flagrante delito ou por ordem escrita e fundamentada de autoridade judiciária competente...\". O flagrante, portanto, autoriza a prisão imediata por qualquer do povo ou pela autoridade policial, independentemente de mandado."
+            },
+            {
+                question: "A comunicação da prisão ao juiz competente deve ocorrer no prazo de vinte e quatro horas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao prazo. O Art. 5º, inciso LXII, determina que a comunicação da prisão seja feita \"imediatamente\". O prazo de 24 horas para a apresentação do preso em audiência de custódia é uma previsão legal e convencional, mas o texto constitucional exige a comunicação imediata."
+            },
+            {
+                question: "O direito de permanecer calado é um dos direitos dos quais o preso deve ser informado no momento de sua prisão.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso LXIII, estabelece que \"o preso será informado de seus direitos, entre os quais o de permanecer calado...\", consagrando o princípio de que ninguém é obrigado a produzir prova contra si mesmo (nemo tenetur se detegere)."
+            },
+            {
+                question: "A autoridade policial pode, a seu critério, relaxar uma prisão que considere ilegal.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. A competência para o relaxamento da prisão ilegal é exclusiva da \"autoridade judiciária\", conforme o Art. 5º, inciso LXV. A autoridade policial, ao constatar a ilegalidade, deve submeter o caso imediatamente ao juiz."
+            },
+            {
+                question: "A prisão por transgressão militar ou crime propriamente militar prescinde de ordem judicial escrita e fundamentada.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois aponta a exceção prevista na parte final do Art. 5º, inciso LXI. A regra da necessidade de ordem judicial para a prisão não se aplica \"nos casos de transgressão militar ou crime propriamente militar, definidos em lei\", que seguem regras específicas do direito castrense."
+            },
+            {
+                question: "O preso tem o direito de indicar qualquer pessoa para ser comunicada de sua prisão, não se restringindo a um membro de sua família.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 5º, inciso LXII, garante a comunicação \"à família do preso ou à pessoa por ele indicada\", conferindo ao detido a prerrogativa de escolher quem deseja notificar."
+            },
+            {
+                question: "A assistência de advogado ao preso só é obrigatória a partir da fase processual, não sendo assegurada durante o interrogatório policial.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXIII, assegura a assistência de advogado ao \"preso\" de forma genérica, o que abrange desde o momento da prisão e o interrogatório na fase policial até a conclusão do processo."
+            },
+            {
+                question: "O direito à identificação dos responsáveis pela prisão ou interrogatório visa coibir abusos e garantir a eventual responsabilização dos agentes públicos.",
+                answer: "Certo",
+                rationale: "A questão está correta. A finalidade (ratio) do Art. 5º, inciso LXIV, é justamente dar transparência à atuação estatal e assegurar ao preso os meios para se defender de eventuais violências, torturas ou abusos de autoridade, permitindo a identificação dos agentes para futura responsabilização."
+            },
+            {
+                question: "Ninguém será preso senão em flagrante delito ou por ordem escrita e fundamentada de autoridade judiciária competente.",
+                answer: "Errado",
+                rationale: "A questão está incompleta e, por isso, incorreta. O Art. 5º, inciso LXI, apresenta uma terceira exceção que foi omitida na assertiva: \"salvo nos casos de transgressão militar ou crime propriamente militar, definidos em lei\"."
+            },
+            {
+                question: "Se a prisão for legal, mas o preso não for informado de seus direitos, a prisão deverá ser relaxada pela autoridade judiciária.",
+                answer: "Certo",
+                rationale: "A questão está correta. A ausência de informação sobre os direitos do preso (Art. 5º, inciso LXIII), como o de permanecer calado, constitui uma ilegalidade que macula a prisão. A consequência de uma prisão que se torna ilegal por violação de garantias constitucionais é o seu imediato relaxamento pela autoridade judicial, conforme o Art. 5º, inciso LXV."
+            },
+            {
+                question: "A comunicação da prisão ao juiz competente e à família do preso é um direito do preso, podendo ele renunciar a essa prerrogativa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A comunicação da prisão ao juiz competente (Art. 5º, inciso LXII) é um dever da autoridade que efetuou a prisão e uma garantia de controle da legalidade do ato, sendo, portanto, irrenunciável. O preso pode apenas escolher não indicar uma pessoa ou familiar para ser avisado."
+            },
+            {
+                question: "O preso será informado de seus direitos, entre os quais o de permanecer calado, sendo-lhe assegurada a assistência da família e de advogado.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LXIII, que detalha as garantias informativas e assistenciais do indivíduo preso."
+            },
+            {
+                question: "O direito à identificação dos responsáveis pela prisão é garantido ao preso, mas não ao interrogado que responde ao inquérito em liberdade.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXIV, refere-se ao direito \"do preso\", mas a garantia se estende, por interpretação lógica, a qualquer pessoa submetida a um interrogatório policial. A norma fala em responsáveis \"pela prisão ou por seu interrogatório policial\", indicando que o direito à identificação no interrogatório é autônomo."
+            },
+            {
+                question: "Mesmo que a prisão seja legal, ela deverá ser relaxada se não for comunicada imediatamente ao juiz competente.",
+                answer: "Certo",
+                rationale: "A questão está correta. A ausência de comunicação imediata da prisão à autoridade judiciária (Art. 5º, inciso LXII) é uma ilegalidade superveniente que torna a prisão, mesmo que legal em sua origem (ex: flagrante), passível de relaxamento (Art. 5º, inciso LXV)."
+            },
+            {
+                question: "A prisão por crime propriamente militar independe de ordem judicial escrita, mas depende de flagrante delito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A exceção prevista no Art. 5º, inciso LXI, para crimes militares não exige a ocorrência de flagrante. O direito militar possui regras próprias para a decretação da prisão, que podem se dar por razões disciplinares ou processuais específicas, independentemente de flagrante ou de ordem judicial comum."
+            },
+            {
+                question: "Ninguém será mantido na prisão quando a lei admitir a liberdade provisória, desde que seja paga a fiança correspondente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXVI, estabelece que a liberdade provisória pode ser concedida \"com ou sem fiança\". A fiança é uma possibilidade, mas não uma condição indispensável em todos os casos em que a liberdade provisória é admitida."
+            },
+            {
+                question: "A prisão civil por dívida é vedada em todas as suas formas, não havendo exceções previstas no texto constitucional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXVII, proíbe a prisão civil por dívida como regra, mas estabelece duas exceções expressas: a do responsável pelo inadimplemento voluntário e inescusável de obrigação alimentícia e a do depositário infiel."
+            },
+            {
+                question: "O habeas corpus é o remédio constitucional cabível sempre que alguém sofrer coação em sua liberdade de locomoção por ilegalidade ou abuso de poder.",
+                answer: "Errado",
+                rationale: "A questão está incompleta e, por isso, incorreta. O Art. 5º, inciso LXVIII, prevê a concessão de habeas corpus sempre que alguém sofrer ou se achar ameaçado de sofrer violência ou coação. O remédio tem, portanto, caráter tanto repressivo (contra a coação já existente) quanto preventivo (contra a ameaça)."
+            },
+            {
+                question: "O mandado de segurança pode ser utilizado para proteger direito líquido e certo que também seja amparado por habeas corpus.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXIX, define o mandado de segurança como uma ação de caráter residual, cabível para proteger direito líquido e certo \"não amparado por habeas corpus ou habeas data\". Se o direito em questão for a liberdade de locomoção, o remédio adequado é o habeas corpus, e não o mandado de segurança."
+            },
+            {
+                question: "Qualquer partido político, independentemente de sua representação no Congresso Nacional, tem legitimidade para impetrar mandado de segurança coletivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXX, alínea 'a', exige que o partido político tenha \"representação no Congresso Nacional\" para possuir legitimidade para a impetração do mandado de segurança coletivo."
+            },
+            {
+                question: "Se a lei admitir a liberdade provisória para um determinado crime, a manutenção da prisão do indivíduo torna-se inconstitucional.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reflete o comando do Art. 5º, inciso LXVI. A norma estabelece um direito subjetivo à liberdade quando a lei assim o permite, de modo que a recusa em concedê-la, ou a manutenção da prisão nessas circunstâncias, viola diretamente a Constituição."
+            },
+            {
+                question: "A prisão civil do devedor de alimentos só é cabível se o inadimplemento for voluntário e inescusável.",
+                answer: "Certo",
+                rationale: "A questão está correta e em plena conformidade com o Art. 5º, inciso LXVII. A Constituição exige a presença cumulativa de dois requisitos para autorizar a prisão do devedor de alimentos: que o não pagamento seja voluntário (intencional) e inescusável (sem justificativa plausível)."
+            },
+            {
+                question: "O habeas corpus preventivo pode ser impetrado quando alguém se achar ameaçado de sofrer coação em sua liberdade de locomoção.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 5º, inciso LXVIII, ao prever a concessão do remédio para quem \"se achar ameaçado de sofrer\" a coação, consagra a modalidade preventiva do habeas corpus, destinada a evitar que a violação à liberdade de ir e vir se concretize."
+            },
+            {
+                question: "O mandado de segurança é cabível contra ato de agente de pessoa jurídica privada, mesmo que este não esteja no exercício de atribuições do Poder Público.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXIX, delimita o cabimento do mandado de segurança contra atos de \"autoridade pública ou agente de pessoa jurídica no exercício de atribuições do Poder Público\". Portanto, o ato de um particular só é atacável por mandado de segurança se ele estiver desempenhando uma função delegada pelo Estado."
+            },
+            {
+                question: "Uma associação, para impetrar mandado de segurança coletivo, precisa estar legalmente constituída e em funcionamento há, no mínimo, um ano.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve com exatidão os requisitos temporais e formais para a legitimação das associações no mandado de segurança coletivo, conforme o Art. 5º, inciso LXX, alínea 'b'."
+            },
+            {
+                question: "Ninguém será levado à prisão ou nela mantido, quando a lei admitir a liberdade provisória, com ou sem fiança.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 5º, inciso LXVI, da Constituição Federal."
+            },
+            {
+                question: "A prisão do depositário infiel é uma das exceções constitucionais à regra da vedação da prisão civil por dívida.",
+                answer: "Certo",
+                rationale: "A questão está correta com base na literalidade do texto constitucional. O Art. 5º, inciso LXVII, menciona expressamente \"a do depositário infiel\" como uma das exceções. (Observação: embora o STF, em virtude de tratados de direitos humanos, entenda que essa parte não é mais aplicável, a literalidade da Constituição ainda a prevê)."
+            },
+            {
+                question: "O habeas corpus pode ser utilizado para questionar a legalidade de uma pena de multa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O objeto de proteção do habeas corpus (Art. 5º, inciso LXVIII) é estritamente a liberdade de locomoção (ir, vir e ficar). A pena de multa afeta o patrimônio, e não a liberdade de locomoção, sendo, portanto, incabível o uso de habeas corpus para discuti-la."
+            },
+            {
+                question: "Será concedido mandado de segurança para proteger direito líquido e certo.",
+                answer: "Errado",
+                rationale: "A questão está incompleta e, por isso, incorreta. Faltam os requisitos negativos essenciais previstos no Art. 5º, inciso LXIX: o direito líquido e certo não pode ser amparado por habeas corpus ou habeas data, e a ilegalidade deve partir de uma autoridade pública ou agente no exercício de função pública."
+            },
+            {
+                question: "Uma entidade de classe pode impetrar mandado de segurança coletivo em defesa dos interesses de seus membros ou associados.",
+                answer: "Certo",
+                rationale: "A questão está correta. A \"entidade de classe\" é uma das legitimadas para a impetração do mandado de segurança coletivo, conforme expressamente previsto no Art. 5º, inciso LXX, alínea 'b'."
+            },
+            {
+                question: "A liberdade provisória é um direito absoluto, devendo ser concedida em todos os casos em que a lei a admita, independentemente da presença dos requisitos da prisão preventiva.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O direito à liberdade provisória (Art. 5º, inciso LXVI) não é absoluto. Mesmo que a lei admita a liberdade para o crime, a prisão preventiva pode ser decretada se estiverem presentes seus requisitos (garantia da ordem pública, da instrução criminal ou da aplicação da lei penal), que prevalecem sobre a regra geral da liberdade."
+            },
+            {
+                question: "O mandado de segurança coletivo pode ser impetrado por organização sindical em defesa dos interesses de toda a categoria, e não apenas de seus membros.",
+                answer: "Certo",
+                rationale: "A questão está correta e reflete o entendimento do STF (Súmula 629) sobre o alcance do Art. 5º, inciso LXX, 'b'. Para as organizações sindicais, a legitimidade é ampla e abrange a defesa dos direitos e interesses coletivos ou individuais da categoria, independentemente de autorização expressa ou da filiação dos substituídos."
+            },
+            {
+                question: "O habeas corpus só pode ser impetrado por advogado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O habeas corpus (Art. 5º, inciso LXVIII) é uma ação constitucional de caráter universal, que não exige capacidade postulatória. Qualquer pessoa, nacional ou estrangeira, física ou jurídica, pode impetrá-lo em favor próprio ou de terceiro, independentemente de ser advogado."
+            },
+            {
+                question: "É cabível mandado de segurança para proteger direito amparado por habeas data.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXIX, estabelece a natureza subsidiária do mandado de segurança. Se o direito líquido e certo for o de conhecer ou retificar informações pessoais em bancos de dados públicos (objeto do habeas data), este será o remédio cabível, e não o mandado de segurança."
+            },
+            {
+                question: "Uma associação que deseje impetrar mandado de segurança coletivo precisa estar em funcionamento há pelo menos seis meses.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao prazo. O Art. 5º, inciso LXX, alínea 'b', exige que a associação esteja em funcionamento há \"pelo menos um ano\", e não seis meses."
             },
             {
                 question: "O mandado de injunção é o remédio cabível para os casos em que a existência de uma norma regulamentadora se mostra ineficaz para viabilizar o exercício de direitos constitucionais.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXI, estabelece que o mandado de injunção será concedido sempre que a 'falta de norma regulamentadora' torne inviável o exercício de um direito, e não quando a norma existe e é ineficaz."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXI, estabelece que o mandado de injunção será concedido sempre que a \"falta de norma regulamentadora\" torne inviável o exercício de um direito, e não quando a norma existe e é ineficaz."
             },
             {
                 question: "O habeas data pode ser utilizado para assegurar o conhecimento de informações relativas à pessoa do impetrante que constem de bancos de dados de empresas privadas.",
                 answer: "Errado",
-                rationale: "A questão está incorreta. O Art. 5º, inciso LXXII, alínea 'a', restringe o cabimento do habeas data para o conhecimento de informações constantes de registros ou bancos de dados de 'entidades governamentais ou de caráter público', não se aplicando, em regra, a bancos de dados de natureza estritamente privada."
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXXII, alínea 'a', restringe o cabimento do habeas data para o conhecimento de informações constantes de registros ou bancos de dados de \"entidades governamentais ou de caráter público\", não se aplicando, em regra, a bancos de dados de natureza estritamente privada."
             },
             {
                 question: "Qualquer pessoa, nacional ou estrangeira, é parte legítima para propor ação popular que vise a anular ato lesivo ao patrimônio público.",
                 answer: "Errado",
-                rationale: "O erro da questão está no termo 'qualquer pessoa'. O Art. 5º, inciso LXXIII, confere legitimidade para a propositura da ação popular a 'qualquer cidadão', conceito que, para fins jurídicos, se refere ao brasileiro no gozo de seus direitos políticos."
+                rationale: "O erro da questão está no termo \"qualquer pessoa\". O Art. 5º, inciso LXXIII, confere legitimidade para a propositura da ação popular a \"qualquer cidadão\", conceito que, para fins jurídicos, se refere ao brasileiro no gozo de seus direitos políticos."
             },
             {
                 question: "O Estado prestará assistência jurídica integral e gratuita a todos que a solicitarem, independentemente de sua condição financeira.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIV, condiciona a prestação de assistência jurídica integral e gratuita àqueles 'que comprovarem insuficiência de recursos'. Não é um serviço universal, mas sim destinado aos necessitados."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIV, condiciona a prestação de assistência jurídica integral e gratuita àqueles \"que comprovarem insuficiência de recursos\". Não é um serviço universal, mas sim destinado aos necessitados."
             },
             {
                 question: "O Estado tem o dever de indenizar o condenado por erro judiciário e também aquele que ficar preso por tempo superior ao fixado na sentença.",
@@ -507,22 +1607,22 @@
             {
                 question: "É cabível habeas data para a retificação de dados, mesmo que o impetrante prefira realizar tal retificação por meio de um processo administrativo sigiloso.",
                 answer: "Errado",
-                rationale: "A questão está incorreta. O Art. 5º, inciso LXXII, alínea 'b', estabelece o cabimento do habeas data para retificação 'quando não se prefira fazê-lo por processo sigiloso, judicial ou administrativo'. Portanto, a existência de preferência por outra via afasta a utilização do remédio constitucional."
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXXII, alínea 'b', estabelece o cabimento do habeas data para retificação \"quando não se prefira fazê-lo por processo sigiloso, judicial ou administrativo\". Portanto, a existência de preferência por outra via afasta a utilização do remédio constitucional."
             },
             {
                 question: "O autor de ação popular ficará isento de custas judiciais e do ônus da sucumbência, mesmo que tenha agido com comprovada má-fé.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta ao ignorar a exceção. O Art. 5º, inciso LXXIII, garante a isenção de custas e sucumbência, 'salvo comprovada má-fé'. A litigância de má-fé afasta a gratuidade e impõe ao autor a responsabilidade pelos custos processuais."
+                rationale: "A assertiva está incorreta ao ignorar a exceção. O Art. 5º, inciso LXXIII, garante a isenção de custas e sucumbência, \"salvo comprovada má-fé\". A litigância de má-fé afasta a gratuidade e impõe ao autor a responsabilidade pelos custos processuais."
             },
             {
                 question: "A assistência jurídica prestada pelo Estado aos que comprovarem insuficiência de recursos é integral, abrangendo tanto a esfera judicial quanto a extrajudicial.",
                 answer: "Certo",
-                rationale: "A questão está correta. O termo 'integral', utilizado no Art. 5º, inciso LXXIV, significa que a assistência jurídica deve ser completa, incluindo a orientação e a defesa em todos os graus, judicial e extrajudicialmente."
+                rationale: "A questão está correta. O termo \"integral\", utilizado no Art. 5º, inciso LXXIV, significa que a assistência jurídica deve ser completa, incluindo a orientação e a defesa em todos os graus, judicial e extrajudicialmente."
             },
             {
                 question: "O dever de indenizar do Estado restringe-se ao condenado que ficar preso além do tempo fixado na sentença, não alcançando o erro judiciário.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta por ser restritiva. O Art. 5º, inciso LXXV, prevê as duas hipóteses de forma cumulativa, e não excludente: 'o Estado indenizará o condenado por erro judiciário, assim como o que ficar preso além do tempo...'."
+                rationale: "A assertiva está incorreta por ser restritiva. O Art. 5º, inciso LXXV, prevê as duas hipóteses de forma cumulativa, e não excludente: \"o Estado indenizará o condenado por erro judiciário, assim como o que ficar preso além do tempo...\"."
             },
             {
                 question: "Conceder-se-á mandado de injunção sempre que a falta de norma regulamentadora torne inviável o exercício dos direitos e liberdades constitucionais.",
@@ -532,7 +1632,7 @@
             {
                 question: "O habeas data é o remédio adequado para assegurar o conhecimento de informações relativas à pessoa do impetrante.",
                 answer: "Errado",
-                rationale: "A questão está incompleta e, por isso, incorreta. Falta o requisito essencial do Art. 5º, inciso LXXII, alínea 'a': que as informações constem de registros ou bancos de dados de 'entidades governamentais ou de caráter público'."
+                rationale: "A questão está incompleta e, por isso, incorreta. Falta o requisito essencial do Art. 5º, inciso LXXII, alínea 'a': que as informações constem de registros ou bancos de dados de \"entidades governamentais ou de caráter público\"."
             },
             {
                 question: "A ação popular pode ser proposta para anular ato lesivo ao meio ambiente e ao patrimônio histórico e cultural.",
@@ -557,7 +1657,7 @@
             {
                 question: "Qualquer cidadão é parte legítima para propor ação popular que vise a anular ato lesivo à moralidade administrativa.",
                 answer: "Certo",
-                rationale: "A questão está correta, pois descreve uma das hipóteses de cabimento da ação popular, nos exatos termos do Art. 5º, inciso LXXIII, que inclui a proteção à 'moralidade administrativa'."
+                rationale: "A questão está correta, pois descreve uma das hipóteses de cabimento da ação popular, nos exatos termos do Art. 5º, inciso LXXIII, que inclui a proteção à \"moralidade administrativa\"."
             },
             {
                 question: "O direito à assistência jurídica gratuita depende de comprovação de insuficiência de recursos, que deve ser feita exclusivamente por meio de declaração de imposto de renda.",
@@ -577,22 +1677,22 @@
             {
                 question: "O registro civil de nascimento e a certidão de óbito são gratuitos para todas as pessoas, independentemente de sua condição financeira.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXVI, condiciona a gratuidade desses atos aos 'reconhecidamente pobres, na forma da lei'. Não se trata de uma gratuidade universal."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXVI, condiciona a gratuidade desses atos aos \"reconhecidamente pobres, na forma da lei\". Não se trata de uma gratuidade universal."
             },
             {
                 question: "As ações de habeas corpus e habeas data são gratuitas, assim como os atos necessários ao exercício da cidadania.",
                 answer: "Errado",
-                rationale: "A questão está incorreta por uma imprecisão. O Art. 5º, inciso LXXVII, estabelece que habeas corpus e habeas data são gratuitas, mas os atos necessários ao exercício da cidadania são gratuitos 'na forma da lei', o que significa que a gratuidade destes últimos depende de regulamentação legal."
+                rationale: "A questão está incorreta por uma imprecisão. O Art. 5º, inciso LXXVII, estabelece que habeas corpus e habeas data são gratuitas, mas os atos necessários ao exercício da cidadania são gratuitos \"na forma da lei\", o que significa que a gratuidade destes últimos depende de regulamentação legal."
             },
             {
                 question: "A garantia da razoável duração do processo aplica-se tanto ao âmbito judicial quanto ao administrativo.",
                 answer: "Certo",
-                rationale: "A questão está correta, pois reflete a literalidade do Art. 5º, inciso LXXVIII, que assegura a todos, 'no âmbito judicial e administrativo', a razoável duração do processo e a celeridade de sua tramitação."
+                rationale: "A questão está correta, pois reflete a literalidade do Art. 5º, inciso LXXVIII, que assegura a todos, \"no âmbito judicial e administrativo\", a razoável duração do processo e a celeridade de sua tramitação."
             },
             {
                 question: "As normas que definem os direitos e garantias fundamentais dependem de lei regulamentadora para terem aplicação.",
                 answer: "Errado",
-                rationale: "A assertiva contraria frontalmente o texto constitucional. O Art. 5º, § 1º, estabelece que as normas definidoras dos direitos e garantias fundamentais têm 'aplicação imediata', não sendo, em regra, condicionadas à edição de legislação posterior."
+                rationale: "A assertiva contraria frontalmente o texto constitucional. O Art. 5º, § 1º, estabelece que as normas definidoras dos direitos e garantias fundamentais têm \"aplicação imediata\", não sendo, em regra, condicionadas à edição de legislação posterior."
             },
             {
                 question: "Os tratados e convenções internacionais sobre direitos humanos que forem aprovados em rito de lei ordinária não produzem qualquer efeito no ordenamento jurídico interno.",
@@ -607,12 +1707,12 @@
             {
                 question: "O direito à proteção dos dados pessoais é assegurado pela Constituição, mas restringe-se aos dados armazenados em meios físicos, não alcançando os meios digitais.",
                 answer: "Errado",
-                rationale: "A questão está incorreta. O Art. 5º, inciso LXXIX, é explícito ao garantir o direito à proteção dos dados pessoais, 'inclusive nos meios digitais', reconhecendo a importância da proteção na era da informação."
+                rationale: "A questão está incorreta. O Art. 5º, inciso LXXIX, é explícito ao garantir o direito à proteção dos dados pessoais, \"inclusive nos meios digitais\", reconhecendo a importância da proteção na era da informação."
             },
             {
                 question: "O rol de direitos e garantias fundamentais expresso na Constituição é taxativo, não admitindo a existência de outros.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, § 2º, estabelece uma cláusula de abertura, afirmando que os direitos e garantias expressos na Constituição 'não excluem outros' decorrentes do regime, dos princípios ou dos tratados internacionais. O rol é, portanto, exemplificativo."
+                rationale: "A assertiva está incorreta. O Art. 5º, § 2º, estabelece uma cláusula de abertura, afirmando que os direitos e garantias expressos na Constituição \"não excluem outros\" decorrentes do regime, dos princípios ou dos tratados internacionais. O rol é, portanto, exemplificativo."
             },
             {
                 question: "Para que um tratado internacional sobre direitos humanos seja equivalente a uma emenda constitucional, ele deve ser aprovado, em cada Casa do Congresso Nacional, em dois turnos, por três quintos dos votos dos respectivos membros.",
@@ -632,17 +1732,17 @@
             {
                 question: "A razoável duração do processo é um direito assegurado a todos, mas restrito ao âmbito judicial.",
                 answer: "Errado",
-                rationale: "A questão está incorreta ao restringir o alcance da garantia. O Art. 5º, inciso LXXVIII, estende o direito à razoável duração do processo ao âmbito 'judicial e administrativo'."
+                rationale: "A questão está incorreta ao restringir o alcance da garantia. O Art. 5º, inciso LXXVIII, estende o direito à razoável duração do processo ao âmbito \"judicial e administrativo\"."
             },
             {
                 question: "O direito à proteção dos dados pessoais, inclusive nos meios digitais, independe de regulamentação legal para ser exercido.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIX, estabelece que o direito é assegurado 'nos termos da lei'. Isso significa que se trata de uma norma de eficácia limitada, que depende de legislação (como a Lei Geral de Proteção de Dados - LGPD) para disciplinar seu exercício."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXIX, estabelece que o direito é assegurado \"nos termos da lei\". Isso significa que se trata de uma norma de eficácia limitada, que depende de legislação (como a Lei Geral de Proteção de Dados - LGPD) para disciplinar seu exercício."
             },
             {
                 question: "A aplicação das normas definidoras dos direitos e garantias fundamentais é mediata, condicionada à vontade do legislador ordinário.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, § 1º, determina que a aplicação é 'imediata', conferindo máxima efetividade a esses direitos e garantias, que devem ser aplicados diretamente pela administração e pelo judiciário."
+                rationale: "A questão está incorreta. O Art. 5º, § 1º, determina que a aplicação é \"imediata\", conferindo máxima efetividade a esses direitos e garantias, que devem ser aplicados diretamente pela administração e pelo judiciário."
             },
             {
                 question: "Os direitos e garantias fundamentais incluem os expressos na Constituição e os decorrentes dos tratados internacionais em que o Brasil seja parte.",
@@ -662,7 +1762,7 @@
             {
                 question: "O registro civil de nascimento é gratuito para todos, mas a certidão de óbito é gratuita apenas para os reconhecidamente pobres.",
                 answer: "Errado",
-                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXVI, estabelece a mesma condição para ambos os atos: tanto o registro de nascimento (alínea 'a') quanto a certidão de óbito (alínea 'b') são gratuitos para os 'reconhecidamente pobres'."
+                rationale: "A assertiva está incorreta. O Art. 5º, inciso LXXVI, estabelece a mesma condição para ambos os atos: tanto o registro de nascimento (alínea 'a') quanto a certidão de óbito (alínea 'b') são gratuitos para os \"reconhecidamente pobres\"."
             },
             {
                 question: "Todos, no âmbito judicial e administrativo, têm assegurados a razoável duração do processo e os meios que garantam a celeridade de sua tramitação.",
