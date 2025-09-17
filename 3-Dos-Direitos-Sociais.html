@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Direitos Sociais - Constituição Federal</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal</h1>
+            <p>Direitos Sociais (Art. 6º a 11)</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 6
+            {
+                question: "A educação, a saúde e a alimentação estão expressamente arroladas como direitos sociais na Constituição Federal.",
+                answer: "Certo",
+                rationale: "A questão está correta. O caput do Art. 6º da Constituição inicia a lista de direitos sociais mencionando, entre os primeiros, exatamente \"a educação, a saúde, a alimentação...\"."
+            },
+            {
+                question: "O trabalho, a moradia, o transporte e o lazer são direitos sociais garantidos pela Constituição.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois cita textualmente quatro direitos que constam na sequência da lista apresentada no caput do Art. 6º."
+            },
+            {
+                question: "A segurança, prevista no Art. 6º como direito social, refere-se exclusivamente à segurança pública, não abrangendo a seguridade social.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao restringir o sentido do direito. O Art. 6º lista \"a segurança\" e, logo em seguida, \"a previdência social\" e \"a assistência aos desamparados\", que, junto com a saúde, formam o tripé da seguridade social. A segurança no Art. 6º é entendida de forma ampla, englobando a segurança pública, a alimentar, a jurídica, entre outras."
+            },
+            {
+                question: "A previdência social, a proteção à maternidade e à infância e a assistência aos desamparados são direitos sociais assegurados na forma da lei.",
+                answer: "Errado",
+                rationale: "O erro da questão está na parte final. O caput do Art. 6º, ao final da enumeração dos direitos sociais, afirma que eles são assegurados \"na forma desta Constituição\", e não \"na forma da lei\". A fonte da garantia é a própria Constituição."
+            },
+            {
+                question: "A liberdade é um dos direitos sociais listados no rol do artigo 6º da Constituição Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora a liberdade seja um direito fundamental de primeira dimensão, ela está garantida no Art. 5º da Constituição. O rol do Art. 6º trata dos direitos sociais (de segunda dimensão), e a liberdade não está expressamente listada nele."
+            },
+            {
+                question: "Todo cidadão brasileiro em situação de vulnerabilidade social terá direito a uma renda básica familiar.",
+                answer: "Errado",
+                rationale: "O erro da questão está no uso do termo \"cidadão\". O parágrafo único do Art. 6º refere-se a \"todo brasileiro\", que é um conceito mais amplo e abrange nacionais que podem não estar no gozo de seus direitos políticos (não sendo, portanto, \"cidadãos\" em sentido estrito)."
+            },
+            {
+                question: "O direito a uma renda básica familiar, garantido aos brasileiros em situação de vulnerabilidade social, será implementado por meio de um programa temporário de transferência de renda.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O parágrafo único do Art. 6º estabelece que a renda básica familiar será garantida pelo poder público em programa \"permanente\" de transferência de renda, e não temporário."
+            },
+            {
+                question: "As normas e os requisitos de acesso ao programa de renda básica familiar serão determinados por decreto do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O parágrafo único do Art. 6º determina que as normas e os requisitos de acesso ao benefício \"serão determinados em lei\", exigindo, portanto, a atuação do Poder Legislativo, em respeito ao princípio da legalidade."
+            },
+            {
+                question: "A implementação do programa permanente de transferência de renda deve observar a legislação fiscal e orçamentária.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do parágrafo único do Art. 6º, que condiciona a implementação do programa à observância da \"legislação fiscal e orçamentária\", submetendo o direito à responsabilidade fiscal."
+            },
+            {
+                question: "Todo brasileiro, independentemente de sua condição social, terá direito a uma renda básica familiar garantida pelo poder público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por universalizar o direito sem observar a condição exigida. O parágrafo único do Art. 6º restringe o direito à renda básica familiar ao \"brasileiro em situação de vulnerabilidade social\", e não a todos os brasileiros indistintamente."
+            },
+            // Art. 7 - Bloco 1
+            {
+                question: "O rol de direitos dos trabalhadores urbanos e rurais previsto no artigo 7º da Constituição é taxativo, não admitindo a inclusão de outros direitos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 7º, em sua parte final, estabelece que os direitos listados são assegurados \"além de outros que visem à melhoria de sua condição social\". Isso significa que o rol é exemplificativo (numerus apertus), permitindo a existência de outros direitos previstos em lei ou em normas coletivas."
+            },
+            {
+                question: "A proteção da relação de emprego contra despedida arbitrária ou sem justa causa deve ser regulamentada por meio de lei ordinária.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao tipo de norma exigida. O Art. 7º, inciso I, determina expressamente que a matéria será tratada \"nos termos de lei complementar\", que exige um quórum de aprovação mais rigoroso (maioria absoluta) do que a lei ordinária."
+            },
+            {
+                question: "A indenização compensatória é um dos direitos previstos em lei complementar para proteger a relação de emprego contra despedida arbitrária ou sem justa causa.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 7º, inciso I. O dispositivo constitucional estabelece que a lei complementar \"preverá indenização compensatória, dentre outros direitos\" como forma de proteção ao trabalhador."
+            },
+            {
+                question: "O seguro-desemprego é um direito garantido a todo trabalhador que se encontre desempregado, independentemente da causa do desligamento.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao não especificar a condição para o recebimento do benefício. O Art. 7º, inciso II, assegura o seguro-desemprego \"em caso de desemprego involuntário\", ou seja, quando o trabalhador é dispensado sem justa causa, não abrangendo, por exemplo, o pedido de demissão."
+            },
+            {
+                question: "O fundo de garantia do tempo de serviço é um direito constitucionalmente assegurado aos trabalhadores urbanos e rurais.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz literally o direito previsto no Art. 7º, inciso III. O FGTS é uma garantia estendida a todos os trabalhadores regidos pela CLT."
+            },
+            {
+                question: "O salário mínimo deve ser fixado em lei e nacionalmente unificado, sendo capaz de atender às necessidades vitais básicas do trabalhador, mas não às de sua família.",
+                answer: "Errado",
+                rationale: "A questão restringe indevidamente o alcance do salário mínimo. O Art. 7º, inciso IV, é claro ao determinar que o salário mínimo deve ser capaz de atender \"a suas necessidades vitais básicas e às de sua família...\"."
+            },
+            {
+                question: "O salário mínimo deve ter reajustes periódicos que lhe preservem o poder aquisitivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com o Art. 7º, inciso IV, que estabelece a obrigatoriedade de \"reajustes periódicos que lhe preservem o poder aquisitivo\" como uma das características do salário mínimo."
+            },
+            {
+                question: "É vedada a vinculação do salário mínimo para qualquer fim, salvo para o cálculo de benefícios previdenciários.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por criar uma exceção que não existe no texto constitucional. O Art. 7º, inciso IV, veda a vinculação do salário mínimo \"para qualquer fim\", sem prever ressalvas. A Súmula Vinculante nº 4 do STF reforça essa proibição."
+            },
+            {
+                question: "É direito dos trabalhadores um piso salarial fixo, independentemente da extensão e da complexidade do trabalho.",
+                answer: "Errado",
+                rationale: "A assertiva contraria a literalidade do dispositivo. O Art. 7º, inciso V, garante um piso salarial \"proporcional à extensão e à complexidade do trabalho\", indicando que o valor deve variar de acordo com as características da função, e não ser um valor fixo para todos."
+            },
+            {
+                question: "O piso salarial proporcional à extensão e à complexidade do trabalho é um direito assegurado tanto aos trabalhadores urbanos quanto aos rurais.",
+                answer: "Certo",
+                rationale: "A questão está correta. O caput do Art. 7º estabelece que todos os direitos listados em seus incisos, incluindo o piso salarial (inciso V), são garantidos aos \"trabalhadores urbanos e rurais\"."
+            },
+            // Art. 7 - Bloco 2
+            {
+                question: "O salário é irredutível em qualquer hipótese, por se tratar de direito fundamental do trabalhador.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora a irredutibilidade salarial seja a regra, o próprio Art. 7º, inciso VI, prevê uma exceção expressa: a redução é possível se estiver disposta em convenção ou acordo coletivo de trabalho."
+            },
+            {
+                question: "A redução salarial é permitida quando negociada e estabelecida por meio de convenção ou acordo coletivo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve exatamente a exceção prevista na parte final do Art. 7º, inciso VI. A negociação coletiva é o instrumento constitucionalmente válido para flexibilizar a regra da irredutibilidade salarial."
+            },
+            {
+                question: "Aos trabalhadores que recebem remuneração variável, como comissões, é assegurada a garantia de um salário mensal, que pode ser inferior ao mínimo.",
+                answer: "Errado",
+                rationale: "A questão está incorreta na sua parte final. O Art. 7º, inciso VII, garante um salário aos trabalhadores com remuneração variável, mas estabelece que este deve ser \"nunca inferior ao mínimo\"."
+            },
+            {
+                question: "É direito dos trabalhadores que percebem remuneração variável a garantia de um salário nunca inferior ao mínimo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição fiel do direito assegurado pelo Art. 7º, inciso VII, aos trabalhadores comissionados ou que recebam outras formas de remuneração variável."
+            },
+            {
+                question: "O décimo terceiro salário tem como base de cálculo o salário-base do trabalhador, excluindo-se as demais verbas que compõem sua remuneração.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 7º, inciso VIII, determina que o décimo terceiro salário seja calculado com base na \"remuneração integral\", o que inclui não apenas o salário-base, mas também outras parcelas de natureza salarial, como horas extras, adicionais, etc."
+            },
+            {
+                question: "O décimo terceiro salário é um direito estendido aos aposentados, tendo como base de cálculo o valor da aposentadoria.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 7º, inciso VIII, que prevê expressamente o pagamento do abono anual aos inativos, calculado sobre \"o valor da aposentadoria\"."
+            },
+            {
+                question: "A remuneração do trabalho noturno deve ser, no mínimo, igual à do trabalho diurno.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso IX, exige que a remuneração do trabalho noturno seja superior à do diurno, em razão do maior desgaste físico e social do trabalhador. A simples igualdade não atende ao mandamento constitucional."
+            },
+            {
+                question: "É direito dos trabalhadores urbanos e rurais a remuneração do trabalho noturno superior à do diurno.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal do direito previsto no Art. 7º, inciso IX. O adicional noturno é uma garantia constitucional para compensar o labor em horário mais penoso."
+            },
+            {
+                question: "A proteção do salário contra retenção dolosa é garantida diretamente pela Constituição, que já define as sanções aplicáveis.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 7º, inciso X, estabelece que a proteção do salário se dará \"na forma da lei\". Trata-se de uma norma de eficácia limitada, que depende de legislação infraconstitucional para ser plenamente aplicada, inclusive para a tipificação do crime."
+            },
+            {
+                question: "A retenção dolosa do salário pelo empregador constitui crime, de acordo com a Constituição Federal.",
+                answer: "Certo",
+                rationale: "A questão está correta. A parte final do Art. 7º, inciso X, eleva a proteção salarial ao patamar penal, estabelecendo um mandado de criminalização ao determinar que a retenção intencional do salário \"constitui crime\"."
+            },
+            // Art. 7 - Bloco 3
+            {
+                question: "A participação nos lucros ou resultados da empresa, por ser uma verba paga com regularidade, integra a remuneração do trabalhador para todos os efeitos legais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso XI, estabelece de forma expressa que a participação nos lucros ou resultados é \"desvinculada da remuneração\". Essa desvinculação significa que sobre tal verba não incidem encargos trabalhistas e previdenciários, como FGTS e contribuição para o INSS."
+            },
+            {
+                question: "A participação na gestão da empresa é um direito comum a todos os trabalhadores, a ser exercido na forma da lei.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao tratar o direito como comum. O Art. 7º, inciso XI, qualifica a participação na gestão da empresa como algo a ser exercido \"excepcionalmente\", indicando que não se trata de uma regra geral, mas de uma possibilidade restrita, a ser definida em lei."
+            },
+            {
+                question: "O salário-família é um benefício pago a todo trabalhador que possua dependentes, independentemente de sua faixa de renda.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso XII, restringe o pagamento do salário-família ao \"trabalhador de baixa renda\", nos termos da lei. Portanto, a renda do trabalhador é um critério constitucional para a concessão do benefício."
+            },
+            {
+                question: "É direito dos trabalhadores de baixa renda o recebimento de salário-família, pago em razão de seus dependentes e na forma que a lei estabelecer.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve com precisão os três elementos do direito previsto no Art. 7º, inciso XII: o beneficiário (trabalhador de baixa renda), o motivo (existência de dependente) e a necessidade de regulamentação legal (\"nos termos da lei\")."
+            },
+            {
+                question: "A duração do trabalho normal é de, no máximo, oito horas diárias e quarenta e quatro semanais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com a primeira parte do Art. 7º, inciso XIII, que estabelece os limites máximos para a jornada de trabalho normal."
+            },
+            {
+                question: "A compensação de horários e a redução da jornada de trabalho podem ser ajustadas por meio de acordo individual escrito entre o empregado e o empregador.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 7º, inciso XIII, exige que a flexibilização da jornada (compensação e redução) seja feita \"mediante acordo ou convenção coletiva de trabalho\". A norma constitucional prestigia a negociação coletiva, não permitindo, em regra, que tais alterações sejam feitas por simples acordo individual."
+            },
+            {
+                question: "A jornada de trabalho para quem atua em turnos ininterruptos de revezamento é, em regra, de seis horas.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 7º, inciso XIV, estabelece a jornada especial de seis horas como o padrão para o trabalho realizado em turnos ininterruptos de revezamento, em razão do maior desgaste à saúde do trabalhador."
+            },
+            {
+                question: "A jornada de seis horas para o trabalho em turnos ininterruptos de revezamento é um direito absoluto e não pode ser alterada.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por desconsiderar a exceção. O Art. 7º, inciso XIV, estabelece a jornada de seis horas, \"salvo negociação coletiva\". Portanto, por meio de acordo ou convenção coletiva, é possível estabelecer uma jornada diferente, como a de oito horas."
+            },
+            {
+                question: "O repouso semanal remunerado deve ser gozado, obrigatoriamente, aos domingos.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 7º, inciso XV, estabelece que o repouso semanal remunerado será \"preferencialmente aos domingos\". O uso do advérbio \"preferencialmente\" indica que o gozo do repouso em outro dia da semana é permitido, embora o domingo seja a regra geral."
+            },
+            {
+                question: "É direito dos trabalhadores o repouso semanal remunerado, que deve ocorrer, de preferência, aos domingos.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do direito assegurado pelo Art. 7º, inciso XV, da Constituição Federal."
+            },
+            // Art. 7 - Bloco 4
+            {
+                question: "A remuneração do serviço extraordinário deve ser paga com um acréscimo de cinquenta por cento sobre o valor da hora normal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por fixar o percentual. O Art. 7º, inciso XVI, estabelece que a remuneração do serviço extraordinário será superior, \"no mínimo\", em cinquenta por cento à do normal. Isso significa que 50% é o piso constitucional, podendo a lei, o acordo ou a convenção coletiva prever um percentual superior."
+            },
+            {
+                question: "É direito dos trabalhadores a remuneração do serviço extraordinário com valor pelo menos cinquenta por cento superior ao do serviço normal.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve com exatidão a garantia prevista no Art. 7º, inciso XVI. O uso da expressão \"pelo menos\" reflete adequadamente o piso (\"no mínimo\") estabelecido pelo texto constitucional para a remuneração das horas extras."
+            },
+            {
+                question: "O gozo de férias anuais remuneradas é um direito do trabalhador, acrescido do valor correspondente a um terço do salário normal.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao fixar o valor do adicional. O Art. 7º, inciso XVII, assegura a remuneração das férias com \"pelo menos\" um terço a mais que o salário normal. Assim como nas horas extras, a Constituição estabelece um piso, sendo possível que normas mais favoráveis ao trabalhador prevejam um adicional superior."
+            },
+            {
+                question: "É assegurado o gozo de férias anuais remuneradas com um acréscimo de, no mínimo, um terço a mais do que o salário normal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois utiliza a expressão \"no mínimo\", que corresponde fielmente ao piso garantido pelo Art. 7º, inciso XVII, para o adicional de férias."
+            },
+            {
+                question: "A licença à gestante tem duração de cento e vinte dias, período no qual é garantida a manutenção de seu salário, mas não de seu emprego.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao excluir a proteção ao vínculo empregatício. O Art. 7º, inciso XVIII, é explícito ao garantir a licença à gestante \"sem prejuízo do emprego e do salário\", assegurando tanto a estabilidade no cargo quanto a manutenção da remuneração."
+            },
+            {
+                question: "É direito da trabalhadora gestante a licença com duração de cento e vinte dias, sem prejuízo do emprego e do salário.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do direito assegurado pelo Art. 7º, inciso XVIII, da Constituição Federal."
+            },
+            {
+                question: "A Constituição Federal fixa a duração da licença-paternidade em cinco dias.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 7º, inciso XIX, estabelece a licença-paternidade \"nos termos fixados em lei\". A própria Constituição delega ao legislador a definição do prazo. O prazo de cinco dias não está no corpo da Constituição, mas sim no Ato das Disposições Constitucionais Transitórias (ADCT), Art. 10, § 1º, até que a lei venha a disciplinar a matéria."
+            },
+            {
+                question: "A licença-paternidade é um direito constitucional, cuja disciplina e prazo são remetidos à legislação infraconstitucional.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois interpreta fielmente o conteúdo do Art. 7º, inciso XIX. Trata-se de uma norma de eficácia limitada, que consagra o direito, mas atribui à lei a tarefa de estabelecer seus termos e condições."
+            },
+            {
+                question: "A proteção do mercado de trabalho da mulher se dará exclusivamente por meio da fixação de cotas de contratação em empresas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por restringir indevidamente o meio de proteção. O Art. 7º, inciso XX, prevê a proteção \"mediante incentivos específicos, nos termos da lei\". A fixação de cotas pode ser um desses incentivos, mas a expressão constitucional é mais ampla, permitindo outras medidas, como benefícios fiscais para empresas que contratam mulheres, programas de qualificação, etc."
+            },
+            {
+                question: "A lei deverá prever incentivos específicos como forma de proteger o mercado de trabalho da mulher.",
+                answer: "Certo",
+                rationale: "A questão está correta e em total conformidade com o Art. 7º, inciso XX, que estabelece um mandamento para o legislador criar \"incentivos específicos\" para promover a proteção do trabalho feminino."
+            },
+             // Art. 7 - Bloco 5
+            {
+                question: "O aviso prévio é fixado pela Constituição em trinta dias para todos os trabalhadores, independentemente do tempo de serviço.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso XXI, estabelece que o aviso prévio será \"proporcional ao tempo de serviço\", sendo o prazo de trinta dias apenas o patamar mínimo. A lei que regulamenta o dispositivo prevê o acréscimo de dias a esse mínimo, de acordo com os anos de trabalho na mesma empresa."
+            },
+            {
+                question: "É direito dos trabalhadores o aviso prévio proporcional ao tempo de serviço, com duração mínima de trinta dias, nos termos da lei.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do direito assegurado pelo Art. 7º, inciso XXI, da Constituição Federal."
+            },
+            {
+                question: "É dever do empregador eliminar completamente os riscos inerentes ao trabalho, por meio de normas de saúde, higiene e segurança.",
+                answer: "Errado",
+                rationale: "O erro da questão está no verbo \"eliminar\". O Art. 7º, inciso XXII, estabelece como direito a \"redução dos riscos inerentes ao trabalho\". A Constituição reconhece que certas atividades possuem riscos intrínsecos que nem sempre podem ser eliminados, mas que devem ser obrigatoriamente reduzidos a patamares seguros."
+            },
+            {
+                question: "A redução dos riscos inerentes ao trabalho é um direito dos trabalhadores a ser efetivado por meio de normas de saúde, higiene e segurança.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente o direito e o meio para sua implementação, conforme previsto no Art. 7º, inciso XXII."
+            },
+            {
+                question: "É assegurado um adicional de remuneração para as atividades consideradas penosas, insalubres ou perigosas, na forma da Constituição.",
+                answer: "Errado",
+                rationale: "A questão está incorreta na sua parte final. O Art. 7º, inciso XXIII, estabelece que o referido adicional será pago \"na forma da lei\". Trata-se de uma norma de eficácia limitada, que depende de legislação infraconstitucional para definir os percentuais e as condições de pagamento."
+            },
+            {
+                question: "O direito ao adicional de remuneração abrange as atividades penosas, insalubres e também as perigosas.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois elenca as três categorias de atividades que, segundo o Art. 7º, inciso XXIII, ensejam o pagamento do adicional de remuneração correspondente."
+            },
+            {
+                question: "A aposentadoria é um direito social garantido constitucionalmente aos trabalhadores urbanos e rurais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 7º, inciso XXIV, prevê a \"aposentadoria\" como um dos direitos dos trabalhadores, sendo este um dos pilares da Previdência Social, estendido a trabalhadores urbanos e rurais pelo caput do artigo."
+            },
+            {
+                question: "O direito à aposentadoria tem suas regras e requisitos integralmente definidos no próprio inciso que o estabelece no rol de direitos dos trabalhadores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso XXIV, apenas lista a \"aposentadoria\" como um direito social. Suas regras complexas, como tempo de contribuição, idade mínima e critérios de cálculo, são detalhadas em outros artigos da Constituição (especialmente o Art. 201 e seguintes) e na legislação previdenciária."
+            },
+            {
+                question: "É garantida a assistência gratuita aos filhos e dependentes dos trabalhadores em creches e pré-escolas, desde o nascimento até os seis anos de idade.",
+                answer: "Errado",
+                rationale: "O erro da questão está na faixa etária. O Art. 7º, inciso XXV, estabelece que a assistência gratuita é garantida desde o nascimento \"até 5 (cinco) anos de idade\", e não seis."
+            },
+            {
+                question: "É direito dos trabalhadores a assistência gratuita a seus filhos e dependentes, do nascimento aos cinco anos de idade, em creches e pré-escolas.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do direito social assegurado pelo Art. 7º, inciso XXV, da Constituição Federal."
+            },
+            // Art. 7 - Bloco 6
+            {
+                question: "As convenções e os acordos coletivos de trabalho, por serem reconhecidos pela Constituição, prevalecem sobre as normas constitucionais de proteção ao trabalhador.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O reconhecimento das convenções e acordos coletivos (Art. 7º, inciso XXVI) é um princípio que valoriza a negociação coletiva, mas esses instrumentos não podem suprimir direitos e garantias fundamentais previstos na própria Constituição, que é a norma hierarquicamente superior."
+            },
+            {
+                question: "O reconhecimento das convenções e dos acordos coletivos de trabalho é um direito constitucional dos trabalhadores urbanos e rurais.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal do direito assegurado pelo Art. 7º, inciso XXVI, da Constituição Federal."
+            },
+            {
+                question: "A Constituição Federal estabelece as regras e os mecanismos específicos de proteção do trabalhador em face da automação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso XXVII, assegura a \"proteção em face da automação, na forma da lei\". Trata-se de uma norma de eficácia limitada, que consagra o direito, mas delega à legislação infraconstitucional a tarefa de criar as regras e os mecanismos para sua efetivação."
+            },
+            {
+                question: "É direito dos trabalhadores a proteção em face da automação, a ser disciplinada por lei.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente o direito e a forma de sua regulamentação, conforme previsto no Art. 7º, inciso XXVII."
+            },
+            {
+                question: "O pagamento do seguro contra acidentes de trabalho pelo empregador exclui a obrigação deste de pagar indenização ao trabalhador pelo mesmo sinistro.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 7º, inciso XXVIII, é explícito ao afirmar que o seguro é devido \"sem excluir a indenização a que este está obrigado, quando incorrer em dolo ou culpa\". As duas obrigações são distintas e cumuláveis: o seguro tem natureza previdenciária (responsabilidade objetiva), e a indenização tem natureza cível (responsabilidade subjetiva)."
+            },
+            {
+                question: "O empregador, além de arcar com o seguro contra acidentes de trabalho, está obrigado a indenizar o empregado acidentado caso tenha agido com dolo ou culpa.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve com precisão a regra da dupla responsabilidade do empregador em caso de acidente de trabalho, conforme previsto na parte final do Art. 7º, inciso XXVIII."
+            },
+            {
+                question: "O prazo prescricional para que o trabalhador reclame créditos resultantes da relação de trabalho é de cinco anos, contados a partir da extinção do contrato de trabalho.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao confundir os dois prazos prescricionais. Conforme o Art. 7º, inciso XXIX, o trabalhador tem o prazo de dois anos após a extinção do contrato para ajuizar a ação (prescrição bienal). Uma vez ajuizada a ação, ele só pode reclamar os créditos dos últimos cinco anos do contrato (prescrição quinquenal)."
+            },
+            {
+                question: "Quanto aos créditos trabalhistas, a Constituição estabelece um prazo prescricional de cinco anos para os trabalhadores, limitado ao prazo de dois anos após a extinção do contrato para o ajuizamento da ação.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve adequadamente os dois prazos prescricionais previstos no Art. 7º, inciso XXIX, e a relação entre eles: a prescrição quinquenal (direito material) e a bienal (direito de ação)."
+            },
+            {
+                question: "A Constituição proíbe a diferença de salários e de critério de admissão por motivo de sexo e idade, mas não por motivo de cor ou estado civil.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. O Art. 7º, inciso XXX, veda a discriminação por todos os motivos elencados: \"sexo, idade, cor ou estado civil\"."
+            },
+            {
+                question: "É proibida a diferença de salários, de exercício de funções e de critério de admissão por motivo de sexo, idade, cor ou estado civil.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta da vedação à discriminação nas relações de trabalho, conforme assegurado pelo Art. 7º, inciso XXX, da Constituição Federal."
+            },
+            // Art. 7 - Bloco 7
+            {
+                question: "É proibida qualquer discriminação referente ao salário do trabalhador com deficiência, mas não há vedação constitucional expressa quanto a critérios de admissão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 7º, inciso XXXI, proíbe expressamente a discriminação no tocante a \"salário e critérios de admissão\" do trabalhador portador de deficiência, abrangendo as duas esferas."
+            },
+            {
+                question: "A Constituição Federal proíbe que se faça distinção entre o trabalho manual, o técnico e o intelectual, bem como entre os profissionais que os executam.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição fiel do princípio da isonomia no tratamento das diferentes modalidades de trabalho, conforme previsto no Art. 7º, inciso XXXII."
+            },
+            {
+                question: "É vedado o trabalho noturno, perigoso ou insalubre a menores de dezesseis anos e qualquer trabalho a menores de quatorze anos.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por confundir as idades de proteção. O Art. 7º, inciso XXXIII, proíbe o trabalho noturno, perigoso ou insalubre a menores de dezoito anos, e veda qualquer trabalho a menores de dezesseis anos (com a exceção do aprendiz a partir dos catorze)."
+            },
+            {
+                question: "É permitido o trabalho a menores de dezesseis anos, desde que seja na condição de aprendiz e a partir dos quatorze anos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve exatamente a exceção contida na parte final do Art. 7º, inciso XXXIII. A regra geral é a proibição de trabalho para menores de dezesseis anos, mas a Constituição autoriza o trabalho na condição de aprendiz para maiores de catorze."
+            },
+            {
+                question: "A Constituição garante a igualdade de direitos entre o trabalhador com vínculo empregatício permanente e o trabalhador avulso.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do direito social previsto no Art. 7º, inciso XXXIV, que equipara os direitos do trabalhador avulso aos do empregado com vínculo permanente."
+            },
+            {
+                question: "São assegurados à categoria dos trabalhadores domésticos, de forma imediata e incondicionada, todos os direitos previstos nos incisos do artigo 7º da Constituição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por dois motivos. Primeiro, o parágrafo único do Art. 7º estende aos domésticos uma lista específica de direitos, e não todos. Segundo, parte desses direitos depende do atendimento de condições a serem estabelecidas em lei."
+            },
+            {
+                question: "O direito ao décimo terceiro salário e às férias anuais remuneradas com acréscimo de um terço são garantias constitucionais asseguradas aos trabalhadores domésticos.",
+                answer: "Certo",
+                rationale: "A questão está correta. O direito ao décimo terceiro salário (inciso VIII) e às férias anuais remuneradas (inciso XVII) estão na primeira lista de direitos do parágrafo único do Art. 7º, sendo, portanto, de aplicação direta e imediata à categoria dos trabalhadores domésticos."
+            },
+            {
+                question: "O direito ao seguro-desemprego e ao fundo de garantia do tempo de serviço (FGTS) são garantias de aplicação imediata aos trabalhadores domésticos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O seguro-desemprego (inciso II) e o FGTS (inciso III) estão na segunda lista de direitos do parágrafo único do Art. 7º, cuja aplicação depende do atendimento de \"condições estabelecidas em lei\", não sendo, portanto, de aplicação imediata."
+            },
+            {
+                question: "A Constituição assegura aos trabalhadores domésticos o direito à integração à previdência social.",
+                answer: "Certo",
+                rationale: "A questão está correta. A parte final do parágrafo único do Art. 7º, após listar os direitos dos incisos, menciona expressamente que é assegurada à categoria \"a sua integração à previdência social\"."
+            },
+            {
+                question: "A extensão de certos direitos aos trabalhadores domésticos, como o FGTS, deve observar a simplificação do cumprimento das obrigações tributárias.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o texto do parágrafo único do Art. 7º. A norma constitucional condiciona a aplicação dos direitos da segunda lista (que inclui o FGTS - inciso III) à observância da \"simplificação do cumprimento das obrigações tributárias\", o que resultou na criação do regime do Simples Doméstico."
+            },
+             // Art. 8
+            {
+                question: "A liberdade de associação profissional ou sindical é um direito absoluto, não se sujeitando a nenhuma observação ou condição imposta pela Constituição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 8º, após declarar a liberdade de associação, afirma que deve ser \"observado o seguinte:\", introduzindo uma série de regras e vedações nos incisos subsequentes que condicionam e regulam o exercício desse direito."
+            },
+            {
+                question: "É livre a associação profissional ou sindical.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à declaração de princípio que inicia o caput do Art. 8º da Constituição."
+            },
+            {
+                question: "A lei não pode exigir autorização do Estado para a fundação de um sindicato, mas pode exigir o registro no órgão competente.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com o Art. 8º, inciso I. O dispositivo veda a exigência de autorização, mas ressalva a necessidade do registro, que tem por finalidade dar publicidade ao ato de criação e verificar os requisitos legais, como a unicidade."
+            },
+            {
+                question: "É permitido ao Poder Público interferir na organização sindical para garantir o cumprimento de suas finalidades.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do Art. 8º, inciso I, veda expressamente ao Poder Público \"a interferência e a intervenção na organização sindical\", consagrando o princípio da liberdade sindical em face do Estado."
+            },
+            {
+                question: "É permitida a criação de mais de uma organização sindical representativa da mesma categoria profissional na mesma base territorial, desde que uma delas seja em grau de federação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 8º, inciso II, adota o princípio da unicidade sindical, vedando a criação de mais de uma organização sindical \"em qualquer grau\" (sindicato, federação ou confederação) na mesma base territorial."
+            },
+            {
+                question: "A base territorial de uma organização sindical não poderá ser inferior à área de um Município.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz literalmente a limitação mínima para a base territorial estabelecida na parte final do Art. 8º, inciso II."
+            },
+            {
+                question: "Ao sindicato cabe a defesa exclusiva dos direitos e interesses coletivos da categoria.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por restringir a atuação do sindicato. O Art. 8º, inciso III, estabelece que cabe ao sindicato a defesa dos direitos e interesses \"coletivos ou individuais da categoria\", conferindo-lhe a função de substituto processual para pleitear também direitos individuais."
+            },
+            {
+                question: "Compete ao sindicato a defesa dos direitos da categoria, inclusive em questões judiciais ou administrativas.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 8º, inciso III, que legitima a atuação do sindicato tanto na esfera judicial quanto na administrativa na defesa dos interesses da categoria que representa."
+            },
+            {
+                question: "A contribuição para o custeio do sistema confederativo da representação sindical é fixada por lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 8º, inciso IV, determina que \"a assembléia geral fixará\" a contribuição confederativa. Sua instituição, portanto, decorre de deliberação da própria categoria, e não de imposição legal."
+            },
+            {
+                question: "A contribuição fixada pela assembleia geral para custeio do sistema confederativo não se confunde com a contribuição sindical prevista em lei.",
+                answer: "Certo",
+                rationale: "A questão está correta. A parte final do Art. 8º, inciso IV, estabelece que a contribuição confederativa será fixada \"independentemente da contribuição prevista em lei\" (antigo imposto sindical), tratando-as como institutos distintos."
+            },
+            {
+                question: "Ninguém será obrigado a filiar-se a sindicato, mas, uma vez filiado, será obrigado a manter-se nesta condição pelo prazo mínimo de um ano.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 8º, inciso V, consagra o princípio da liberdade sindical negativa em sua dupla dimensão, estabelecendo que ninguém será obrigado \"a filiar-se ou a manter-se filiado a sindicato\", garantindo o direito de desfiliação a qualquer tempo."
+            },
+            {
+                question: "Ninguém poderá ser compelido a filiar-se ou a permanecer filiado a um sindicato.",
+                answer: "Certo",
+                rationale: "A questão é uma paráfrase correta do direito fundamental à liberdade de associação sindical, nos termos do Art. 8º, inciso V."
+            },
+            {
+                question: "A participação dos sindicatos nas negociações coletivas de trabalho é facultativa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 8º, inciso VI, estabelece que \"é obrigatória a participação dos sindicatos nas negociações coletivas de trabalho\", consagrando o monopólio de representação sindical nesse âmbito."
+            },
+            {
+                question: "O aposentado filiado a sindicato tem direito a votar, mas não a ser votado nas organizações sindicais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 8º, inciso VII, garante ao aposentado filiado o direito de exercer plenamente sua cidadania sindical, podendo \"votar e ser votado\"."
+            },
+            {
+                question: "É direito do aposentado filiado votar e ser votado nas organizações sindicais.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do direito previsto no Art. 8º, inciso VII."
+            },
+            {
+                question: "É vedada a dispensa do empregado sindicalizado a partir de sua eleição para cargo de direção, ainda que suplente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao marco inicial da estabilidade. O Art. 8º, inciso VIII, estabelece que a vedação à dispensa se inicia \"a partir do registro da candidatura\", e não apenas a partir da eleição."
+            },
+            {
+                question: "A estabilidade do empregado eleito para cargo de direção sindical, mesmo que suplente, se estende até um ano após o final do mandato, salvo cometimento de falta grave.",
+                answer: "Certo",
+                rationale: "A questão descreve corretamente a duração e a exceção à garantia de emprego do dirigente sindical, nos exatos termos do Art. 8º, inciso VIII."
+            },
+            {
+                question: "As disposições do artigo 8º sobre a liberdade sindical aplicam-se à organização de sindicatos rurais, mas não às colônias de pescadores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O parágrafo único do Art. 8º estende expressamente as disposições do artigo à organização de \"sindicatos rurais e de colônias de pescadores\"."
+            },
+            {
+                question: "As regras sobre a organização sindical previstas na Constituição aplicam-se de forma incondicionada aos sindicatos rurais e às colônias de pescadores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O parágrafo único do Art. 8º, ao estender as regras a essas categorias, ressalva que devem ser \"atendidas as condições que a lei estabelecer\", indicando que a aplicação pode ser condicionada por legislação específica."
+            },
+            {
+                question: "As regras constitucionais sobre organização sindical aplicam-se aos sindicatos rurais e às colônias de pescadores, observadas as condições legais.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois interpreta fielmente o parágrafo único do Art. 8º, que estende a aplicação das normas do artigo a essas categorias específicas, mas sujeita essa aplicação ao atendimento de condições a serem definidas em lei."
+            },
+            // Arts. 9, 10 e 11
+            {
+                question: "O direito de greve é assegurado, competindo à lei definir a oportunidade de exercê-lo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 9º estabelece que compete aos próprios trabalhadores decidir sobre a oportunidade de exercer o direito de greve, e não à lei."
+            },
+            {
+                question: "Compete aos trabalhadores decidir sobre os interesses que devam por meio da greve defender.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do caput do Art. 9º, que atribui aos trabalhadores a prerrogativa de definir a pauta de reivindicações e os interesses a serem defendidos no movimento grevista."
+            },
+            {
+                question: "A lei definirá os serviços ou atividades essenciais e disporá sobre o atendimento das necessidades inadiáveis da comunidade.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 9º, § 1º, que estabelece a competência da lei para regulamentar o direito de greve no que tange às atividades essenciais e à manutenção dos serviços indispensáveis."
+            },
+            {
+                question: "Os abusos cometidos no exercício do direito de greve sujeitam os responsáveis exclusivamente a sanções de natureza cível.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 9º, § 2º, afirma que os abusos \"sujeitam os responsáveis às penas da lei\", expressão genérica que abrange sanções de diversas naturezas, como cível, administrativa e, a depender do ato, até mesmo penal, não se restringindo à esfera cível."
+            },
+            {
+                question: "É assegurada a participação exclusiva dos trabalhadores nos colegiados dos órgãos públicos em que seus interesses profissionais ou previdenciários sejam objeto de discussão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exclusiva\". O Art. 10 assegura a participação \"dos trabalhadores e empregadores\", consagrando um modelo de representação paritária nos colegiados que tratam de seus interesses."
+            },
+            {
+                question: "A participação de trabalhadores e empregadores é assegurada nos colegiados de órgãos públicos onde seus interesses profissionais ou previdenciários sejam discutidos e deliberados.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente o conteúdo do Art. 10, indicando tanto os sujeitos (trabalhadores e empregadores) quanto o objeto da participação (interesses profissionais ou previdenciários)."
+            },
+            {
+                question: "Nas empresas com duzentos ou mais empregados, é assegurada a eleição de um representante destes.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao número mínimo de empregados. O Art. 11 estabelece a garantia nas empresas \"de mais de duzentos empregados\", o que significa que o direito se aplica a partir de 201 empregados, e não em empresas com exatamente 200."
+            },
+            {
+                question: "É assegurada a eleição de um representante dos empregados nas empresas de mais de duzentos empregados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com a primeira parte do Art. 11, que garante a eleição de um representante dos trabalhadores em empresas com o contingente especificado."
+            },
+            {
+                question: "A finalidade do representante dos empregados eleito é promover-lhes o entendimento direto com os empregadores e atuar nas negociações coletivas.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por adicionar uma atribuição não prevista no dispositivo. O Art. 11 estabelece que a finalidade é \"exclusiva de promover-lhes o entendimento direto com os empregadores\". A atuação em negociações coletivas é uma prerrogativa do sindicato (Art. 8º, VI)."
+            },
+            {
+                question: "O representante dos empregados em empresas com mais de duzentos funcionários tem a finalidade exclusiva de promover o entendimento direto entre os trabalhadores e os empregadores.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve com exatidão a finalidade única e específica do representante eleito, conforme a literalidade da parte final do Art. 11 da Constituição Federal."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
