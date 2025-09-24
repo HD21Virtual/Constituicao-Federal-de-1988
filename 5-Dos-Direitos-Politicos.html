@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Constituição Federal</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal</h1>
+            <p>Dos Direitos Políticos</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 14 - Bloco 1
+            {
+                question: "A soberania popular é exercida pelo sufrágio universal e pelo voto direto, secreto e com valor igual para todos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente os instrumentos de exercício da democracia representativa (indireta) listados na primeira parte do caput do Art. 14 da Constituição."
+            },
+            {
+                question: "O exercício da soberania popular se dá exclusivamente pelo voto direto e secreto, com valor igual para todos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exclusivamente\". O caput do Art. 14 estabelece que a soberania popular também é exercida, nos termos da lei, mediante plebiscito, referendo e iniciativa popular, que são instrumentos de democracia direta."
+            },
+            {
+                question: "O plebiscito é uma das formas de exercício da soberania popular, a ser regulamentado por lei.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 14, inciso I, lista o \"plebiscito\" como um dos instrumentos de exercício da soberania popular. A expressão \"nos termos da lei\", contida no caput, aplica-se a ele, indicando a necessidade de regulamentação legal."
+            },
+            {
+                question: "O referendo é um instrumento de exercício da soberania popular.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente ao que dispõe o Art. 14, inciso II, que elenca o referendo como uma das manifestações da democracia direta."
+            },
+            {
+                question: "A iniciativa popular, o plebiscito e o referendo são as únicas formas de exercício da soberania popular.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por omitir a forma principal de exercício da soberania popular. O caput do Art. 14 estabelece que ela é exercida, primeiramente, \"pelo sufrágio universal e pelo voto direto e secreto\", e, complementarmente, pelos instrumentos de democracia direta listados nos incisos."
+            },
+            // Art. 14 - Bloco 2
+            {
+                question: "O alistamento eleitoral e o voto são obrigatórios para os maiores de dezoito anos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal da regra geral de obrigatoriedade do alistamento e do voto, conforme estabelecido no Art. 14, § 1º, inciso I, da Constituição."
+            },
+            {
+                question: "O voto é facultativo para os analfabetos e para os maiores de setenta anos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois menciona duas das hipóteses em que o voto é facultativo, de acordo com o Art. 14, § 1º, inciso II, alíneas 'a' (os analfabetos) e 'b' (os maiores de setenta anos)."
+            },
+            {
+                question: "O alistamento eleitoral e o voto são facultativos para os maiores de sessenta e cinco anos.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto à idade. O Art. 14, § 1º, inciso II, alínea 'b', torna o voto facultativo para os maiores de setenta anos, e não sessenta e cinco."
+            },
+            {
+                question: "Para os maiores de dezesseis e menores de dezoito anos, o alistamento eleitoral é obrigatório, mas o voto é facultativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do § 1º do Art. 14 trata \"o alistamento eleitoral e o voto\" de forma conjunta. Portanto, para a faixa etária dos maiores de dezesseis e menores de dezoito anos (inciso II, 'c'), tanto o alistamento quanto o voto são facultativos."
+            },
+            {
+                question: "O alistamento eleitoral e o voto são facultativos para os maiores de dezesseis e menores de dezoito anos.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta da hipótese de facultatividade do voto para jovens, conforme previsto no Art. 14, § 1º, inciso II, alínea 'c'."
+            },
+            // Art. 14 - Bloco 3
+            {
+                question: "Os estrangeiros não podem alistar-se como eleitores no Brasil.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à primeira parte do Art. 14, § 2º, que estabelece a vedação absoluta ao alistamento eleitoral de estrangeiros, por não possuírem nacionalidade brasileira."
+            },
+            {
+                question: "Os conscritos, durante o período do serviço militar obrigatório, não podem alistar-se como eleitores.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da segunda parte do Art. 14, § 2º. A condição de conscrito (jovem em prestação do serviço militar inicial) suspende temporariamente a capacidade eleitoral ativa (o direito de votar)."
+            },
+            {
+                question: "Os estrangeiros e todos os militares são inalistáveis.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por generalizar a regra aplicável aos militares. O Art. 14, § 2º, restringe a inalistabilidade apenas aos \"conscritos\" e somente \"durante o período do serviço militar obrigatório\". Os militares de carreira (oficiais e praças profissionais) são alistáveis e votam normalmente."
+            },
+            // Art. 14 - Bloco 4
+            {
+                question: "São condições de elegibilidade, entre outras, a nacionalidade brasileira e o pleno exercício dos direitos políticos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois menciona textualmente duas das condições de elegibilidade listadas no Art. 14, § 3º: a nacionalidade brasileira (inciso I) e o pleno exercício dos direitos políticos (inciso II)."
+            },
+            {
+                question: "O alistamento eleitoral e o domicílio eleitoral na circunscrição são condições de elegibilidade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente aos requisitos previstos nos incisos III (alistamento eleitoral) e IV (domicílio eleitoral na circunscrição) do § 3º do Art. 14."
+            },
+            {
+                question: "A filiação partidária é uma condição de elegibilidade, não sendo permitida, em regra, a candidatura avulsa.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 14, § 3º, inciso V, estabelece a \"filiação partidária\" como uma das condições de elegibilidade, o que, segundo o entendimento do STF, veda as candidaturas avulsas (sem partido) no sistema eleitoral brasileiro."
+            },
+            {
+                question: "A idade mínima de trinta e cinco anos é exigida para os cargos de Presidente da República, Vice-Presidente da República e Governador de Estado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao incluir o cargo de Governador. A idade mínima de trinta e cinco anos, conforme o Art. 14, § 3º, VI, 'a', é exigida para Presidente, Vice-Presidente e Senador. Para Governador, a idade mínima é de trinta anos (alínea 'b')."
+            },
+            {
+                question: "A idade mínima para concorrer ao cargo de Senador é de trinta e cinco anos.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 14, § 3º, VI, alínea 'a', que estabelece a idade mínima de trinta e cinco anos para o cargo de Senador da República."
+            },
+            {
+                question: "Para se candidatar ao cargo de Governador de Estado ou do Distrito Federal, o cidadão deve ter a idade mínima de trinta anos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente o requisito de idade para o chefe do Poder Executivo estadual e distrital, conforme previsto no Art. 14, § 3º, VI, alínea 'b'."
+            },
+            {
+                question: "A idade mínima de vinte e um anos é condição de elegibilidade para os cargos de Deputado Federal e Senador.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao incluir o cargo de Senador. A idade mínima de vinte e um anos (Art. 14, § 3º, VI, 'c') aplica-se a Deputado Federal, Estadual ou Distrital, Prefeito, Vice-Prefeito e juiz de paz. Para Senador, a idade mínima é de trinta e cinco anos (alínea 'a')."
+            },
+            {
+                question: "Para os cargos de Deputado Estadual, Prefeito e Vice-Prefeito, a idade mínima exigida é de vinte e um anos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois lista cargos para os quais o Art. 14, § 3º, VI, alínea 'c', exige a idade mínima de vinte e um anos."
+            },
+            {
+                question: "A idade mínima de dezoito anos é condição de elegibilidade para o cargo de Prefeito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A idade mínima de dezoito anos, prevista no Art. 14, § 3º, VI, alínea 'd', é exigida para o cargo de Vereador. Para Prefeito, a idade mínima é de vinte e um anos (alínea 'c')."
+            },
+            {
+                question: "Para o cargo de Vereador, a idade mínima exigida é de dezoito anos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde exatamente à exigência de idade para o cargo de legislador municipal, conforme o Art. 14, § 3º, VI, alínea 'd'."
+            },
+            // Art. 14 - Bloco 5
+            {
+                question: "São inelegíveis os inalistáveis e os analfabetos.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 14, § 4º, que estabelece as duas hipóteses de inelegibilidade absoluta: a dos inalistáveis (estrangeiros e conscritos) e a dos analfabetos."
+            },
+            {
+                question: "A condição de analfabeto torna o voto facultativo, mas não impede a elegibilidade para cargos políticos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta em sua segunda parte. Embora o voto seja de fato facultativo para os analfabetos (Art. 14, § 1º, II, 'a'), a condição de analfabeto é uma causa de inelegibilidade, conforme expressamente previsto no Art. 14, § 4º."
+            },
+            {
+                question: "O Presidente da República, os Governadores e os Prefeitos, bem como quem os houver sucedido ou substituído, poderão ser reeleitos para um único período subsequente.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente a regra da reeleição para os chefes do Poder Executivo, nos exatos termos do Art. 14, § 5º da Constituição."
+            },
+            {
+                question: "Deputados Federais e Senadores podem ser reeleitos para um único período subsequente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A regra de reeleição para um único período subsequente, prevista no Art. 14, § 5º, aplica-se exclusivamente aos chefes do Poder Executivo (Presidente, Governadores e Prefeitos). Para os membros do Poder Legislativo, não há limite constitucional para o número de reeleições."
+            },
+            {
+                question: "Para concorrer a um cargo diferente, o Presidente da República, os Governadores e os Prefeitos devem renunciar aos seus respectivos mandatos até seis meses antes do pleito.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal da regra de desincompatibilização para os chefes do Executivo, conforme o Art. 14, § 6º. A renúncia é necessária para que não utilizem a máquina pública em benefício de sua nova candidatura."
+            },
+            {
+                question: "O Prefeito que desejar se candidatar à reeleição para o mesmo cargo de Prefeito deve renunciar ao mandato até seis meses antes do pleito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A regra de desincompatibilização (renúncia) prevista no Art. 14, § 6º, aplica-se apenas quando o titular do cargo executivo deseja concorrer a \"outros cargos\". Para a reeleição ao mesmo cargo, não é exigida a renúncia."
+            },
+            {
+                question: "O cônjuge e os parentes consanguíneos ou afins, até o terceiro grau, do Presidente da República são inelegíveis no território nacional.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao grau de parentesco. O Art. 14, § 7º, estabelece a inelegibilidade reflexa para o cônjuge e os parentes consanguíneos ou afins, \"até o segundo grau\", não incluindo, portanto, os parentes de terceiro grau (como tios e sobrinhos)."
+            },
+            {
+                question: "A inelegibilidade do cônjuge e de parentes do chefe do Poder Executivo restringe-se ao território de jurisdição do titular.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A chamada \"inelegibilidade reflexa\" ou \"por parentesco\", prevista no Art. 14, § 7º, não é absoluta. Ela se aplica apenas \"no território de jurisdição do titular\". Por exemplo, o filho de um Prefeito de um município \"A\" é inelegível no município \"A\", mas pode se candidatar em um município vizinho \"B\"."
+            },
+            {
+                question: "A esposa de um Prefeito, que já exerce o mandato de Vereadora no mesmo município, não poderá se candidatar à reeleição para o cargo de Vereadora.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 14, § 7º, prevê uma exceção à inelegibilidade reflexa, afirmando que a regra não se aplica se o parente \"já for titular de mandato eletivo e candidato à reeleição\". Portanto, a Vereadora pode, sim, se candidatar à reeleição."
+            },
+            {
+                question: "A inelegibilidade reflexa se aplica ao cônjuge e parentes de quem haja substituído o titular do cargo de Prefeito dentro dos seis meses anteriores ao pleito.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 14, § 7º. A regra visa evitar que o titular se licencie estrategicamente nos últimos seis meses para permitir a candidatura de um parente. A inelegibilidade, portanto, atinge também os parentes do substituto que assumiu o cargo nesse período."
+            },
+            // Art. 14 - Bloco 6
+            {
+                question: "O militar alistável é elegível, desde que atendidas as condições específicas previstas na Constituição.",
+                answer: "Certo",
+                rationale: "A questão está correta. O caput do § 8º do Art. 14 estabelece a regra geral de que o militar que pode votar (alistável) também pode ser votado (é elegível), mas condiciona esse direito ao cumprimento das regras especiais detalhadas nos incisos I e II."
+            },
+            {
+                question: "O militar que contar menos de dez anos de serviço e desejar se candidatar a cargo eletivo deverá afastar-se da atividade.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da condição imposta pelo Art. 14, § 8º, inciso I. Para o militar com menos de uma década de serviço, a candidatura exige o desligamento definitivo da carreira militar."
+            },
+            {
+                question: "O militar com mais de dez anos de serviço que se candidatar a cargo eletivo deverá afastar-se definitivamente da atividade militar no momento do registro da candidatura.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Para o militar com mais de dez anos de serviço, o Art. 14, § 8º, inciso II, prevê que ele \"será agregado pela autoridade superior\". A agregação é uma situação de afastamento temporário para concorrer ao pleito, não implicando em desligamento definitivo nesse momento."
+            },
+            {
+                question: "O militar com mais de dez anos de serviço, caso seja eleito, passará automaticamente para a inatividade no ato da posse.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao marco temporal. O Art. 14, § 8º, inciso II, estabelece que a passagem para a inatividade (reserva remunerada) ocorrerá \"no ato da diplomação\", que é o ato formal da Justiça Eleitoral que habilita o eleito a tomar posse, e não no ato da posse propriamente dito."
+            },
+            {
+                question: "Se for eleito, o militar com mais de dez anos de serviço passará automaticamente para a inatividade no ato da diplomação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a consequência da eleição para o militar com mais de uma década de serviço, conforme a parte final do Art. 14, § 8º, inciso II."
+            },
+            // Art. 14 - Bloco 7
+            {
+                question: "Lei ordinária poderá estabelecer outros casos de inelegibilidade, a fim de proteger a probidade administrativa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao tipo de norma exigida. O Art. 14, § 9º, determina expressamente que \"Lei complementar estabelecerá outros casos de inelegibilidade\", exigindo um quórum de aprovação mais rigoroso para tratar da matéria."
+            },
+            {
+                question: "A lei complementar que criar novos casos de inelegibilidade também deverá prever os prazos de sua cessação.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 14, § 9º, que atribui à lei complementar a competência para estabelecer tanto \"outros casos de inelegibilidade\" quanto \"os prazos de sua cessação\"."
+            },
+            {
+                question: "A proteção da moralidade para exercício de mandato, considerada a vida pregressa do candidato, é uma das finalidades das inelegibilidades criadas por lei complementar.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois cita um dos objetivos expressamente listados no Art. 14, § 9º, que orientam a criação de novas hipóteses de inelegibilidade."
+            },
+            {
+                question: "A proteção da normalidade e legitimidade das eleições contra a influência do poder econômico ou o abuso de função na administração é um dos objetivos que fundamentam a criação de novos casos de inelegibilidade.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente as finalidades previstas na parte final do Art. 14, § 9º, que visam a proteger a lisura do processo eleitoral."
+            },
+            {
+                question: "O mandato eletivo pode ser impugnado ante a Justiça Eleitoral no prazo de quinze dias contados da posse.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao marco inicial do prazo. O Art. 14, § 10, estabelece que o prazo de quinze dias é contado \"da diplomação\", que é o ato da Justiça Eleitoral que antecede a posse."
+            },
+            {
+                question: "A ação de impugnação de mandato eletivo deve ser instruída com provas de abuso do poder econômico, corrupção ou fraude.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 14, § 10, define um rol taxativo de causas de pedir para a Ação de Impugnação de Mandato Eletivo (AIME), sendo elas exatamente o abuso do poder econômico, a corrupção ou a fraude."
+            },
+            {
+                question: "O mandato eletivo poderá ser impugnado ante a Justiça Comum, desde que a ação seja instruída com provas de corrupção ou fraude.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao foro competente. O Art. 14, § 10, determina que a impugnação será feita \"ante a Justiça Eleitoral\", que é a competente para processar e julgar a matéria."
+            },
+            {
+                question: "O abuso do poder econômico é uma das causas que podem fundamentar a ação de impugnação de mandato eletivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois menciona uma das três hipóteses de cabimento da Ação de Impugnação de Mandato Eletivo, conforme previsto no Art. 14, § 10."
+            },
+            {
+                question: "A ação de impugnação de mandato tramitará em segredo de justiça.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 14, § 11, que estabelece o sigilo como regra para a tramitação da Ação de Impugnação de Mandato Eletivo."
+            },
+            {
+                question: "O autor de uma ação de impugnação de mandato, caso perca a demanda, responderá objetivamente pelos custos do processo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A responsabilidade do autor não é objetiva. O Art. 14, § 11, estabelece que ele responderá \"se [a ação for] temerária ou de manifesta má-fé\", exigindo-se, portanto, a comprovação do dolo ou da culpa grave na propositura da ação."
+            },
+            {
+                question: "O autor de ação de impugnação de mandato responderá, na forma da lei, se a ação for temerária ou de manifesta má-fé.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta da parte final do Art. 14, § 11, que prevê a responsabilização do autor em caso de abuso do direito de ação."
+            },
+            {
+                question: "As consultas populares sobre questões locais serão realizadas concomitantemente às eleições gerais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao tipo de eleição. O Art. 14, § 12, estabelece que as consultas populares sobre questões locais ocorrerão concomitantemente às eleições municipais, e não às eleições gerais (para Presidente, Governador, Senador, etc.)."
+            },
+            {
+                question: "As consultas populares sobre questões locais devem ser aprovadas pelas Câmaras Municipais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 14, § 12, atribui às Câmaras Municipais a competência para aprovar as questões que serão submetidas à consulta popular no âmbito do município."
+            },
+            {
+                question: "As questões para consulta popular devem ser encaminhadas à Justiça Eleitoral até trinta dias antes da data das eleições municipais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao prazo. O Art. 14, § 12, estabelece que o encaminhamento deve ser feito \"até 90 (noventa) dias antes da data das eleições\"."
+            },
+            {
+                question: "A realização de consultas populares observará os limites operacionais relativos ao número de quesitos.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 14, § 12, que condiciona a consulta à viabilidade operacional da Justiça Eleitoral, especialmente quanto ao número de perguntas a serem feitas aos eleitores."
+            },
+            {
+                question: "As manifestações favoráveis e contrárias às questões submetidas a consultas populares ocorrerão durante as campanhas eleitorais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a primeira parte do Art. 14, § 13, que alinha o período de debate das consultas populares com o das campanhas eleitorais regulares."
+            },
+            {
+                question: "É permitida a utilização de propaganda gratuita no rádio e na televisão para as manifestações sobre questões submetidas a consultas populares.",
+                answer: "Errado",
+                rationale: "A assertiva contraria diretamente a parte final do dispositivo. O Art. 14, § 13, veda expressamente o uso desse meio de divulgação, ao dispor que as manifestações ocorrerão \"sem a utilização de propaganda gratuita no rádio e na televisão\"."
+            },
+            {
+                question: "É vedada qualquer forma de propaganda ou manifestação sobre as questões submetidas a consultas populares.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por generalizar a vedação. O Art. 14, § 13, permite \"as manifestações favoráveis e contrárias\" e veda apenas a \"utilização de propaganda gratuita no rádio e na televisão\", não proibindo outras formas de propaganda e debate."
+            },
+            {
+                question: "Lei complementar estabelecerá outros casos de inelegibilidade para proteger a probidade administrativa.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à determinação do Art. 14, § 9º, que delega à lei complementar a criação de novas hipóteses de inelegibilidade com a finalidade, entre outras, de proteger a probidade na administração."
+            },
+            {
+                question: "A ação de impugnação de mandato eletivo poderá ser impugnada no prazo de quinze dias contados da diplomação.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do prazo e do marco inicial para a propositura da Ação de Impugnação de Mandato Eletivo, conforme o Art. 14, § 10."
+            },
+            // Art. 15
+            {
+                question: "A cassação de direitos políticos é permitida, desde que por decisão judicial transitada em julgado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 15 estabelece que \"É vedada a cassação de direitos políticos...\". A Constituição proíbe a cassação de forma absoluta, permitindo apenas a perda ou a suspensão dos direitos políticos nas hipóteses taxativamente listadas."
+            },
+            {
+                question: "A perda ou a suspensão dos direitos políticos só se dará nos casos expressamente previstos na Constituição.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reflete a natureza taxativa do rol do Art. 15. A perda ou suspensão de direitos políticos é uma medida excepcional, cujas hipóteses estão listadas de forma exaustiva nos incisos do referido artigo."
+            },
+            {
+                question: "O cancelamento da naturalização, que acarreta a perda dos direitos políticos, pode ocorrer por meio de sentença judicial, ainda que não transitada em julgado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto à finalidade da decisão. O Art. 15, inciso I, exige que o cancelamento da naturalização ocorra por \"sentença transitada em julgado\", ou seja, uma decisão da qual não caiba mais recurso."
+            },
+            {
+                question: "A incapacidade civil absoluta é uma das causas de perda ou suspensão dos direitos políticos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal da hipótese prevista no Art. 15, inciso II, da Constituição Federal."
+            },
+            {
+                question: "A condenação criminal, por si só, acarreta a suspensão dos direitos políticos, independentemente do trânsito em julgado da sentença.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 15, inciso III, é explícito ao exigir \"condenação criminal transitada em julgado\". A mera existência de uma condenação recorrível não é suficiente para suspender os direitos políticos, em respeito ao princípio da presunção de inocência."
+            },
+            {
+                question: "No caso de condenação criminal transitada em julgado, a suspensão dos direitos políticos perdurará enquanto durarem os efeitos da condenação.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 15, inciso III, que estabelece o marco temporal da suspensão: \"enquanto durarem seus efeitos\"."
+            },
+            {
+                question: "A recusa de cumprir obrigação a todos imposta, mesmo que o cidadão se disponha a cumprir a prestação alternativa, resultará na suspensão dos direitos políticos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A sanção de suspensão dos direitos políticos, prevista no Art. 15, inciso IV, só se aplica àquele que, além de se recusar a cumprir a obrigação principal, também se nega a cumprir a \"prestação alternativa\", nos termos do art. 5º, VIII."
+            },
+            {
+                question: "É causa de perda ou suspensão dos direitos políticos a recusa de cumprir obrigação a todos imposta ou prestação alternativa.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente a hipótese de escusa de consciência qualificada pela recusa da alternativa, conforme previsto no Art. 15, inciso IV."
+            },
+            {
+                question: "A condenação por improbidade administrativa acarreta a perda dos direitos políticos.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao usar o termo \"perda\". A improbidade administrativa (Art. 15, V, c/c Art. 37, § 4º) acarreta a suspensão dos direitos políticos, que é uma medida temporária, e não a perda, que tem caráter mais definitivo."
+            },
+            {
+                question: "A prática de ato de improbidade administrativa, nos termos do art. 37, § 4º, é uma das hipóteses constitucionais para a perda ou suspensão dos direitos políticos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da hipótese prevista no Art. 15, inciso V, da Constituição Federal."
+            },
+            // Art. 16
+            {
+                question: "A lei que alterar o processo eleitoral entrará em vigor na data de sua publicação.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à primeira parte do Art. 16 da Constituição, que estabelece a vigência imediata para a lei que modifica o processo eleitoral, a partir de sua publicação."
+            },
+            {
+                question: "A lei que alterar o processo eleitoral não se aplicará à eleição que ocorra até um ano da data de sua vigência.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em total conformidade com a segunda parte do Art. 16. Este dispositivo consagra o princípio da anterioridade ou anualidade eleitoral, que visa garantir a estabilidade e a segurança jurídica nas disputas eleitorais."
+            },
+            {
+                question: "A lei que alterar o processo eleitoral só entrará em vigor um ano após a sua publicação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois confunde a vigência da lei com sua aplicabilidade à próxima eleição. O Art. 16 estabelece que a lei \"entrará em vigor na data de sua publicação\" (vigência imediata), mas \"não se aplicando à eleição que ocorra até um ano\" (aplicabilidade postergada). A lei passa a valer imediatamente, mas seus efeitos só serão sentidos nas eleições que ocorrerem após o prazo de um ano."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
