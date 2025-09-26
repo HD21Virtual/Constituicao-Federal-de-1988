@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partidos Políticos</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Partidos Políticos</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 17 - caput e incisos
+            {
+                question: "É livre a criação, fusão, incorporação e extinção de partidos políticos.",
+                answer: "Errado",
+                rationale: "A assertiva está incompleta e, por isso, incorreta. O caput do Art. 17, embora assegure a liberdade partidária, condiciona-a ao resguardo de valores como a soberania nacional, o regime democrático, o pluripartidarismo e os direitos fundamentais, além da observância dos preceitos listados nos incisos. A liberdade não é, portanto, absoluta."
+            },
+            {
+                question: "A liberdade de criação de partidos políticos deve resguardar, entre outros princípios, a soberania nacional, o regime democrático e o pluripartidarismo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois menciona os limites materiais expressos no caput do Art. 17, que devem ser obrigatoriamente observados na criação e funcionamento dos partidos políticos."
+            },
+            {
+                question: "Os partidos políticos devem ter caráter nacional.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do preceito contido no Art. 17, inciso I. É vedada a criação de partidos políticos de âmbito apenas regional ou municipal."
+            },
+            {
+                question: "É permitido aos partidos políticos terem caráter regional, desde que não recebam recursos do fundo partidário.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. O Art. 17, inciso I, exige o \"caráter nacional\" de forma incondicional, não havendo a exceção mencionada."
+            },
+            {
+                question: "É vedado aos partidos políticos o recebimento de recursos financeiros de entidade ou governo estrangeiros, bem como a subordinação a estes.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente a dupla proibição contida no Art. 17, inciso II, que visa a proteger a soberania nacional e a autonomia decisória dos partidos políticos."
+            },
+            {
+                question: "Os partidos políticos são proibidos de receber recursos financeiros de governos estrangeiros, mas não de entidades estrangeiras de natureza privada.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao criar uma distinção não prevista na norma. O Art. 17, inciso II, proíbe o recebimento de recursos de \"entidade ou governo estrangeiros\", abrangendo tanto as fontes públicas quanto as privadas de origem externa."
+            },
+            {
+                question: "Os partidos políticos devem prestar contas ao Tribunal de Contas da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao órgão destinatário da prestação de contas. O Art. 17, inciso III, determina que a prestação de contas deve ser feita à Justiça Eleitoral, que é o órgão competente para fiscalizar os aspectos contábeis e financeiros das agremiações partidárias."
+            },
+            {
+                question: "A prestação de contas à Justiça Eleitoral é um dos preceitos que devem ser observados pelos partidos políticos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde exatamente à obrigação de transparência e controle imposta pelo Art. 17, inciso III."
+            },
+            {
+                question: "O funcionamento parlamentar dos partidos políticos será regido exclusivamente por seus estatutos internos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, inciso IV, estabelece que o funcionamento parlamentar se dará \"de acordo com a lei\". Os estatutos partidários devem se submeter aos ditames da legislação que rege a matéria (a Lei dos Partidos Políticos e o regimento interno das Casas Legislativas)."
+            },
+            {
+                question: "O funcionamento parlamentar dos partidos políticos deve seguir o que dispõe a lei.",
+                answer: "Certo",
+                rationale: "A questão está correta e em total conformidade com o preceito do Art. 17, inciso IV, que submete a atuação parlamentar dos partidos ao princípio da legalidade."
+            },
+            // Art. 17 - § 1º e § 2º
+            {
+                question: "É assegurada aos partidos políticos autonomia para definir sua estrutura interna e estabelecer regras sobre a escolha, formação e duração de seus órgãos permanentes e provisórios.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente a primeira parte do Art. 17, § 1º, que consagra o princípio da autonomia partidária no que tange à sua organização interna."
+            },
+            {
+                question: "Os partidos políticos têm autonomia para adotar os critérios de escolha e o regime de suas coligações tanto nas eleições majoritárias quanto nas proporcionais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 1º, ao mesmo tempo que assegura a autonomia para a formação de coligações nas eleições majoritárias, veda expressamente \"a sua celebração nas eleições proporcionais\"."
+            },
+            {
+                question: "É vedada a celebração de coligações partidárias nas eleições proporcionais.",
+                answer: "Certo",
+                rationale: "A questão está correta e em total conformidade com a parte do Art. 17, § 1º, que estabelece a proibição de coligações para as eleições de deputados e vereadores."
+            },
+            {
+                question: "As coligações partidárias firmadas em âmbito nacional devem ser obrigatoriamente seguidas nos âmbitos estadual, distrital e municipal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 1º, extinguiu o princípio da verticalização, ao estabelecer que as coligações são formadas \"sem obrigatoriedade de vinculação entre as candidaturas em âmbito nacional, estadual, distrital ou municipal\"."
+            },
+            {
+                question: "Os estatutos dos partidos políticos devem, obrigatoriamente, estabelecer normas de disciplina e fidelidade partidária.",
+                answer: "Certo",
+                rationale: "A questão está correta. A parte final do Art. 17, § 1º, impõe um dever aos partidos, ao determinar que seus estatutos \"devendo (...) estabelecer normas de disciplina e fidelidade partidária\"."
+            },
+            {
+                question: "A autonomia partidária é absoluta, sendo facultativo aos partidos políticos estabelecerem normas de fidelidade partidária em seus estatutos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A autonomia partidária, embora ampla, não é absoluta. A parte final do Art. 17, § 1º, mitiga essa autonomia ao impor o dever de que os estatutos contenham normas de disciplina e fidelidade partidária, não sendo, portanto, uma faculdade."
+            },
+            {
+                question: "O primeiro passo para a criação de um partido político é o registro de seu estatuto no Tribunal Superior Eleitoral, para somente depois adquirir personalidade jurídica.",
+                answer: "Errado",
+                rationale: "A questão inverte a ordem dos procedimentos e, por isso, está incorreta. O Art. 17, § 2º, estabelece que os partidos, \"após adquirirem personalidade jurídica, na forma da lei civil, registrarão seus estatutos no Tribunal Superior Eleitoral\". A aquisição da personalidade jurídica no cartório civil é um ato prévio ao registro na Justiça Eleitoral."
+            },
+            {
+                question: "Os partidos políticos adquirem personalidade jurídica na forma da lei eleitoral.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 2º, determina que a aquisição da personalidade jurídica se dá \"na forma da lei civil\", por meio do registro de seus atos constitutivos no Cartório de Registro Civil das Pessoas Jurídicas."
+            },
+            {
+                question: "Após a aquisição da personalidade jurídica na forma da lei civil, os partidos políticos registrarão seus estatutos no Tribunal Superior Eleitoral.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente a sequência de atos para a regularização de um partido político, conforme previsto no Art. 17, § 2º."
+            },
+            {
+                question: "O registro dos estatutos dos partidos políticos deve ser feito no Tribunal Regional Eleitoral do estado onde se localiza sua sede.",
+                answer: "Errado",
+                rationale: "A questão está incorreta quanto ao órgão competente para o registro. O Art. 17, § 2º, determina que o registro dos estatutos será feito no Tribunal Superior Eleitoral (TSE), uma vez que o partido deve ter caráter nacional."
+            },
+            // Art. 17 - § 3º
+            {
+                question: "Todos os partidos políticos, independentemente de seu desempenho eleitoral, têm direito a recursos do fundo partidário e acesso gratuito ao rádio e à televisão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do § 3º do Art. 17 estabelece que \"Somente terão direito\" a esses benefícios os partidos que atingirem a cláusula de desempenho, não sendo um direito de todos."
+            },
+            {
+                question: "Para ter direito a recursos do fundo partidário, os partidos políticos devem, cumulativamente, atingir um percentual mínimo de votos e eleger um número mínimo de Deputados Federais.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao usar o termo \"cumulativamente\". O caput do § 3º do Art. 17 estabelece que os requisitos dos incisos I e II são alternativos, bastando o preenchimento de apenas um deles."
+            },
+            {
+                question: "Um dos requisitos para o acesso ao fundo partidário é que o partido obtenha, nas eleições para a Câmara dos Deputados, no mínimo, 3% dos votos válidos.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por ser incompleta. Além dos 3% dos votos válidos em âmbito nacional, o Art. 17, § 3º, inciso I, exige que esses votos sejam \"distribuídos em pelo menos um terço das unidades da Federação, com um mínimo de 2% dos votos válidos em cada uma delas\"."
+            },
+            {
+                question: "Para cumprir a cláusula de barreira, um partido político deve obter, no mínimo, 3% dos votos válidos para a Câmara dos Deputados, distribuídos em pelo menos um terço das unidades da Federação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por omitir um requisito. O Art. 17, § 3º, inciso I, exige, além da distribuição em um terço das unidades da Federação, que o partido obtenha \"um mínimo de 2% (dois por cento) dos votos válidos em cada uma delas\"."
+            },
+            {
+                question: "O percentual mínimo de 3% dos votos válidos, exigido pela cláusula de desempenho, é calculado com base nas eleições para o Senado Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 3º, inciso I, especifica que o cálculo do percentual de votos se refere \"às eleições para a Câmara dos Deputados\", e não para o Senado."
+            },
+            {
+                question: "A exigência de distribuição de votos por um terço das unidades da Federação se aplica tanto ao requisito de percentual de votos quanto ao de número de deputados eleitos.",
+                answer: "Certo",
+                rationale: "A questão está correta. A regra de distribuição em \"pelo menos um terço das unidades da Federação\" está presente tanto no inciso I (referente aos votos) quanto no inciso II (referente ao número de Deputados Federais eleitos)."
+            },
+            {
+                question: "Um partido político que eleger quinze Deputados Federais, todos concentrados em uma única unidade da Federação, terá direito a recursos do fundo partidário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 3º, inciso II, exige que os quinze Deputados Federais eleitos sejam \"distribuídos em pelo menos um terço das unidades da Federação\". A concentração em um único estado não cumpre o requisito."
+            },
+            {
+                question: "Ter elegido pelo menos quinze Deputados Federais, distribuídos em no mínimo um terço das unidades da Federação, é uma das formas de o partido político ter acesso gratuito ao rádio e à televisão.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente uma das duas hipóteses alternativas previstas no Art. 17, § 3º (especificamente a do inciso II) para que um partido cumpra a cláusula de desempenho."
+            },
+            {
+                question: "O acesso ao fundo partidário e ao tempo de rádio e TV são assegurados aos partidos políticos na forma que seus estatutos dispuserem.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do § 3º do Art. 17 estabelece que o direito a esses recursos se dará \"na forma da lei\", e não conforme o estatuto partidário. A matéria é, portanto, de reserva legal."
+            },
+            {
+                question: "Um partido que obtiver 2,5% dos votos válidos para a Câmara dos Deputados em todo o Brasil não terá acesso ao fundo partidário, ainda que tenha elegido quinze Deputados Federais distribuídos em dez unidades da Federação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Os requisitos são alternativos. Apesar de o partido não ter cumprido o requisito do inciso I (3% dos votos), ele cumpriu integralmente o requisito do inciso II (pelo menos quinze deputados em pelo menos um terço das unidades da federação), o que já lhe garante o direito ao fundo partidário e ao tempo de rádio e TV."
+            },
+            // Art. 17 - § 4º e § 5º
+            {
+                question: "É vedada a utilização pelos partidos políticos de organização paramilitar.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 17, § 4º, que proíbe, de forma absoluta, que os partidos políticos mantenham estruturas que se assemelhem a milícias ou forças armadas paralelas."
+            },
+            {
+                question: "Os partidos políticos podem utilizar organização paramilitar, desde que para a defesa do Estado Democrático de Direito.",
+                answer: "Errado",
+                rationale: "A questão está incorreta. A vedação do Art. 17, § 4º, é incondicional. A defesa do Estado e de suas instituições é uma atribuição exclusiva das forças de segurança do Estado, não sendo permitida a criação de organizações armadas por partidos políticos, independentemente da finalidade alegada."
+            },
+            {
+                question: "O candidato eleito por um partido que não atingir a cláusula de desempenho prevista na Constituição perderá o seu mandato.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 5º, protege o resultado da eleição, estabelecendo que ao eleito por partido que não preencher os requisitos \"é assegurado o mandato\"."
+            },
+            {
+                question: "Ao eleito por partido que não cumprir os requisitos da cláusula de desempenho é facultada a filiação a outro partido que os tenha atingido, sem que isso implique a perda do mandato.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente o direito assegurado pelo Art. 17, § 5º. A norma cria uma janela de migração partidária para o eleito, que tem a faculdade (e não a obrigação) de se filiar a uma legenda que tenha superado a cláusula de barreira, mantendo seu mandato."
+            },
+            {
+                question: "A filiação de um parlamentar a novo partido, na hipótese de sua legenda de origem não ter atingido a cláusula de desempenho, será considerada para fins de distribuição dos recursos do fundo partidário e de acesso gratuito ao tempo de rádio e de televisão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do Art. 17, § 5º, estabelece que, embora o mandato seja preservado, \"não sendo essa filiação considerada para fins de distribuição dos recursos do fundo partidário e de acesso gratuito ao tempo de rádio e de televisão\". A bancada considerada para esses fins é a eleita originalmente, e não a formada após as migrações."
+            },
+            // Art. 17 - § 6º
+            {
+                question: "Deputados Federais, Deputados Estaduais, Deputados Distritais e Vereadores que se desligarem do partido pelo qual foram eleitos perderão, como regra geral, o mandato.",
+                answer: "Certo",
+                rationale: "A questão está correta. A primeira parte do Art. 17, § 6º, estabelece a regra da fidelidade partidária para os detentores de mandatos eletivos proporcionais, determinando a perda do mandato em caso de desfiliação partidária injustificada."
+            },
+            {
+                question: "A regra da perda de mandato por desfiliação partidária aplica-se a todos os cargos eletivos, incluindo os de Prefeito e Governador.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 6º, lista um rol taxativo de cargos sujeitos à perda do mandato por infidelidade: \"Deputados Federais, os Deputados Estaduais, os Deputados Distritais e os Vereadores\". A regra não se aplica aos chefes do Poder Executivo (cargos majoritários)."
+            },
+            {
+                question: "A perda do mandato por desfiliação partidária não ocorrerá nos casos de anuência do partido ou em outras hipóteses de justa causa estabelecidas em lei.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente as exceções à regra da perda do mandato, conforme previsto na parte intermediária do Art. 17, § 6º. A anuência (concordância) do partido ou a existência de uma justa causa legal (como mudança substancial do programa partidário) permitem a migração sem a perda do cargo."
+            },
+            {
+                question: "Um Deputado Federal pode se desfiliar de seu partido sem perder o mandato, bastando para isso que o partido manifeste sua concordância.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A \"anuência do partido\" é uma das hipóteses de exceção expressamente previstas no Art. 17, § 6º, que autorizam a desfiliação do parlamentar sem que isso resulte na perda de seu mandato."
+            },
+            {
+                question: "A migração de um Deputado para outro partido, mesmo nos casos de justa causa, será computada para fins de distribuição de recursos do fundo partidário e de acesso gratuito ao rádio e à televisão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do Art. 17, § 6º, é categórica ao afirmar que a migração de partido \"não será computada, em qualquer caso\", para esses fins. Para efeito da distribuição de fundos e tempo de mídia, considera-se a bancada eleita originalmente pelo partido, e não a sua composição após as migrações."
+            },
+            // Art. 17 - § 7º
+            {
+                question: "Os partidos políticos devem aplicar, no mínimo, cinco por cento dos recursos do fundo partidário em programas de promoção e difusão da participação política das mulheres.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente a obrigação constitucional imposta aos partidos políticos pelo Art. 17, § 7º. A norma estabelece um percentual mínimo do fundo partidário a ser destinado a ações de incentivo à participação feminina na política."
+            },
+            {
+                question: "Os partidos políticos devem aplicar exatamente cinco por cento dos recursos do fundo partidário na criação e manutenção de programas de incentivo à participação política das mulheres.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exatamente\". O Art. 17, § 7º, estabelece o percentual de 5% como um piso, ao dizer \"no mínimo\". Portanto, os partidos podem, por liberalidade, aplicar um percentual superior a este."
+            },
+            {
+                question: "Os programas de promoção e difusão da participação política das mulheres devem ser criados e mantidos de acordo com os interesses intrapartidários.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 17, § 7º. O dispositivo confere aos partidos políticos a autonomia para definir o conteúdo e a forma de seus programas de incentivo à participação feminina, desde que respeitado o percentual mínimo de financiamento."
+            },
+            // Art. 17 - § 8º e § 9º
+            {
+                question: "O montante do Fundo Especial de Financiamento de Campanha, da parcela do fundo partidário para campanhas e do tempo de propaganda gratuita no rádio e na televisão a ser distribuído às candidatas deverá ser de, no mínimo, trinta por cento.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente os recursos (FEFC, fundo partidário e tempo de mídia) que devem ser destinados às candidatas no patamar mínimo de 30%, conforme o Art. 17, § 8º."
+            },
+            {
+                question: "A destinação de recursos para as candidatas deve ser de exatamente trinta por cento, não podendo o partido, por liberalidade, destinar um percentual superior.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exatamente\". O Art. 17, § 8º, estabelece que o montante deverá ser de \"no mínimo 30% (trinta por cento)\", fixando um piso e não um teto para a destinação dos recursos."
+            },
+            {
+                question: "A distribuição dos recursos e do tempo de mídia para as candidatas deve ser proporcional ao número de candidatas.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 17, § 8º, que estabelece o critério da proporcionalidade: o montante mínimo de 30% é calculado de forma \"proporcional ao número de candidatas\" lançadas pelo partido."
+            },
+            {
+                question: "Os critérios de distribuição dos recursos entre as candidatas são definidos pela Justiça Eleitoral, visando a uma repartição isonômica.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 8º, estabelece que a distribuição será realizada \"conforme critérios definidos pelos respectivos órgãos de direção e pelas normas estatutárias\" dos partidos, considerados a autonomia e o interesse partidário, e não por imposição da Justiça Eleitoral."
+            },
+            {
+                question: "A distribuição dos recursos e do tempo de mídia para as candidatas deve ser realizada conforme critérios definidos pelos órgãos de direção dos partidos e por suas normas estatutárias.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente a quem compete definir os critérios de distribuição interna dos recursos, conforme a parte final do Art. 17, § 8º."
+            },
+            {
+                question: "Dos recursos do Fundo Especial de Financiamento de Campanha e do fundo partidário para campanhas, os partidos devem, facultativamente, aplicar trinta por cento em candidaturas de pessoas pretas e pardas.",
+                answer: "Errado",
+                rationale: "A questão está incorreta ao tratar a aplicação como facultativa. O Art. 17, § 9º, é impositivo ao afirmar que os partidos políticos \"devem, obrigatoriamente, aplicar\" o percentual em tais candidaturas."
+            },
+            {
+                question: "Os partidos políticos devem aplicar, no mínimo, trinta por cento dos fundos de campanha em candidaturas de pessoas pretas e pardas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por uma imprecisão literal. Diferentemente do parágrafo anterior (para mulheres), o Art. 17, § 9º, não utiliza a expressão \"no mínimo\". Ele determina que os partidos devem \"aplicar 30%\", indicando um valor fixo a ser observado na distribuição, conforme a literalidade do texto."
+            },
+            {
+                question: "A aplicação obrigatória de trinta por cento dos fundos de campanha se destina a candidaturas de pessoas pretas, pardas e indígenas.",
+                answer: "Errado",
+                rationale: "A questão está incorreta por incluir uma etnia não prevista no dispositivo. O Art. 17, § 9º, refere-se expressamente a candidaturas de pessoas \"pretas e pardas\", não mencionando, em seu texto, as candidaturas de pessoas indígenas."
+            },
+            {
+                question: "A aplicação dos recursos em candidaturas de pessoas pretas e pardas deve ser feita nas circunscrições que melhor atendam aos interesses e às estratégias partidárias.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do Art. 17, § 9º, que confere aos partidos políticos autonomia para definir, de forma estratégica, em quais localidades a aplicação desses recursos será feita."
+            },
+            {
+                question: "A obrigação de aplicar trinta por cento dos recursos em candidaturas de pessoas pretas e pardas incide apenas sobre o montante do Fundo Especial de Financiamento de Campanha (FEFC).",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 17, § 9º, estabelece que a regra se aplica aos recursos oriundos \"do Fundo Especial de Financiamento de Campanha e do fundo partidário destinados às campanhas eleitorais\", abrangendo, portanto, as duas fontes de recursos públicos."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
