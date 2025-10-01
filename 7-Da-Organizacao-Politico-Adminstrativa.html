@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Organização do Estado - Art. 18 e 19</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal</h1>
+            <p>Organização do Estado (Art. 18 e 19)</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 18
+            {
+                question: "A organização político-administrativa da República Federativa do Brasil compreende a União, os Estados, o Distrito Federal e os Municípios, todos autônomos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a composição e a característica principal dos entes federativos (Art. 18)."
+            },
+            {
+                question: "Na organização político-administrativa brasileira, os Municípios são entes autônomos, porém subordinados hierarquicamente aos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao afirmar a existência de hierarquia. A Constituição estabelece uma federação de três níveis, na qual todos os entes são autônomos entre si (Art. 18)."
+            },
+            {
+                question: "Os Territórios Federais são entes autônomos que compõem a organização político-administrativa da República Federativa do Brasil.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Os Territórios Federais não são entes federativos autônomos, mas sim descentralizações administrativas da União, conforme o § 2º deste mesmo artigo (Art. 18)."
+            },
+            {
+                question: "O Distrito Federal é a Capital Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A Capital Federal não é o ente federativo (Distrito Federal), mas sim a cidade que exerce essa função (Art. 18, § 1º Brasília é a Capital Federal)."
+            },
+            {
+                question: "Os Territórios Federais integram a União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois afirma a natureza jurídica dos Territórios como parte integrante da União, sendo considerados autarquias territoriais (Art. 18, § 2º)."
+            },
+            {
+                question: "A criação de um Território Federal, sua transformação em Estado ou sua reintegração ao estado de origem serão reguladas por lei ordinária.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao tipo de norma exigida para regular a matéria. A Constituição exige lei complementar (Art. 18, § 2º)."
+            },
+            {
+                question: "Os Estados podem se subdividir para formar novos Estados, mediante aprovação do Congresso Nacional, por lei complementar, sendo dispensada a consulta à população diretamente interessada.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por dispensar um requisito indispensável. A criação de novos estados exige tanto a aprovação do Congresso quanto a consulta plebiscitária (Art. 18, § 3º)."
+            },
+            {
+                question: "A formação de um novo Estado a partir do desmembramento de outro depende da aprovação da população diretamente interessada, por meio de referendo, e do Congresso Nacional, por lei complementar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao indicar o referendo como forma de consulta popular. A Constituição exige expressamente a realização de plebiscito (Art. 18, § 3º)."
+            },
+            {
+                question: "Os Estados podem desmembrar-se para formar novos Territórios Federais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A Constituição prevê essa possibilidade, embora seja politicamente rara (Art. 18, § 3º)."
+            },
+            {
+                question: "A criação de Municípios far-se-á por lei federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao ente federativo competente para legislar sobre a criação de municípios. A competência é para lei estadual (Art. 18, § 4º)."
+            },
+            {
+                question: "A criação de Municípios deve ocorrer dentro de período determinado por Lei Complementar Federal e depende de consulta prévia, mediante plebiscito, às populações dos Municípios envolvidos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente os requisitos procedimentais e temporais para a criação de novos municípios (Art. 18, § 4º)."
+            },
+            {
+                question: "A consulta prévia para a criação de um novo Município será feita por meio de plebiscito apenas à população do território que se pretende emancipar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A consulta deve ser realizada com as populações de todos os municípios envolvidos, ou seja, tanto do território que se pretende desmembrar quanto do município que sofrerá o desmembramento (Art. 18, § 4º)."
+            },
+            {
+                question: "A criação de um novo Município depende da prévia divulgação dos Estudos de Viabilidade Municipal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois menciona um dos requisitos indispensáveis para o processo de criação de municípios, que visa a garantir a sustentabilidade do novo ente (Art. 18, § 4º)."
+            },
+            {
+                question: "A criação, incorporação, fusão e desmembramento de Municípios pode ocorrer a qualquer tempo, desde que aprovada por lei estadual.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao ignorar a limitação temporal para a criação de municípios, que deve ocorrer dentro de período determinado por Lei Complementar Federal (Art. 18, § 4º)."
+            },
+            {
+                question: "Os Estudos de Viabilidade Municipal, necessários para a criação de um novo município, devem ser apresentados e publicados na forma da lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à exigência de publicidade e legalidade para os estudos técnicos que embasam a criação de um município (Art. 18, § 4º)."
+            },
+            // Art. 19
+            {
+                question: "As vedações expressas no artigo 19 da Constituição Federal se aplicam a todos os entes da Federação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O caput do Art. 19 enumera todos os entes federativos, indicando que as proibições se aplicam a todos eles igualmente, em consagração ao princípio da laicidade e da isonomia federativa."
+            },
+            {
+                question: "As proibições de estabelecer cultos religiosos e de criar distinções entre brasileiros aplicam-se à União e aos Estados, mas não aos Municípios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao excluir os Municípios. As vedações do Art. 19 são impostas a todos os entes da Federação, sem exceção."
+            },
+            {
+                question: "É vedado aos entes federativos estabelecer ou subvencionar cultos religiosos ou igrejas.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz parte da vedação que estabelece o Estado Laico no Brasil (Art. 19, I)."
+            },
+            {
+                question: "É vedada aos entes da Federação qualquer forma de colaboração com igrejas ou cultos religiosos, ainda que de interesse público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ignorar a exceção prevista na norma. A Constituição permite a cooperação entre o Estado e as instituições religiosas, desde que seja de interesse público e regulada por lei (Art. 19, I)."
+            },
+            {
+                question: "A colaboração de interesse público entre os entes federativos e as entidades religiosas é permitida, na forma da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve exatamente a ressalva contida na parte final do dispositivo, que flexibiliza a vedação geral de aliança ou dependência (Art. 19, I)."
+            },
+            {
+                question: "É vedado à União, aos Estados, ao Distrito Federal e aos Municípios recusar fé aos documentos públicos.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da vedação constitucional, que consagra o princípio da fé pública dos documentos emitidos pelo Estado (Art. 19, II)."
+            },
+            {
+                question: "A presunção de veracidade dos documentos públicos é absoluta, não podendo ser contestada em nenhuma hipótese.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A vedação a \"recusar fé\" significa que os documentos públicos gozam de presunção de legitimidade e veracidade (juris tantum), devendo ser aceitos, em princípio, por todos os entes. No entanto, essa presunção é relativa, admitindo prova em contrário para demonstrar eventual falsidade (Art. 19, II)."
+            },
+            {
+                question: "É vedado aos entes federativos criar distinções entre brasileiros.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à primeira parte da vedação contida no inciso III, que visa a garantir a isonomia entre todos os brasileiros, independentemente de seu local de nascimento ou residência (Art. 19, III)."
+            },
+            {
+                question: "A União pode criar preferências entre os Estados, desde que para corrigir desigualdades regionais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A vedação a \"criar (...) preferências entre si\" é uma norma que visa a manter o equilíbrio da Federação. Embora a Constituição preveja mecanismos para a redução de desigualdades regionais (Art. 3º, III), isso não se confunde com a criação de preferências arbitrárias entre os entes federativos (Art. 19, III)."
+            },
+            {
+                question: "Aos entes da Federação é proibido criar distinções entre brasileiros ou preferências entre si.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da norma que visa a garantir a unidade nacional e o pacto federativo, impedindo tratamentos discriminatórios (Art. 19, III)."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
