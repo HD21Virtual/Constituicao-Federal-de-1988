@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competências Comuns</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Competências Comuns da União, dos Estados, do Distrito Federal e dos Municípios</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "É competência comum da União, dos Estados, do Distrito Federal e dos Municípios zelar pela guarda da Constituição.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O caput do Art. 23 define as competências listadas em seus incisos como comuns a todos os entes da federação (União, Estados, Distrito Federal e Municípios), e o inciso I inicia com a incumbência de \"zelar pela guarda da Constituição\"."
+            },
+            {
+                question: "As competências listadas no Art. 23 são de responsabilidade privativa da União, podendo ser delegadas aos demais entes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 23 estabelece expressamente que a competência é \"comum\" a todos os entes federativos, o que significa que todos têm o dever de exercê-la, não se tratando de competência privativa da União."
+            },
+            {
+                question: "É competência comum a todos os entes da federação zelar pela guarda das leis e das instituições democráticas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à parte intermediária do inciso I do Art. 23."
+            },
+            {
+                question: "A conservação do patrimônio público é uma atribuição de competência comum da União, dos Estados, do Distrito Federal e dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz a parte final do inciso I do Art. 23."
+            },
+            {
+                question: "Cuidar da saúde e da assistência pública é competência comum da União, dos Estados, do Distrito Federal e dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete a primeira parte do inciso II do Art. 23, que atribui essa incumbência a todos os entes federativos."
+            },
+            {
+                question: "É competência exclusiva da União cuidar da proteção e garantia das pessoas portadoras de deficiência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso II do Art. 23 define a proteção e garantia das pessoas com deficiência como uma competência \"comum\" a todos os entes, e não exclusiva da União."
+            },
+            {
+                question: "É competência comum a todos os entes federativos proteger os documentos, as obras e outros bens de valor histórico, artístico e cultural.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve a primeira parte do inciso III do Art. 23."
+            },
+            {
+                question: "A proteção dos monumentos, das paisagens naturais notáveis e dos sítios arqueológicos é de competência comum da União, dos Estados, do Distrito Federal e dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em plena conformidade com a parte final do inciso III do Art. 23."
+            },
+            {
+                question: "Compete a todos os entes da federação, em regime de colaboração, impedir a evasão, a destruição e a descaracterização de obras de arte.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete a primeira parte do inciso IV do Art. 23."
+            },
+            {
+                question: "A competência para impedir a evasão e a destruição de bens de valor histórico, artístico ou cultural é exclusiva da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso IV do Art. 23 estabelece essa incumbência como competência comum a todos os entes da federação, e não exclusiva da União."
+            },
+            {
+                question: "Proporcionar os meios de acesso à cultura e à educação é competência comum da União, dos Estados, do Distrito Federal e dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à parte inicial do inciso V do Art. 23."
+            },
+            {
+                question: "É competência comum de todos os entes federativos proporcionar os meios de acesso à ciência, à tecnologia, à pesquisa e à inovação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e corresponde à literalidade da parte final do inciso V do Art. 23."
+            },
+            {
+                question: "A proteção do meio ambiente é uma competência comum a todos os entes da federação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a primeira parte do inciso VI do Art. 23 atribui essa competência a todos os entes."
+            },
+            {
+                question: "Compete a todos os entes federativos combater a poluição em qualquer de suas formas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a parte final do inciso VI do Art. 23."
+            },
+            {
+                question: "É competência comum da União, dos Estados, do Distrito Federal e dos Municípios preservar as florestas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a preservação das florestas é a primeira incumbência listada no inciso VII do Art. 23."
+            },
+            {
+                question: "A preservação da fauna e da flora é de competência exclusiva dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme a parte final do inciso VII do Art. 23, a preservação da fauna e da flora é competência comum de todos os entes federativos."
+            },
+            {
+                question: "Compete a todos os entes da federação, de forma comum, fomentar a produção agropecuária.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso VIII do Art. 23."
+            },
+            {
+                question: "A organização do abastecimento alimentar é uma competência comum da União, dos Estados, do Distrito Federal e dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete a parte final do inciso VIII do Art. 23."
+            },
+            {
+                question: "É competência comum de todos os entes federativos promover programas de construção de moradias.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é o que determina a primeira parte do inciso IX do Art. 23."
+            },
+            {
+                question: "A melhoria das condições habitacionais e de saneamento básico é de competência comum da União, dos Estados, do Distrito Federal e dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em total conformidade com a parte final do inciso IX do Art. 23."
+            },
+            {
+                question: "Compete a todos os entes da federação, em regime de cooperação, combater as causas da pobreza e os fatores de marginalização.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso X do Art. 23."
+            },
+            {
+                question: "A promoção da integração social dos setores desfavorecidos é de competência exclusiva dos Municípios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso X do Art. 23 estabelece essa atribuição como competência comum a todos os entes da federação, não exclusiva dos Municípios."
+            },
+            {
+                question: "É competência comum da União, dos Estados, do Distrito Federal e dos Municípios registrar, acompanhar e fiscalizar as concessões de direitos de pesquisa e exploração de recursos hídricos em seus territórios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente parte do inciso XI do Art. 23."
+            },
+            {
+                question: "Compete a todos os entes federativos fiscalizar as concessões de direitos de pesquisa e exploração de recursos minerais em seus territórios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e corresponde à literalidade da parte final do inciso XI do Art. 23."
+            },
+            {
+                question: "É competência comum de todos os entes da federação estabelecer e implantar política de educação para a segurança do trânsito.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente o texto do inciso XII do Art. 23."
+            },
+            {
+                question: "Compete privativamente à União estabelecer e implantar política de educação para a segurança do trânsito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora legislar sobre trânsito seja competência privativa da União (Art. 22, XI), estabelecer e implantar políticas de educação para a segurança do trânsito é uma competência material comum a todos os entes, conforme o Art. 23, XII."
+            },
+            {
+                question: "Leis complementares fixarão normas para a cooperação entre a União e os Estados, o Distrito Federal e os Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do parágrafo único do Art. 23, que exige a forma de lei complementar para regular essa cooperação."
+            },
+            {
+                question: "Leis ordinárias podem fixar normas para a cooperação entre os entes federativos no exercício da competência comum.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O parágrafo único do Art. 23 exige expressamente \"Leis complementares\" para essa finalidade, não sendo suficiente uma lei ordinária."
+            },
+            {
+                question: "As normas de cooperação entre os entes federativos devem ter em vista o equilíbrio do desenvolvimento e do bem-estar em âmbito nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve a finalidade expressa na parte final do parágrafo único do Art. 23."
+            },
+            {
+                question: "As normas de cooperação entre os entes federativos visam, exclusivamente, o equilíbrio do desenvolvimento em âmbito nacional, não incluindo o bem-estar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O parágrafo único do Art. 23 menciona de forma cumulativa \"o equilíbrio do desenvolvimento e do bem-estar em âmbito nacional\"."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>

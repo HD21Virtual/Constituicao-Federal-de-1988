@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competências da União</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Competências da União</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 21, I a V
+            {
+                question: "Compete concorrentemente à União, aos Estados e ao Distrito Federal manter relações com Estados estrangeiros.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 21 estabelece que as competências listadas em seus incisos são da União, de forma exclusiva. O inciso I, especificamente, atribui à União a competência para \"manter relações com Estados estrangeiros e participar de organizações internacionais\"."
+            },
+            {
+                question: "É de competência da União participar de organizações internacionais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à parte final do inciso I do Art. 21 da Constituição Federal, que define como competência da União \"participar de organizações internacionais\"."
+            },
+            {
+                question: "Compete à União declarar a guerra.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e reflete a literalidade da primeira parte do inciso II do Art. 21, que atribui à União a competência para \"declarar a guerra\"."
+            },
+            {
+                question: "É de competência dos Estados celebrar a paz, mediante autorização da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com a parte final do inciso II do Art. 21, a competência para \"celebrar a paz\" é exclusiva da União, não havendo previsão para delegação ou autorização aos Estados."
+            },
+            {
+                question: "Compete à União assegurar a defesa nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a redação do inciso III do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A União pode permitir, em qualquer caso, que forças estrangeiras transitem pelo território nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso IV do Art. 21 estabelece uma condição para tal permissão, que só pode ocorrer \"nos casos previstos em lei complementar\". Não se trata de uma permissão incondicionada."
+            },
+            {
+                question: "A permanência temporária de forças estrangeiras no território nacional depende de permissão da União, nos casos previstos em lei complementar.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com o disposto no inciso IV do Art. 21, que exige permissão da União e que a hipótese esteja prevista em lei complementar para a permanência temporária de forças estrangeiras."
+            },
+            {
+                question: "Compete à União decretar o estado de sítio.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso V do Art. 21, que atribui à União a competência para \"decretar o estado de sítio\"."
+            },
+            {
+                question: "A decretação do estado de defesa é de competência da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está de acordo com a parte intermediária do inciso V do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "Compete à União, e concorrentemente aos Estados, decretar a intervenção federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A competência para decretar a intervenção federal, conforme a parte final do inciso V do Art. 21, é exclusiva da União, não havendo previsão de competência concorrente para os Estados nesta matéria."
+            },
+            // Art. 21, VI a X
+            {
+                question: "Compete à União autorizar a produção e o comércio de material bélico.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso VI do Art. 21, que estabelece textualmente a competência da União para \"autorizar (...) a produção e o comércio de material bélico\"."
+            },
+            {
+                question: "A fiscalização da produção e do comércio de material bélico é de competência concorrente entre a União e os Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 21 define as competências listadas como exclusivas da União. O inciso VI, especificamente, atribui à União tanto a autorização quanto a fiscalização da produção e do comércio de material bélico, sem prever concorrência com os Estados."
+            },
+            {
+                question: "É de competência da União emitir moeda.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente o texto do inciso VII do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "Compete à União administrar as reservas cambiais do País.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com a primeira parte do inciso VIII do Art. 21, que atribui à União a competência para \"administrar as reservas cambiais do País\"."
+            },
+            {
+                question: "Compete à União fiscalizar as operações de natureza financeira, excetuando-se as de seguros e de previdência privada.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VIII do Art. 21 é explícito ao determinar que a competência da União para fiscalizar operações de natureza financeira abrange \"especialmente as de crédito, câmbio e capitalização, bem como as de seguros e de previdência privada\", incluindo-as, portanto, no escopo da fiscalização."
+            },
+            {
+                question: "A fiscalização das operações de crédito, câmbio e capitalização é de competência da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete parte do conteúdo do inciso VIII do Art. 21, que menciona expressamente a competência da União para fiscalizar as operações de natureza financeira, \"especialmente as de crédito, câmbio e capitalização\"."
+            },
+            {
+                question: "Compete à União elaborar e executar planos nacionais de ordenação do território e de desenvolvimento econômico e social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso IX do Art. 21, que atribui à União a competência para \"elaborar e executar planos nacionais (...) de ordenação do território e de desenvolvimento econômico e social\"."
+            },
+            {
+                question: "A elaboração e execução de planos regionais de ordenação do território e de desenvolvimento econômico e social é de competência da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso IX do Art. 21 estabelece que compete à União elaborar e executar tanto os planos \"nacionais\" quanto os \"regionais\" com esses objetivos."
+            },
+            {
+                question: "Compete à União manter o serviço postal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, reproduzindo literalmente a primeira parte do inciso X do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A manutenção do correio aéreo nacional é de competência da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a parte final do inciso X do Art. 21, que atribui à União a competência para manter \"o correio aéreo nacional\"."
+            },
+            // Art. 21, XI e XII
+            {
+                question: "Compete à União explorar, exclusivamente de forma direta, os serviços de telecomunicações.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XI do Art. 21 estabelece que a exploração dos serviços de telecomunicações pela União pode ocorrer \"diretamente ou mediante autorização, concessão ou permissão\", não se restringindo à exploração direta."
+            },
+            {
+                question: "A exploração dos serviços de telecomunicações pela União deve ocorrer nos termos da lei, que disporá, entre outros aspectos, sobre a criação de um órgão regulador.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a redação do inciso XI do Art. 21, que condiciona a exploração dos serviços à lei e especifica que esta disporá sobre \"a organização dos serviços, a criação de um órgão regulador e outros aspectos institucionais\"."
+            },
+            {
+                question: "Compete à União explorar, diretamente ou mediante autorização, concessão ou permissão, os serviços de radiodifusão sonora.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O caput do inciso XII, combinado com a alínea 'a', atribui à União a competência para explorar, sob as formas mencionadas, \"os serviços de radiodifusão sonora, e de sons e imagens\"."
+            },
+            {
+                question: "É de competência dos Estados explorar os serviços de radiodifusão de sons e imagens.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com o inciso XII, alínea 'a', do Art. 21, a competência para explorar os serviços de radiodifusão de sons e imagens é da União."
+            },
+            {
+                question: "Compete à União explorar os serviços e instalações de energia elétrica.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte da alínea 'b' do inciso XII do Art. 21."
+            },
+            {
+                question: "A exploração do aproveitamento energético dos cursos de água pela União deve ocorrer em articulação com os Estados onde se situam os potenciais hidroenergéticos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final da alínea 'b' do inciso XII do Art. 21 condiciona a exploração do aproveitamento energético à \"articulação com os Estados onde se situam os potenciais hidroenergéticos\"."
+            },
+            {
+                question: "A competência da União para explorar o aproveitamento energético dos cursos de água independe de qualquer articulação com os Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois contradiz a parte final da alínea 'b' do inciso XII do Art. 21, que exige expressamente a articulação com os Estados onde se situam os potenciais hidroenergéticos."
+            },
+            {
+                question: "Compete à União explorar a navegação aérea e a aeroespacial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com a primeira parte da alínea 'c' do inciso XII do Art. 21."
+            },
+            {
+                question: "A exploração da infraestrutura aeroportuária é de competência dos Municípios onde os aeroportos se localizam.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Segundo a parte final da alínea 'c' do inciso XII do Art. 21, a exploração da \"infra-estrutura aeroportuária\" é de competência da União."
+            },
+            {
+                question: "Compete à União explorar os serviços de transporte ferroviário e aquaviário entre portos brasileiros e fronteiras nacionais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete literalmente a primeira parte da alínea 'd' do inciso XII do Art. 21."
+            },
+            {
+                question: "É competência da União explorar os serviços de transporte ferroviário ou aquaviário que transponham os limites de Estado ou Território.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo fielmente à parte final da alínea 'd' do inciso XII do Art. 21."
+            },
+            {
+                question: "O serviço de transporte ferroviário que se inicia e termina dentro dos limites de um mesmo Estado é de competência da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'd' do inciso XII do Art. 21 especifica que a competência da União se aplica ao transporte ferroviário que ocorre \"entre portos brasileiros e fronteiras nacionais\" ou que \"transponham os limites de Estado ou Território\". O transporte intramunicipal ou intraestadual é, por exclusão, de competência dos respectivos entes."
+            },
+            {
+                question: "Compete à União explorar os serviços de transporte rodoviário interestadual e internacional de passageiros.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente o texto da alínea 'e' do inciso XII do Art. 21."
+            },
+            {
+                question: "O transporte rodoviário intermunicipal de passageiros é de competência da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'e' do inciso XII do Art. 21 limita a competência da União ao transporte rodoviário \"interestadual e internacional\" de passageiros. O transporte intermunicipal é de competência dos Estados, conforme o Art. 25, § 1º, da Constituição."
+            },
+            {
+                question: "É competência da União explorar os portos marítimos, fluviais e lacustres.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à redação da alínea 'f' do inciso XII do Art. 21 da Constituição Federal."
+            },
+            // Art. 21, XIII a XVII
+            {
+                question: "Compete à União organizar e manter o Poder Judiciário do Distrito Federal e dos Territórios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso XIII do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "Compete à União organizar e manter o Ministério Público e a Defensoria Pública do Distrito Federal e dos Territórios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XIII do Art. 21 atribui à União a competência para organizar e manter o Ministério Público do Distrito Federal e dos Territórios, mas, em relação à Defensoria Pública, a competência se restringe à dos Territórios, não incluindo a do Distrito Federal."
+            },
+            {
+                question: "Compete ao Distrito Federal organizar e manter sua polícia civil, sua polícia penal e sua polícia militar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com o inciso XIV do Art. 21, a competência para organizar e manter a polícia civil, a polícia penal e a polícia militar do Distrito Federal é da União."
+            },
+            {
+                question: "É de competência da União organizar e manter o corpo de bombeiros militar do Distrito Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente parte do conteúdo do inciso XIV do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "Compete à União prestar assistência financeira ao Distrito Federal para a execução de serviços públicos, por meio de fundo próprio.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em plena conformidade com a parte final do inciso XIV do Art. 21, que prevê essa modalidade de assistência financeira da União ao Distrito Federal."
+            },
+            {
+                question: "Compete à União organizar e manter os serviços oficiais de estatística, geografia, geologia e cartografia de âmbito nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve integralmente a redação do inciso XV do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A organização e manutenção de serviços oficiais de geografia e cartografia de âmbito estadual é de competência da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XV do Art. 21 limita a competência da União a esses serviços quando forem de \"âmbito nacional\", excluindo, portanto, aqueles de escopo puramente estadual ou municipal."
+            },
+            {
+                question: "Compete à União exercer a classificação, para efeito indicativo, de diversões públicas e de programas de rádio e televisão.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz textualmente o disposto no inciso XVI do Art. 21. A natureza \"para efeito indicativo\" da classificação é ponto central da competência."
+            },
+            {
+                question: "A classificação exercida pela União sobre programas de rádio e televisão tem efeito censório e vinculativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XVI do Art. 21 é claro ao determinar que a classificação tem \"efeito indicativo\", ou seja, serve como recomendação e informação ao público, não possuindo caráter de censura prévia ou de obrigação."
+            },
+            {
+                question: "Compete à União conceder anistia.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à redação do inciso XVII do Art. 21 da Constituição Federal."
+            },
+            // Art. 21, XVIII a XXII
+            {
+                question: "Compete à União planejar e promover a defesa permanente contra as calamidades públicas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso XVIII do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A competência da União para planejar e promover a defesa contra calamidades públicas se restringe às secas e inundações.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XVIII do Art. 21 estabelece a competência da União de forma ampla (\"calamidades públicas\"), e a menção às secas e inundações é feita a título de exemplo e ênfase (\"especialmente\"), não de exclusão das demais calamidades."
+            },
+            {
+                question: "É competência da União instituir o sistema nacional de gerenciamento de recursos hídricos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a primeira parte do inciso XIX do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "Compete à União definir critérios de outorga de direitos de uso dos recursos hídricos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em plena conformidade com a parte final do inciso XIX do Art. 21."
+            },
+            {
+                question: "Compete à União instituir diretrizes para o desenvolvimento urbano.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à parte inicial do inciso XX do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A competência da União para instituir diretrizes para o desenvolvimento urbano inclui temas como habitação, saneamento básico e transportes urbanos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso XX do Art. 21, ao listar habitação, saneamento básico e transportes urbanos, o faz de forma exemplificativa (\"inclusive\"), indicando que tais matérias estão contidas na competência mais ampla de instituir diretrizes para o desenvolvimento urbano."
+            },
+            {
+                question: "Compete à União estabelecer princípios e diretrizes para o sistema nacional de viação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a redação do inciso XXI do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "Compete exclusivamente aos Estados e Municípios estabelecer princípios e diretrizes para o sistema nacional de viação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme expressa determinação do inciso XXI do Art. 21, a competência para estabelecer os princípios e diretrizes para o sistema nacional de viação é da União."
+            },
+            {
+                question: "É competência da União executar os serviços de polícia marítima e aeroportuária.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira e segunda parte do inciso XXII do Art. 21. Tais atribuições são exercidas pela Polícia Federal."
+            },
+            {
+                question: "A execução dos serviços de polícia de fronteiras é de competência dos Estados fronteiriços.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com a parte final do inciso XXII do Art. 21, a competência para executar os serviços de polícia de fronteiras é da União, também exercida por meio da Polícia Federal."
+            },
+            // Art. 21, XXIII
+            {
+                question: "Compete à União explorar os serviços e instalações nucleares de qualquer natureza.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do caput do inciso XXIII do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "É competência da União exercer monopólio estatal sobre a pesquisa, a lavra, o enriquecimento e o reprocessamento de minérios nucleares e seus derivados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente parte do caput do inciso XXIII do Art. 21, que estabelece o monopólio da União sobre essas atividades nucleares."
+            },
+            {
+                question: "O monopólio estatal exercido pela União abrange a industrialização e o comércio de minérios nucleares e seus derivados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em plena conformidade com a parte final do caput do inciso XXIII do Art. 21."
+            },
+            {
+                question: "Toda atividade nuclear em território nacional somente será admitida para fins pacíficos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A alínea 'a' do inciso XXIII do Art. 21 estabelece a finalidade pacífica como uma das condições indispensáveis para a admissão de atividade nuclear no país."
+            },
+            {
+                question: "A atividade nuclear em território nacional, mesmo que para fins pacíficos, depende de aprovação do Congresso Nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A alínea 'a' do inciso XXIII do Art. 21 exige, cumulativamente, que a atividade seja para fins pacíficos e que haja a \"aprovação do Congresso Nacional\"."
+            },
+            {
+                question: "Qualquer atividade nuclear em território nacional será admitida desde que aprovada pelo Poder Executivo, independentemente de manifestação do Congresso Nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois contraria frontalmente a alínea 'a' do inciso XXIII do Art. 21, que exige expressamente a \"aprovação do Congresso Nacional\"."
+            },
+            {
+                question: "São autorizadas, sob regime de permissão, a comercialização e a utilização de radioisótopos para pesquisa e uso agrícolas e industriais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve integralmente o disposto na alínea 'b' do inciso XXIII do Art. 21."
+            },
+            {
+                question: "A utilização de radioisótopos para pesquisa e uso agrícolas e industriais é atividade sujeita ao monopólio estatal, não podendo ser realizada por terceiros.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'b' do inciso XXIII do Art. 21 excepciona o monopólio ao autorizar expressamente a comercialização e a utilização desses radioisótopos para tais fins, desde que sob regime de permissão."
+            },
+            {
+                question: "É autorizada, sob regime de concessão, a produção de radioisótopos para pesquisa e uso médicos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'c' do inciso XXIII do Art. 21 estabelece que a autorização para a produção, comercialização e utilização de radioisótopos para fins médicos se dá \"sob regime de permissão\", e não de concessão."
+            },
+            {
+                question: "São autorizadas, sob regime de permissão, a produção, a comercialização e a utilização de radioisótopos para pesquisa e uso médicos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz textualmente a redação da alínea 'c' do inciso XXIII do Art. 21."
+            },
+            {
+                question: "A produção de radioisótopos para fins agrícolas e industriais é autorizada sob regime de permissão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Comparando as alíneas 'b' e 'c' do inciso XXIII, a Constituição autoriza a \"produção\" sob regime de permissão apenas para os radioisótopos de uso médico (alínea 'c'). A alínea 'b', referente aos usos agrícolas e industriais, autoriza apenas a \"comercialização e a utilização\", mas não a \"produção\"."
+            },
+            {
+                question: "A responsabilidade civil por danos nucleares depende da existência de culpa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'd' do inciso XXIII do Art. 21 é explícita ao afirmar que \"a responsabilidade civil por danos nucleares independe da existência de culpa\". Trata-se, portanto, de responsabilidade objetiva."
+            },
+            {
+                question: "No caso de um dano nuclear, a responsabilidade civil para repará-lo é objetiva.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A afirmação de que a responsabilidade \"independe da existência de culpa\", contida na alínea 'd' do inciso XXIII do Art. 21, é a definição da responsabilidade objetiva, na qual basta a comprovação da conduta, do dano e do nexo causal."
+            },
+            {
+                question: "A comercialização de radioisótopos para pesquisa e uso médicos é vedada em qualquer hipótese.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'c' do inciso XXIII do Art. 21 autoriza expressamente a comercialização de radioisótopos para pesquisa e uso médicos, desde que sob regime de permissão."
+            },
+            {
+                question: "A exploração de instalações nucleares para fins militares é permitida mediante aprovação do Congresso Nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A alínea 'a' do inciso XXIII do Art. 21 é categórica ao afirmar que \"toda atividade nuclear em território nacional somente será admitida para fins pacíficos\", não havendo exceção para a finalidade militar, mesmo com aprovação do Congresso."
+            },
+             // Art. 21, XXIV a XXVI
+            {
+                question: "Compete à União organizar, manter e executar a inspeção do trabalho.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a redação do inciso XXIV do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A execução da inspeção do trabalho é de competência concorrente entre a União e os Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 21 estabelece as competências exclusivas da União. O inciso XXIV atribui à União, sem prever concorrência, a competência para \"organizar, manter e executar\" a inspeção do trabalho."
+            },
+            {
+                question: "É competência da União estabelecer as áreas e as condições para o exercício da atividade de garimpagem.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso XXV do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A competência da União para estabelecer as condições para o exercício da atividade de garimpagem limita-se à sua exploração em forma associativa.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final do inciso XXV do Art. 21 especifica que a regulamentação da atividade de garimpagem pela União deve ser \"em forma associativa\", condicionando o exercício dessa competência."
+            },
+            {
+                question: "Compete à União organizar e fiscalizar a proteção e o tratamento de dados pessoais, nos termos da lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve textualmente o disposto no inciso XXVI do Art. 21 da Constituição Federal."
+            },
+            {
+                question: "A competência da União para organizar e fiscalizar a proteção e o tratamento de dados pessoais pode ser exercida independentemente de lei que a regulamente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XXVI do Art. 21 é claro ao determinar que a organização e fiscalização da proteção de dados pessoais ocorrerá \"nos termos da lei\", indicando que se trata de uma norma de eficácia limitada, que depende de legislação infraconstitucional (como a Lei Geral de Proteção de Dados - LGPD) para sua plena aplicação."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>

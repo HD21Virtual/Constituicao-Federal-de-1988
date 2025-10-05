@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bens da União</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Bens da União</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Questões Art. 20, I a V
+            {
+                question: "São bens da União os que atualmente lhe pertencem e os que lhe vierem a ser atribuídos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a redação do inciso I do Art. 20 da Constituição Federal, que define a titularidade dos bens da União de forma ampla, abrangendo tanto os bens presentes quanto os futuros."
+            },
+            {
+                question: "As terras devolutas indispensáveis à defesa das fronteiras são bens da União, independentemente de definição em lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com o inciso II do Art. 20, as terras devolutas indispensáveis à defesa das fronteiras, das fortificações e construções militares, das vias federais de comunicação e à preservação ambiental, para serem consideradas bens da União, devem ser \"definidas em lei\". A lei é um requisito indispensável para essa caracterização."
+            },
+            {
+                question: "Os lagos em terrenos de domínio da União são considerados bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à literalidade da primeira parte do inciso III do Art. 20, que estabelece serem bens da União \"os lagos, rios e quaisquer correntes de água em terrenos de seu domínio\"."
+            },
+            {
+                question: "Rios que banhem apenas um Estado, desde que não se estendam a território estrangeiro ou dele não provenham, são bens da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso III do Art. 20 é claro ao definir como bens da União os rios e correntes de água \"que banhem mais de um Estado\". Rios que correm em apenas um Estado, e não se enquadram nas demais hipóteses do inciso (limites com outros países, extensão a território estrangeiro), são de domínio estadual, conforme o Art. 26, I, da Constituição."
+            },
+            {
+                question: "Correntes de água que sirvam de limites com outros países são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e reflete fielmente parte do disposto no inciso III do Art. 20 da Constituição Federal, que inclui entre os bens da União as correntes de água que \"sirvam de limites com outros países\"."
+            },
+            {
+                question: "Rios que nascem em território estrangeiro e adentram o Brasil são considerados bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final do inciso III do Art. 20 estabelece que são bens da União os rios e correntes de água que \"se estendam a território estrangeiro ou dele provenham\"."
+            },
+            {
+                question: "Os terrenos marginais e as praias fluviais são bens da União, independentemente da titularidade do rio que os banha.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso III do Art. 20, \"bem como os terrenos marginais e as praias fluviais\", está diretamente ligada às águas de domínio da União descritas no início do mesmo inciso. Portanto, somente os terrenos marginais e as praias fluviais banhados por rios federais são bens da União."
+            },
+            {
+                question: "As ilhas fluviais e lacustres situadas em zonas limítrofes com outros países são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve literalmente a primeira parte do inciso IV do Art. 20 da Constituição Federal."
+            },
+            {
+                question: "Todas as praias marítimas, sem exceção, são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. Conforme a literalidade do inciso IV do Art. 20, \"as praias marítimas\" são bens da União. O texto constitucional não apresenta exceções para esta categoria de bem."
+            },
+            {
+                question: "Todas as ilhas oceânicas e costeiras são bens da União, sem nenhuma exceção.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O próprio inciso IV do Art. 20 estabelece exceções. São excluídas da propriedade da União as ilhas costeiras \"que contenham a sede de Municípios\", bem como \"as referidas no art. 26, II\" (que pertencem aos Estados)."
+            },
+            {
+                question: "As ilhas costeiras que contenham a sede de Municípios são excluídas da propriedade da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso IV do Art. 20 da Constituição Federal expressamente dispõe que são bens da União as ilhas costeiras, \"excluídas, destas, as que contenham a sede de Municípios\"."
+            },
+            {
+                question: "Em uma ilha costeira que seja sede de Município, as áreas afetadas ao serviço público e a unidade ambiental federal permanecem como bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e reflete a exceção da exceção prevista no inciso IV do Art. 20. Embora as ilhas-sede de Municípios sejam, em regra, excluídas dos bens da União, o dispositivo ressalva que pertencem à União \"aquelas áreas afetadas ao serviço público e a unidade ambiental federal\"."
+            },
+            {
+                question: "As ilhas costeiras que abrigam áreas de relevante interesse público e que não contenham sede de Município são bens dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso IV do Art. 20 estabelece que as ilhas costeiras são bens da União, excetuando as que são sede de Município e as referidas no art. 26, II. O Art. 26, II, por sua vez, atribui aos Estados \"as áreas, nas ilhas oceânicas e costeiras, que estiverem no seu domínio, excluídas aquelas sob domínio da União, de Municípios ou de terceiros\". Portanto, a regra geral para ilhas costeiras (não sede de município e não de domínio estadual prévio) é pertencerem à União."
+            },
+            {
+                question: "Os recursos naturais da plataforma continental são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz literalmente a primeira parte do inciso V do Art. 20 da Constituição Federal."
+            },
+            {
+                question: "Os recursos naturais da zona econômica exclusiva são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo fielmente à parte final do inciso V do Art. 20 da Constituição Federal."
+            },
+            // Questões Art. 20, VI a XI
+            {
+                question: "O mar territorial é considerado um bem dos Estados litorâneos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o inciso VI do Art. 20 da Constituição Federal, o mar territorial é, expressamente, um bem da União."
+            },
+            {
+                question: "Inclui-se no rol de bens da União o mar territorial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete exatamente a disposição contida no inciso VI do Art. 20 da Constituição Federal."
+            },
+            {
+                question: "Os terrenos de marinha são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso VII do Art. 20, que define os terrenos de marinha como bens da União."
+            },
+            {
+                question: "Os acrescidos dos terrenos de marinha são bens dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VII do Art. 20 é explícito ao determinar que tanto os terrenos de marinha quanto \"seus acrescidos\" são bens da União."
+            },
+            {
+                question: "Os potenciais de energia hidráulica são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente o texto do inciso VIII do Art. 20 da Constituição Federal."
+            },
+            {
+                question: "Apenas os potenciais de energia hidráulica localizados em rios que banham mais de um Estado são bens da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VIII do Art. 20 não impõe qualquer restrição, estabelecendo de forma genérica que \"os potenciais de energia hidráulica\" são bens da União, independentemente da titularidade do corpo d'água onde se encontrem."
+            },
+            {
+                question: "Os recursos minerais, exceto os do subsolo, são bens da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso IX do Art. 20 da Constituição Federal é claro ao afirmar que são bens da União \"os recursos minerais, inclusive os do subsolo\", não havendo exclusão, mas sim uma inclusão expressa dos recursos do subsolo."
+            },
+            {
+                question: "Os recursos minerais localizados no subsolo pertencem à União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em total conformidade com a redação do inciso IX do Art. 20, que inclui expressamente os recursos do subsolo entre os bens da União."
+            },
+            {
+                question: "As cavidades naturais subterrâneas são bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo fielmente à primeira parte do inciso X do Art. 20 da Constituição Federal."
+            },
+            {
+                question: "Os sítios arqueológicos e os sítios pré-históricos são classificados como bens da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final do inciso X do Art. 20 inclui, de forma literal, \"os sítios arqueológicos e pré-históricos\" no rol de bens da União."
+            },
+            {
+                question: "As cavidades naturais subterrâneas e os sítios arqueológicos e pré-históricos pertencem ao proprietário do solo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso X do Art. 20 determina que tais locais são bens da União, cuja propriedade é distinta da propriedade do solo, conforme também estabelece o Art. 176 da Constituição Federal."
+            },
+            {
+                question: "São bens da União as terras tradicionalmente ocupadas pelos índios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve literalmente a redação do inciso XI do Art. 20 da Constituição Federal."
+            },
+            {
+                question: "Apenas as terras demarcadas e homologadas como indígenas são consideradas bens da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XI do Art. 20 utiliza a expressão \"terras tradicionalmente ocupadas pelos índios\". A demarcação é um ato administrativo declaratório de um direito originário, não constitutivo. Portanto, a propriedade da União sobre essas terras decorre da ocupação tradicional, e não do ato de demarcação."
+            },
+            {
+                question: "O domínio das terras tradicionalmente ocupadas pelos índios é da União, sendo a posse permanente e o usufruto exclusivo das riquezas do solo, dos rios e dos lagos nelas existentes garantidos às comunidades indígenas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. Embora o inciso XI do Art. 20 estabeleça que as terras são bens da União, a sua interpretação deve ser feita em conjunto com o Art. 231, que reconhece aos índios a posse permanente e o usufruto exclusivo das riquezas, consolidando a titularidade dominial da União e o direito possessório dos indígenas."
+            },
+            {
+                question: "As terras ocupadas por comunidades indígenas de forma não tradicional, mesmo que tituladas em nome da comunidade, são consideradas bens da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XI do Art. 20 é específico ao se referir às terras \"tradicionalmente ocupadas\". Terras adquiridas por comunidades indígenas por outros meios, como compra e venda, não se enquadram nessa categoria de bem da União e possuem regime jurídico distinto."
+            },
+            // Questões Art. 20, Parágrafos
+            {
+                question: "É assegurada, nos termos da lei, apenas à União, aos Estados e ao Distrito Federal a participação no resultado da exploração de petróleo ou gás natural.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 1º do Art. 20 assegura a participação no resultado da exploração de recursos não apenas à União, aos Estados e ao Distrito Federal, mas também, expressamente, aos Municípios."
+            },
+            {
+                question: "A participação dos entes federativos no resultado da exploração de recursos minerais pode ser substituída por uma compensação financeira por essa exploração.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final do § 1º do Art. 20 estabelece que é assegurada a participação no resultado da exploração \"ou compensação financeira por essa exploração\", apresentando-a como uma alternativa."
+            },
+            {
+                question: "A participação no resultado da exploração ou a compensação financeira abrange recursos hídricos para fins de geração de energia elétrica e outros recursos minerais na plataforma continental, mar territorial ou zona econômica exclusiva.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente o que dispõe o § 1º do Art. 20, que menciona tanto os tipos de recursos (hídricos para energia, outros minerais) quanto os locais de exploração (plataforma continental, mar territorial ou zona econômica exclusiva)."
+            },
+            {
+                question: "A faixa de fronteira, considerada fundamental para a defesa do território nacional, possui exatamente cento e cinquenta quilômetros de largura.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 2º do Art. 20 define a faixa de fronteira como tendo \"até cento e cinquenta quilômetros de largura\", o que significa que este é um limite máximo, e não uma medida fixa."
+            },
+            {
+                question: "A faixa de fronteira, localizada ao longo das fronteiras terrestres, é considerada fundamental para a defesa do território nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz literalmente a descrição e a finalidade da faixa de fronteira, conforme estabelecido no § 2º do Art. 20."
+            },
+            {
+                question: "A ocupação e a utilização da faixa de fronteira serão reguladas em lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final do § 2º do Art. 20 determina expressamente que a ocupação e a utilização da faixa de fronteira \"serão reguladas em lei\"."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>

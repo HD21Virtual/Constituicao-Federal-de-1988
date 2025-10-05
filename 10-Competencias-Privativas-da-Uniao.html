@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competências Privativas da União</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Competência Legislativa Privativa da União</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Compete privativamente à União legislar sobre direito civil e comercial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz literalmente parte do inciso I do Art. 22, que atribui à União a competência legislativa privativa sobre direito civil e comercial."
+            },
+            {
+                question: "A competência para legislar sobre direito penal e processual é concorrente entre a União e os Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 22 estabelece que a competência é \"privativamente da União\", e o inciso I inclui expressamente o direito penal e o processual nessa competência."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre direito eleitoral e agrário.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em plena conformidade com o inciso I do Art. 22, que elenca o direito eleitoral e o agrário entre as matérias de competência legislativa privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre direito marítimo e aeronáutico.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo a parte do rol de matérias listadas no inciso I do Art. 22."
+            },
+            {
+                question: "A competência para legislar sobre direito espacial e do trabalho pertence aos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso I do Art. 22 é explícito ao atribuir à União, com privatividade, a competência para legislar sobre direito espacial e do trabalho."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre desapropriação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a competência descrita no inciso II do Art. 22 da Constituição Federal."
+            },
+            {
+                question: "Os Estados e Municípios possuem competência privativa para legislar sobre desapropriação em seus respectivos territórios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o inciso II do Art. 22, a competência para legislar sobre desapropriação é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre requisições civis e militares.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. No entanto, é importante notar que o inciso III do Art. 22 condiciona essa competência aos casos de \"iminente perigo e em tempo de guerra\"."
+            },
+            {
+                question: "A competência da União para legislar sobre requisições civis e militares pode ser exercida a qualquer tempo, independentemente da situação de normalidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois contradiz a parte final do inciso III do Art. 22, que restringe essa competência legislativa aos casos \"de iminente perigo e em tempo de guerra\"."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre águas e energia.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, refletindo fielmente a primeira parte do inciso IV do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre informática.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois \"informática\" está listada como matéria de competência legislativa privativa da União no inciso IV do Art. 22."
+            },
+            {
+                question: "A competência para legislar sobre telecomunicações e radiodifusão é concorrente entre União, Estados e Distrito Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso IV do Art. 22 atribui à União, de forma privativa, a competência para legislar sobre telecomunicações e radiodifusão."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre serviço postal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a competência descrita no inciso V do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre o sistema monetário e de medidas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso VI do Art. 22."
+            },
+            {
+                question: "Legislar sobre títulos e garantias dos metais é de competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a matéria está expressamente listada na parte final do inciso VI do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre política de crédito e câmbio.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso VII do Art. 22 atribui à União, com privatividade, a competência para legislar sobre essas matérias."
+            },
+            {
+                question: "A competência para legislar sobre seguros e transferência de valores é dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com o inciso VII do Art. 22, a competência legislativa sobre seguros e transferência de valores é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre comércio exterior.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso VIII do Art. 22 define essa competência como privativa da União."
+            },
+            {
+                question: "A legislação sobre comércio interestadual é de competência concorrente entre a União e os Estados envolvidos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VIII do Art. 22 é claro ao estabelecer que a competência para legislar sobre comércio interestadual é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre as diretrizes da política nacional de transportes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve textualmente a competência descrita no inciso IX do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre o regime dos portos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso X do Art. 22."
+            },
+            {
+                question: "Legislar sobre navegação lacustre e fluvial é de competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois tais modalidades de navegação estão incluídas no rol do inciso X do Art. 22."
+            },
+            {
+                question: "A competência para legislar sobre navegação marítima, aérea e aeroespacial é privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a parte final do inciso X do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre trânsito.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso XI do Art. 22 atribui à União, com privatividade, a competência para legislar sobre trânsito."
+            },
+            {
+                question: "A competência para legislar sobre transporte é concorrente entre União e Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o inciso XI do Art. 22, a competência para legislar sobre transporte é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre jazidas, minas e outros recursos minerais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso XII do Art. 22 estabelece essa competência como privativa da União."
+            },
+            {
+                question: "Legislar sobre metalurgia é de competência dos Estados onde se localizam as indústrias.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso XII do Art. 22 inclui \"metalurgia\" no rol de competências legislativas privativas da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre nacionalidade e cidadania.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso XIII do Art. 22."
+            },
+            {
+                question: "Legislar sobre naturalização é de competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a naturalização está expressamente listada como matéria de competência privativa da União no inciso XIII do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre populações indígenas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente o texto do inciso XIV do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre emigração e imigração.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso XV do Art. 22 atribui essa competência à União."
+            },
+            {
+                question: "A competência para legislar sobre entrada, extradição e expulsão de estrangeiros é privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a parte final do inciso XV do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre a organização do sistema nacional de emprego.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso XVI do Art. 22."
+            },
+            {
+                question: "Legislar sobre as condições para o exercício de profissões é de competência dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso XVI do Art. 22 estabelece que legislar sobre as condições para o exercício de profissões é competência privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre a organização judiciária do Ministério Público do Distrito Federal e dos Territórios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso XVII do Art. 22 atribui à União a competência para legislar sobre a organização judiciária e do Ministério Público do DF e Territórios."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre a organização da Defensoria Pública do Distrito Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XVII do Art. 22 restringe a competência da União à Defensoria Pública \"dos Territórios\", não incluindo a do Distrito Federal."
+            },
+            {
+                question: "Legislar sobre a organização administrativa do Distrito Federal é competência privativa da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso XVII (\"bem como organização administrativa destes\") refere-se aos Territórios, não ao Distrito Federal."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre o sistema estatístico nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é a primeira matéria listada no inciso XVIII do Art. 22."
+            },
+            {
+                question: "Legislar sobre o sistema cartográfico e de geologia de âmbito estadual é competência dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XVIII do Art. 22 atribui à União a competência para legislar sobre os sistemas cartográfico e de geologia \"nacionais\", sendo esta privativa."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre sistemas de poupança.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso XIX do Art. 22."
+            },
+            {
+                question: "Legislar sobre a captação e garantia da poupança popular é competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a parte final do inciso XIX do Art. 22 define expressamente essa competência."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre sistemas de consórcios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em conformidade com a primeira parte do inciso XX do Art. 22."
+            },
+            {
+                question: "A competência para legislar sobre sorteios é concorrente entre União e Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XX do Art. 22 atribui à União, com privatividade, a competência para legislar sobre sorteios."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre normas gerais de organização das polícias militares.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso XXI do Art. 22 atribui à União a competência para legislar sobre normas gerais de diversas matérias relativas às polícias militares, incluindo sua organização."
+            },
+            {
+                question: "Legislar sobre efetivos e material bélico das polícias militares e dos corpos de bombeiros militares é competência privativa dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XXI do Art. 22 estabelece que a competência para legislar sobre normas gerais de efetivos e material bélico dessas corporações é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre normas gerais de garantias, convocação e mobilização das polícias militares.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente parte do rol de matérias listadas no inciso XXI do Art. 22."
+            },
+            {
+                question: "Legislar sobre normas gerais de inatividades e pensões dos corpos de bombeiros militares é competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a parte final do inciso XXI do Art. 22 define essa competência."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre a competência da polícia federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à primeira parte do inciso XXII do Art. 22."
+            },
+            {
+                question: "Legislar sobre a competência das polícias rodoviária e ferroviária federais é atribuição privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois está em conformidade com a parte final do inciso XXII do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre seguridade social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a competência descrita no inciso XXIII do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre as diretrizes e bases da educação nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve textualmente o inciso XXIV do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre registros públicos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é o que determina o inciso XXV do Art. 22."
+            },
+            {
+                question: "Legislar sobre atividades nucleares de qualquer natureza é competência concorrente entre União e Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o inciso XXVI do Art. 22, a competência para legislar sobre atividades nucleares de qualquer natureza é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre normas gerais de licitação e contratação para as administrações públicas diretas da União, Estados, Distrito Federal e Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete parte do inciso XXVII do Art. 22."
+            },
+            {
+                question: "A competência da União para legislar sobre normas gerais de licitação abrange as administrações autárquicas e fundacionais de todos os entes da federação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso XXVII do Art. 22 menciona expressamente as administrações \"autárquicas e fundacionais da União, Estados, Distrito Federal e Municípios\"."
+            },
+            {
+                question: "Compete aos Estados legislar sobre normas gerais de licitação e contratação para suas empresas públicas e sociedades de economia mista.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso XXVII do Art. 22 estabelece que a competência para legislar sobre normas gerais de licitação para empresas públicas e sociedades de economia mista é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre defesa territorial, aeroespacial e marítima.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois essas são as três primeiras matérias listadas no inciso XXVIII do Art. 22."
+            },
+            {
+                question: "Legislar sobre defesa civil é competência concorrente entre União, Estados e Municípios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XXVIII do Art. 22 atribui à União, de forma privativa, a competência para legislar sobre defesa civil."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre mobilização nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois \"mobilização nacional\" é a última matéria listada no inciso XXVIII do Art. 22."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre propaganda comercial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz integralmente a competência descrita no inciso XXIX do Art. 22."
+            },
+            {
+                question: "Os Municípios possuem competência privativa para legislar sobre propaganda comercial em seu âmbito local.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o inciso XXIX do Art. 22, a competência legislativa sobre propaganda comercial é privativa da União."
+            },
+            {
+                question: "Compete privativamente à União legislar sobre proteção de dados pessoais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, correspondendo à primeira parte do inciso XXX do Art. 22."
+            },
+            {
+                question: "Legislar sobre o tratamento de dados pessoais é competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a parte final do inciso XXX do Art. 22."
+            },
+            {
+                question: "Lei ordinária poderá autorizar os Estados a legislar sobre questões específicas das matérias relacionadas no Art. 22.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O parágrafo único do Art. 22 exige expressamente \"Lei complementar\" para autorizar os Estados a legislarem sobre questões específicas das matérias de competência privativa da União, não sendo suficiente uma lei ordinária."
+            },
+            {
+                question: "Mediante autorização de lei complementar, os Estados poderão legislar sobre questões específicas das matérias de competência privativa da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz a regra de delegação de competência legislativa prevista no parágrafo único do Art. 22 da Constituição Federal."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
