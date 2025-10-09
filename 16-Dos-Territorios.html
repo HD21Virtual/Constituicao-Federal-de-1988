@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dos Territórios</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Dos Territórios</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "A lei disporá sobre a organização administrativa e judiciária dos Territórios.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do caput do Art. 33, que delega à legislação infraconstitucional a competência para estruturar os Territórios Federais."
+            },
+            {
+                question: "A organização administrativa dos Territórios será disposta em lei, mas sua organização judiciária será definida pela Constituição do Estado mais próximo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 33 determina que a lei disporá sobre a organização \"administrativa e judiciária\", atribuindo à mesma lei a competência para tratar de ambas as estruturas."
+            },
+            {
+                question: "A organização administrativa e judiciária dos Territórios é matéria de lei complementar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 33 refere-se genericamente a \"A lei\", o que remete à lei ordinária. Quando a Constituição exige lei complementar, ela o faz expressamente, o que não é o caso aqui."
+            },
+            {
+                question: "A organização judiciária dos Territórios será disposta em lei, mas sua organização administrativa será definida por decreto do Presidente da República.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 33 é claro ao determinar que tanto a organização administrativa quanto a judiciária serão dispostas em lei."
+            },
+            {
+                question: "A lei disporá sobre a organização administrativa, mas não sobre a organização judiciária dos Territórios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. O caput do Art. 33 estabelece que a lei disporá sobre a organização \"administrativa e judiciária\", cobrindo ambas as áreas."
+            },
+            {
+                question: "Os Territórios poderão ser divididos em Municípios.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a primeira parte do Art. 33, § 1º, que prevê a possibilidade de criação de municípios dentro de um Território Federal."
+            },
+            {
+                question: "É vedada a divisão dos Territórios em Municípios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 33, § 1º, afirma expressamente que os Territórios \"poderão ser divididos em Municípios\", indicando uma faculdade, e não uma proibição."
+            },
+            {
+                question: "Aos Municípios criados a partir da divisão de um Território aplicar-se-á, no que couber, o disposto no Capítulo IV do Título III da Constituição, que trata dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a determinação do Art. 33, § 1º, estendendo o regime jurídico dos municípios aos entes criados dentro de Territórios."
+            },
+            {
+                question: "As contas do Governo do Território serão submetidas à Assembleia Legislativa do Estado mais próximo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Por serem os Territórios parte da União, o Art. 33, § 2º, estabelece que suas contas serão submetidas ao Congresso Nacional."
+            },
+            {
+                question: "As contas do Governo do Território serão submetidas ao Congresso Nacional, com parecer prévio do Tribunal de Contas da União.",
+                answer: "Certo",
+                rationale: "A questão é uma transcrição literal e correta do Art. 33, § 2º, que define o rito de fiscalização contábil dos Governos dos Territórios."
+            },
+            {
+                question: "A apreciação das contas do Governo do Território pelo Congresso Nacional dispensa o parecer prévio do Tribunal de Contas da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 33, § 2º, exige expressamente a manifestação do TCU, ao determinar que as contas serão submetidas ao Congresso \"com parecer prévio do Tribunal de Contas da União\"."
+            },
+            {
+                question: "O parecer prévio sobre as contas do Governo do Território é de competência do Tribunal de Contas do Estado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Como o Território integra a União, o órgão de controle externo competente para emitir o parecer é o Tribunal de Contas da União, conforme o Art. 33, § 2º."
+            },
+            {
+                question: "Em Territórios Federais com mais de cem mil habitantes, o Governador será eleito por voto direto.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 33, § 3º, refere-se ao \"Governador nomeado na forma desta Constituição\", indicando que, mesmo nesses Territórios mais populosos, a chefia do Executivo não é eleita diretamente."
+            },
+            {
+                question: "Nos Territórios Federais com mais de cem mil habitantes, haverá órgãos judiciários de primeira e segunda instância, membros do Ministério Público e defensores públicos federais.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente a estrutura mínima do sistema de justiça exigida pelo Art. 33, § 3º, para os Territórios mais populosos."
+            },
+            {
+                question: "A lei disporá sobre as eleições para a Câmara Territorial e sua competência deliberativa nos Territórios com mais de cem mil habitantes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com a parte final do Art. 33, § 3º, que prevê a existência de um poder legislativo local, a ser regulamentado por lei."
+            },
+            {
+                question: "A existência de órgãos judiciários de primeira e segunda instância é obrigatória em todos os Territórios Federais, independentemente da população.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 33, § 3º, condiciona a existência dessa estrutura judiciária, bem como de MP e Defensoria, aos Territórios \"com mais de cem mil habitantes\"."
+            },
+            {
+                question: "Nos Territórios Federais com mais de cem mil habitantes, haverá defensores públicos estaduais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto à esfera da defensoria. Como os Territórios são parte da União, o Art. 33, § 3º, prevê a atuação de \"defensores públicos federais\"."
+            },
+            {
+                question: "Os Territórios Federais se regem por Constituições próprias, aprovadas por suas Câmaras Territoriais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Territórios não possuem autonomia de ente federativo para ter uma Constituição. Conforme o caput do Art. 33, sua organização administrativa e judiciária é disposta em lei federal."
+            },
+            {
+                question: "As contas do Governo do Território são julgadas pelo Congresso Nacional, após parecer prévio do Tribunal de Contas da União.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve adequadamente o rito de controle externo das contas de um Território, conforme o Art. 33, § 2º, que espelha o rito de julgamento das contas do Presidente da República."
+            },
+            {
+                question: "A Câmara Territorial, nos Territórios mais populosos, terá sua competência deliberativa definida pela Constituição Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do Art. 33, § 3º, estabelece que \"a lei disporá sobre as eleições para a Câmara Territorial e sua competência deliberativa\", delegando a matéria à legislação infraconstitucional."
+            }
+        ];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>

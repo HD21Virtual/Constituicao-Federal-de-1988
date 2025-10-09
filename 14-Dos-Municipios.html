@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dos Municípios</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Dos Municípios</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 29
+            {
+                question: "O Município reger-se-á por lei orgânica, votada em dois turnos, com interstício mínimo de dez dias, e aprovada por dois terços dos membros da Câmara Municipal.",
+                answer: "Certo",
+                rationale: "A assertiva descreve corretamente o rito de aprovação da Lei Orgânica Municipal, conforme estabelecido na primeira parte do caput do Art. 29."
+            },
+            {
+                question: "A Lei Orgânica Municipal, após aprovada pela Câmara Municipal, será promulgada pelo Prefeito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 29 determina que a própria Câmara Municipal promulgará a Lei Orgânica, não havendo participação do Prefeito nesse ato."
+            },
+            {
+                question: "A Lei Orgânica Municipal deve atender aos princípios estabelecidos na Constituição Federal e na Constituição do respectivo Estado.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o caput do Art. 29, que subordina a autonomia municipal aos princípios das constituições federal e estadual."
+            },
+            {
+                question: "O mandato do Prefeito, do Vice-Prefeito e dos Vereadores é de quatro anos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde ao que dispõe o Art. 29, inciso I, sobre a duração dos mandatos eletivos municipais."
+            },
+            {
+                question: "As eleições municipais são realizadas de forma direta e simultânea em todo o País.",
+                answer: "Certo",
+                rationale: "A questão está correta, refletindo a determinação do Art. 29, inciso I, que uniformiza a data e a forma das eleições municipais em todo o território nacional."
+            },
+            {
+                question: "A eleição do Prefeito e do Vice-Prefeito ocorre no primeiro domingo de outubro do ano anterior ao término do mandato.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com a data estabelecida para as eleições municipais no Art. 29, inciso II."
+            },
+            {
+                question: "As regras sobre eleição em dois turnos, previstas no art. 77, aplicam-se a todos os Municípios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 29, inciso II, restringe a aplicação das regras de segundo turno \"no caso de Municípios com mais de duzentos mil eleitores\"."
+            },
+            {
+                question: "A posse do Prefeito e do Vice-Prefeito ocorre no dia 1º de janeiro do ano subsequente ao da eleição.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do Art. 29, inciso III."
+            },
+            {
+                question: "Os subsídios do Prefeito, do Vice-Prefeito e dos Secretários Municipais são fixados por lei de iniciativa do próprio Prefeito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 29, inciso V, determina que a lei que fixa tais subsídios é de \"iniciativa da Câmara Municipal\"."
+            },
+            {
+                question: "A lei que fixa os subsídios do Prefeito e do Vice-Prefeito também abrange os subsídios dos Secretários Municipais.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois o Art. 29, inciso V, inclui expressamente os \"Secretários Municipais\" no rol de autoridades cujos subsídios são fixados pela mesma lei."
+            },
+            {
+                question: "O subsídio dos Vereadores será fixado pelas respectivas Câmaras Municipais na mesma legislatura de sua vigência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 29, inciso VI, estabelece o princípio da anterioridade, determinando que o subsídio será fixado \"em cada legislatura para a subseqüente\"."
+            },
+            {
+                question: "O subsídio dos Vereadores será fixado pela Câmara Municipal em cada legislatura para a legislatura seguinte.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reflete fielmente o princípio da anterioridade na fixação da remuneração dos vereadores, conforme o Art. 29, inciso VI."
+            },
+            {
+                question: "O total da despesa com a remuneração dos Vereadores não poderá ultrapassar o montante de cinco por cento da receita do Município.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do limite global de gastos com a remuneração dos vereadores, previsto no Art. 29, inciso VII."
+            },
+            {
+                question: "Os Vereadores são invioláveis por suas opiniões, palavras e votos no exercício do mandato em todo o território estadual.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto à abrangência territorial da imunidade material. O Art. 29, inciso VIII, restringe a inviolabilidade \"na circunscrição do Município\"."
+            },
+            {
+                question: "A inviolabilidade dos Vereadores abrange suas opiniões, palavras e votos proferidos no exercício do mandato.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve o objeto da imunidade material dos vereadores, conforme o Art. 29, inciso VIII."
+            },
+            {
+                question: "As proibições e incompatibilidades aplicáveis aos membros do Congresso Nacional são idênticas àquelas aplicáveis aos Vereadores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 29, inciso IX, estabelece que as proibições e incompatibilidades são \"similares, no que couber\", indicando uma aplicação por simetria, e não uma identidade absoluta."
+            },
+            {
+                question: "O julgamento do Prefeito por crimes comuns ocorre perante o Tribunal de Justiça.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o foro por prerrogativa de função do Prefeito, estabelecido no Art. 29, inciso X."
+            },
+            {
+                question: "Compete à Prefeitura a organização das funções legislativas e fiscalizadoras da Câmara Municipal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 29, inciso XI, em respeito à separação dos Poderes, atribui à própria Câmara Municipal a competência para organizar suas funções típicas."
+            },
+            {
+                question: "É preceito a ser observado na Lei Orgânica a cooperação das associações representativas no planejamento municipal.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde ao mecanismo de participação popular previsto no Art. 29, inciso XII."
+            },
+            {
+                question: "A iniciativa popular de projetos de lei de interesse municipal exige a manifestação de, pelo menos, cinco por cento do eleitorado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve o quórum exigido pelo Art. 29, inciso XIII, para o exercício da iniciativa popular em âmbito municipal."
+            },
+            {
+                question: "A iniciativa popular de projetos de lei pode tratar de interesse específico de bairros.",
+                answer: "Certo",
+                rationale: "A questão está correta. O Art. 29, inciso XIII, prevê expressamente que os projetos podem ser de interesse \"do Município, da cidade ou de bairros\"."
+            },
+            // Art. 30
+            {
+                question: "Compete aos Municípios legislar sobre assuntos de interesse local.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da competência legislativa geral dos Municípios, prevista no Art. 30, inciso I."
+            },
+            {
+                question: "Os Municípios podem suplementar a legislação federal e a estadual no que couber.",
+                answer: "Certo",
+                rationale: "A questão está correta e corresponde à competência suplementar dos Municípios, prevista no Art. 30, inciso II."
+            },
+            {
+                question: "A competência dos Municípios para instituir e arrecadar seus tributos os desobriga de prestar contas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso III, afirma que a competência tributária existe \"sem prejuízo da obrigatoriedade de prestar contas...\"."
+            },
+            {
+                question: "Os Municípios podem criar, organizar e suprimir distritos, observada a legislação federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto à legislação a ser observada. O Art. 30, inciso IV, determina que deve ser observada a \"legislação estadual\"."
+            },
+            {
+                question: "Compete aos Municípios organizar e prestar os serviços públicos de interesse local, incluído o de transporte coletivo, que tem caráter essencial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com o Art. 30, inciso V, que define a competência municipal sobre os serviços públicos locais."
+            },
+            {
+                question: "A prestação dos serviços públicos de interesse local, como o transporte coletivo, deve ser feita exclusivamente de forma direta pelo Município.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso V, prevê que a prestação pode ser feita \"diretamente ou sob regime de concessão ou permissão\"."
+            },
+            {
+                question: "É competência exclusiva dos Municípios manter programas de educação infantil e de ensino fundamental.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso VI, estabelece que a manutenção desses programas se dará \"com a cooperação técnica e financeira da União e do Estado\"."
+            },
+            {
+                question: "Compete aos Municípios prestar serviços de atendimento à saúde da população, com a cooperação técnica e financeira da União e do Estado.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reflete a atuação municipal no sistema de saúde, conforme o Art. 30, inciso VII."
+            },
+            {
+                question: "Promover o adequado ordenamento territorial, mediante planejamento e controle do uso, do parcelamento e da ocupação do solo urbano, é competência dos Municípios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve a principal competência urbanística municipal, prevista no Art. 30, inciso VIII."
+            },
+            {
+                question: "A promoção da proteção do patrimônio histórico-cultural local pelo Município independe da observância da legislação federal e estadual.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso IX, determina que a proteção do patrimônio local deve ocorrer \"observada a legislação e a ação fiscalizadora federal e estadual\"."
+            },
+            // Art. 31
+            {
+                question: "A fiscalização do Município será exercida pelo Poder Legislativo Municipal, mediante controle externo, e pelos sistemas de controle interno do Poder Executivo Municipal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve o duplo sistema de fiscalização (externo e interno) previsto no caput do Art. 31."
+            },
+            {
+                question: "O controle externo da Câmara Municipal será exercido com o auxílio dos Tribunais de Contas dos Estados ou do Município, onde houver.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve o órgão auxiliar do Poder Legislativo no exercício do controle externo, conforme o Art. 31, § 1º."
+            },
+            {
+                question: "O parecer prévio emitido pelo Tribunal de Contas sobre as contas anuais do Prefeito prevalecerá, em qualquer hipótese, sobre a decisão da Câmara Municipal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 31, § 2º, estabelece que o parecer prévio \"só deixará de prevalecer por decisão de dois terços dos membros da Câmara Municipal\". Portanto, ele pode ser derrubado por quórum qualificado."
+            },
+            {
+                question: "A decisão de dois terços dos membros da Câmara Municipal pode derrubar o parecer prévio emitido pelo órgão competente sobre as contas do Prefeito.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 31, § 2º, que confere à Câmara Municipal a competência para o julgamento final das contas do chefe do Executivo."
+            },
+            {
+                question: "As contas dos Municípios ficarão, durante sessenta dias, anualmente, à disposição de qualquer cidadão, para exame e apreciação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao legitimado para o exame. O Art. 31, § 3º, confere essa prerrogativa a \"qualquer contribuinte\", e não a qualquer cidadão."
+            },
+            {
+                question: "As contas municipais ficarão anualmente à disposição de qualquer contribuinte para exame durante sessenta dias.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente o mecanismo de controle social das contas públicas previsto no Art. 31, § 3º."
+            },
+            {
+                question: "Ao examinar as contas do Município, o contribuinte poderá questionar-lhes a legitimidade, nos termos da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta e corresponde à parte final do Art. 31, § 3º, que garante ao contribuinte o direito de impugnar a legitimidade das contas."
+            },
+            {
+                question: "É vedada a criação de Tribunais, Conselhos ou órgãos de Contas Municipais.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta da vedação contida no Art. 31, § 4º."
+            },
+            {
+                question: "A Constituição permite que a lei estadual crie novos Tribunais de Contas Municipais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 31, § 4º, estabelece uma vedação constitucional expressa (\"É vedada a criação...\"), que não pode ser contrariada por legislação infraconstitucional."
+            },
+            // Continuação - Variações
+            {
+                question: "A aprovação da Lei Orgânica Municipal exige um quórum de maioria simples dos membros da Câmara Municipal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 29 exige um quórum qualificado, determinando a aprovação por \"dois terços dos membros da Câmara Municipal\"."
+            },
+            {
+                question: "As eleições para Prefeito e Vereadores ocorrem em pleitos separados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 29, inciso I, estabelece que a eleição se dará \"mediante pleito direto e simultâneo\"."
+            },
+            {
+                question: "Em Municípios com duzentos mil eleitores ou menos, não haverá segundo turno para a eleição de Prefeito.",
+                answer: "Certo",
+                rationale: "A questão está correta. A regra do segundo turno, conforme o Art. 29, inciso II, aplica-se apenas a Municípios \"com mais de duzentos mil eleitores\"."
+            },
+            {
+                question: "O total da despesa com a remuneração da Câmara Municipal não poderá ultrapassar o montante de cinco por cento da receita do Município.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O limite de 5% da receita municipal, previsto no Art. 29, inciso VII, refere-se ao total da despesa \"com a remuneração dos Vereadores\", e não da Câmara como um todo."
+            },
+            {
+                question: "As proibições e incompatibilidades no exercício da vereança são similares às previstas para os membros da Assembleia Legislativa do respectivo Estado.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 29, inciso IX, que estende, por simetria, o regime de incompatibilidades dos deputados estaduais aos vereadores."
+            },
+            {
+                question: "Compete aos Municípios legislar sobre assuntos de interesse predominantemente local.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois interpreta adequadamente a expressão \"interesse local\" do Art. 30, inciso I. A jurisprudência define o interesse local como aquele que afeta predominantemente o Município."
+            },
+            {
+                question: "Os Municípios são obrigados a publicar balancetes nos prazos fixados em lei.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o Art. 30, inciso III, que impõe o dever de transparência fiscal aos Municípios."
+            },
+            {
+                question: "O transporte coletivo, por ser de interesse local, tem caráter secundário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso V, define expressamente o transporte coletivo como um serviço que \"tem caráter essencial\"."
+            },
+            {
+                question: "Compete aos Municípios manter, sozinhos, programas de educação infantil e de ensino fundamental.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso VI, prevê que a manutenção desses programas se dará \"com a cooperação técnica e financeira da União e do Estado\"."
+            },
+            {
+                question: "A prestação de serviços de saúde pela população é uma competência municipal a ser exercida com a cooperação dos demais entes federativos.",
+                answer: "Certo",
+                rationale: "A questão está correta e reflete a organização do Sistema Único de Saúde (SUS), conforme o Art. 30, inciso VII, que prevê a atuação cooperada dos entes."
+            },
+            {
+                question: "O controle do uso, do parcelamento e da ocupação do solo urbano é competência da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 30, inciso VIII, atribui essa competência de política urbana aos Municípios."
+            },
+            {
+                question: "A proteção do patrimônio histórico-cultural local é feita pelo Município, observada a ação fiscalizadora federal e estadual.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve a atuação municipal na proteção do patrimônio local em harmonia com os demais entes, conforme o Art. 30, inciso IX."
+            },
+            {
+                question: "A fiscalização do Município é exercida exclusivamente pelo Poder Legislativo Municipal, mediante controle externo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 31 estabelece um sistema misto, que inclui o controle externo do Legislativo e \"os sistemas de controle interno do Poder Executivo Municipal\"."
+            },
+            {
+                question: "O controle externo da Câmara Municipal será exercido com o auxílio dos Conselhos ou Tribunais de Contas dos Municípios, onde houver.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois menciona uma das possibilidades de órgão auxiliar previstas no Art. 31, § 1º."
+            },
+            {
+                question: "O parecer prévio do Tribunal de Contas sobre as contas do Prefeito tem caráter opinativo e pode ser rejeitado por maioria simples da Câmara Municipal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora o parecer seja opinativo, o Art. 31, § 2º, exige um quórum qualificado de \"dois terços dos membros da Câmara Municipal\" para sua rejeição."
+            },
+            {
+                question: "As contas dos Municípios ficarão anualmente à disposição pública pelo prazo de noventa dias.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto ao prazo. O Art. 31, § 3º, estabelece o prazo de \"sessenta dias\"."
+            },
+            {
+                question: "Qualquer contribuinte poderá questionar a legitimidade das contas do Município, nos termos da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta e corresponde à parte final do Art. 31, § 3º."
+            },
+            {
+                question: "É permitida a criação de novos órgãos de Contas Municipais, desde que por emenda à Constituição Estadual.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A vedação à criação de novos Tribunais, Conselhos ou órgãos de Contas Municipais, prevista no Art. 31, § 4º, é uma norma da Constituição Federal e não pode ser contrariada por normas estaduais."
+            },
+            {
+                question: "A fiscalização do Município engloba tanto o controle externo, a cargo do Legislativo, quanto o controle interno, a cargo do Executivo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois resume de forma precisa o sistema dual de controle estabelecido no caput do Art. 31."
+            },
+            {
+                question: "A Câmara Municipal exerce o controle externo com o auxílio exclusivo do Tribunal de Contas do Estado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exclusivo\". O Art. 31, § 1º, prevê o auxílio dos Tribunais de Contas dos Estados ou do Município ou dos Conselhos ou Tribunais de Contas dos Municípios, onde houver, admitindo outras configurações além do TCE."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
