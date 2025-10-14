@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Da Administração Pública - Disposições Gerais</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Da Administração Pública - Disposições Gerais</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "A administração pública direta e indireta de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade и eficiência.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve fielmente o caput do Art. 37 da Constituição, listando os entes da administração e os princípios expressos que a regem.<br><br><b>Dispositivo Legal:</b> Art. 37. A administração pública direta e indireta de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade e eficiência e, também, ao seguinte:"
+            },
+            {
+                question: "A administração pública direta de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios obedecerá aos princípios de legalidade, impessoalidade, moralidade e publicidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. O caput do Art. 37 estabelece que, além dos princípios citados, a administração pública também obedecerá ao princípio da eficiência.<br><br><b>Dispositivo Legal:</b> Art. 37. A administração pública direta e indireta de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade e eficiência e, também, ao seguinte:"
+            },
+            {
+                question: "Os cargos, empregos e funções públicas são acessíveis aos brasileiros que preencham os requisitos estabelecidos em lei, assim como aos estrangeiros, na forma da lei.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal do inciso I do Art. 37, que trata da acessibilidade aos cargos, empregos e funções públicas.<br><br><b>Dispositivo Legal:</b> I - os cargos, empregos e funções públicas são acessíveis aos brasileiros que preencham os requisitos estabelecidos em lei, assim como aos estrangeiros, na forma da lei;"
+            },
+            {
+                question: "Os cargos, empregos e funções públicas são acessíveis exclusivamente aos brasileiros que preencham os requisitos estabelecidos em lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exclusivamente\". O inciso I do Art. 37 estende o acesso também \"aos estrangeiros, na forma da lei\".<br><br><b>Dispositivo Legal:</b> I - os cargos, empregos e funções públicas são acessíveis aos brasileiros que preencham os requisitos estabelecidos em lei, assim como aos estrangeiros, na forma da lei;"
+            },
+            {
+                question: "A investidura em cargo ou emprego público depende de aprovação prévia em concurso público de provas ou de provas e títulos, ressalvadas as nomeações para cargo em comissão declarado em lei de livre nomeação e exoneração.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a regra geral da investidura por concurso público e sua principal exceção, os cargos em comissão, conforme o inciso II do Art. 37.<br><br><b>Dispositivo Legal:</b> II - a investidura em cargo ou emprego público depende de aprovação prévia em concurso público de provas ou de provas e títulos, de acordo com a natureza e a complexidade do cargo ou emprego, na forma prevista em lei, ressalvadas as nomeações para cargo em comissão declarado em lei de livre nomeação e exoneração;"
+            },
+            {
+                question: "Toda investidura em cargo ou emprego público depende, sem exceções, de aprovação prévia em concurso público de provas ou de provas e títulos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por absolutizar a regra. O próprio inciso II do Art. 37 prevê uma exceção: \"ressalvadas as nomeações para cargo em comissão declarado em lei de livre nomeação e exoneração\".<br><br><b>Dispositivo Legal:</b> II - a investidura em cargo ou emprego público depende de aprovação prévia em concurso público de provas ou de provas e títulos, de acordo com a natureza e a complexidade do cargo ou emprego, na forma prevista em lei, ressalvadas as nomeações para cargo em comissão declarado em lei de livre nomeação e exoneração;"
+            },
+            {
+                question: "O prazo de validade do concurso público será de até dois anos, prorrogável uma vez, por igual período.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do inciso III do Art. 37, que estabelece o prazo máximo de validade dos concursos públicos e as regras de sua prorrogação.<br><br><b>Dispositivo Legal:</b> III - o prazo de validade do concurso público será de até dois anos, prorrogável uma vez, por igual período;"
+            },
+            {
+                question: "O prazo de validade do concurso público será de dois anos, prorrogável por mais duas vezes, por igual período.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta em dois pontos. O prazo é de \"até dois anos\" (pode ser menor) e a prorrogação é permitida apenas \"uma vez\", e não duas.<br><br><b>Dispositivo Legal:</b> III - o prazo de validade do concurso público será de até dois anos, prorrogável uma vez, por igual período;"
+            },
+            {
+                question: "Durante o prazo improrrogável previsto no edital de convocação, aquele aprovado em concurso público será convocado com prioridade sobre novos concursados para assumir cargo ou emprego, na carreira.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a garantia do direito de nomeação dos aprovados dentro do cadastro de reserva, conforme o inciso IV do Art. 37.<br><br><b>Dispositivo Legal:</b> IV - durante o prazo improrrogável previsto no edital de convocação, aquele aprovado em concurso público de provas ou de provas e títulos será convocado com prioridade sobre novos concursados para assumir cargo ou emprego, na carreira;"
+            },
+            {
+                question: "Durante o prazo de validade do concurso, aquele aprovado será convocado com exclusividade sobre novos concursados para assumir cargo ou emprego.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao usar o termo \"exclusividade\". O inciso IV do Art. 37 assegura \"prioridade\" na convocação, o que é diferente de exclusividade. A administração pode convocar novos concursados, desde que todos os aprovados do concurso anterior tenham sido chamados primeiro.<br><br><b>Dispositivo Legal:</b> IV - durante o prazo improrrogável previsto no edital de convocação, aquele aprovado em concurso público de provas ou de provas e títulos será convocado com prioridade sobre novos concursados para assumir cargo ou emprego, na carreira;"
+            },
+            {
+                question: "As funções de confiança são exercidas exclusivamente por servidores ocupantes de cargo efetivo e destinam-se apenas às atribuições de direção, chefia e assessoramento.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve com exatidão os dois requisitos das funções de confiança: serem exercidas apenas por servidores efetivos e terem suas atribuições restritas a direção, chefia e assessoramento, conforme o inciso V do Art. 37.<br><br><b>Dispositivo Legal:</b> V - as funções de confiança, exercidas exclusivamente por servidores ocupantes de cargo efetivo, e os cargos em comissão, a serem preenchidos por servidores de carreira nos casos, condições e percentuais mínimos previstos em lei, destinam-se apenas às atribuições de direção, chefia e assessoramento;"
+            },
+            {
+                question: "Os cargos em comissão destinam-se apenas às atribuições de direção, chefia e assessoramento.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. Assim como as funções de confiança, os cargos em comissão também têm suas atribuições limitadas a direção, chefia e assessoramento, conforme a parte final do inciso V do Art. 37.<br><br><b>Dispositivo Legal:</b> V - as funções de confiança, exercidas exclusivamente por servidores ocupantes de cargo efetivo, e os cargos em comissão, a serem preenchidos por servidores de carreira nos casos, condições e percentuais mínimos previstos em lei, destinam-se apenas às atribuições de direção, chefia e assessoramento;"
+            },
+            {
+                question: "As funções de confiança e os cargos em comissão podem ser exercidos por qualquer pessoa, servidor público ou não.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso V do Art. 37 estabelece que as funções de confiança são exercidas \"exclusivamente por servidores ocupantes de cargo efetivo\". Apenas os cargos em comissão podem, em parte, ser preenchidos por não servidores.<br><br><b>Dispositivo Legal:</b> V - as funções de confiança, exercidas exclusivamente por servidores ocupantes de cargo efetivo, e os cargos em comissão, a serem preenchidos por servidores de carreira nos casos, condições e percentuais mínimos previstos em lei, destinam-se apenas às atribuições de direção, chefia e assessoramento;"
+            },
+            {
+                question: "Os cargos em comissão devem ser preenchidos integralmente por servidores de carreira.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso V do Art. 37 determina que os cargos em comissão serão preenchidos por servidores de carreira \"nos casos, condições e percentuais mínimos previstos em lei\", o que significa que uma parte deles pode ser preenchida por pessoas de fora da administração (livre nomeação).<br><br><b>Dispositivo Legal:</b> V - as funções de confiança, exercidas exclusivamente por servidores ocupantes de cargo efetivo, e os cargos em comissão, a serem preenchidos por servidores de carreira nos casos, condições e percentuais mínimos previstos em lei, destinam-se apenas às atribuições de direção, chefia e assessoramento;"
+            },
+            {
+                question: "As funções de confiança e os cargos em comissão destinam-se a quaisquer atribuições definidas em lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso V do Art. 37 restringe as atribuições desses postos, determinando que se destinam \"apenas às atribuições de direção, chefia e assessoramento\".<br><br><b>Dispositivo Legal:</b> V - as funções de confiança, exercidas exclusivamente por servidores ocupantes de cargo efetivo, e os cargos em comissão, a serem preenchidos por servidores de carreira nos casos, condições e percentuais mínimos previstos em lei, destinam-se apenas às atribuições de direção, chefia e assessoramento;"
+            },
+            {
+                question: "É garantido ao servidor público civil o direito à livre associação sindical.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso VI do Art. 37, que estende o direito à livre associação sindical aos servidores públicos civis.<br><br><b>Dispositivo Legal:</b> VI - é garantido ao servidor público civil o direito à livre associação sindical;"
+            },
+            {
+                question: "É garantido a todo servidor público, civil ou militar, o direito à livre associação sindical.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao incluir os servidores militares. O inciso VI do Art. 37 garante o direito de sindicalização expressamente ao \"servidor público civil\". Aos militares, a sindicalização é vedada pelo Art. 142, § 3º, IV, da Constituição.<br><br><b>Dispositivo Legal:</b> VI - é garantido ao servidor público civil o direito à livre associação sindical;"
+            },
+            {
+                question: "O direito de greve dos servidores públicos será exercido nos termos e nos limites definidos em lei específica.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente o texto do inciso VII do Art. 37, que reconhece o direito de greve do servidor, mas o condiciona à regulamentação por meio de lei específica.<br><br><b>Dispositivo Legal:</b> VII - o direito de greve será exercido nos termos e nos limites definidos em lei específica;"
+            },
+            {
+                question: "O direito de greve dos servidores públicos será exercido nos termos e nos limites definidos em lei complementar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao especificar o tipo de lei. O inciso VII do Art. 37 exige \"lei específica\", que é uma lei ordinária que trata exclusivamente daquele assunto, e não uma \"lei complementar\", que demanda um quórum de aprovação mais rigoroso.<br><br><b>Dispositivo Legal:</b> VII - o direito de greve será exercido nos termos e nos limites definidos em lei específica;"
+            },
+            {
+                question: "O direito de greve dos servidores públicos é de eficácia plena, podendo ser exercido a qualquer tempo, independentemente de regulamentação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VII do Art. 37 é uma norma de eficácia limitada, pois seu exercício pleno depende de regulamentação, ao afirmar que será exercido \"nos termos e nos limites definidos em lei específica\".<br><br><b>Dispositivo Legal:</b> VII - o direito de greve será exercido nos termos e nos limites definidos em lei específica;"
+            },
+            {
+                question: "A lei reservará percentual dos cargos e empregos públicos para as pessoas portadoras de deficiência e definirá os critérios de sua admissão.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal do inciso VIII do Art. 37, que estabelece um mandamento constitucional para a criação de cotas em concursos públicos para pessoas com deficiência.<br><br><b>Dispositivo Legal:</b> VIII - a lei reservará percentual dos cargos e empregos públicos para as pessoas portadoras de deficiência e definirá os critérios de sua admissão;"
+            },
+            {
+                question: "A lei poderá reservar, a seu critério, percentual dos cargos e empregos públicos para as pessoas portadoras de deficiência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o verbo, transformando a obrigação em faculdade. O inciso VIII do Art. 37 utiliza o verbo \"reservará\", que tem natureza impositiva (um dever), e não \"poderá reservar\" (uma faculdade).<br><br><b>Dispositivo Legal:</b> VIII - a lei reservará percentual dos cargos e empregos públicos para as pessoas portadoras de deficiência e definirá os critérios de sua admissão;"
+            },
+            {
+                question: "A lei estabelecerá os casos de contratação por tempo determinado para atender a necessidade temporária de excepcional interesse público.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso IX do Art. 37, que prevê a exceção à regra do concurso público para situações temporárias e excepcionais.<br><br><b>Dispositivo Legal:</b> IX - a lei estabelecerá os casos de contratação por tempo determinado para atender a necessidade temporária de excepcional interesse público;"
+            },
+            {
+                question: "A lei estabelecerá os casos de contratação por tempo determinado para atender a qualquer interesse público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por suprimir os requisitos para a contratação temporária. O inciso IX do Art. 37 exige a cumulação de dois requisitos: \"necessidade temporária de excepcional interesse público\".<br><br><b>Dispositivo Legal:</b> IX - a lei estabelecerá os casos de contratação por tempo determinado para atender a necessidade temporária de excepcional interesse público;"
+            },
+            {
+                question: "A remuneração dos servidores públicos somente poderá ser fixada ou alterada por lei específica, observada a iniciativa privativa em cada caso.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à primeira parte do inciso X do Art. 37, que estabelece o princípio da reserva de lei específica para a fixação e alteração de remunerações no serviço público.<br><br><b>Dispositivo Legal:</b> X - a remuneração dos servidores públicos e o subsídio de que trata o § 4º do art. 39 somente poderão ser fixados ou alterados por lei específica, observada a iniciativa privativa em cada caso, assegurada revisão geral anual, sempre na mesma data e sem distinção de índices;"
+            },
+            {
+                question: "A remuneração dos servidores públicos poderá ser fixada ou alterada por decreto do chefe do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso X do Art. 37 é explícito ao exigir que a fixação ou alteração de remuneração seja feita por \"lei específica\", vedando que tal matéria seja tratada por ato infralegal, como um decreto.<br><br><b>Dispositivo Legal:</b> X - a remuneração dos servidores públicos e o subsídio de que trata o § 4º do art. 39 somente poderão ser fixados ou alterados por lei específica, observada a iniciativa privativa em cada caso, assegurada revisão geral anual, sempre na mesma data e sem distinção de índices;"
+            },
+            {
+                question: "É assegurada a revisão geral anual da remuneração dos servidores públicos, sempre na mesma data e sem distinção de índices.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente o direito à revisão geral anual, previsto na parte final do inciso X do Art. 37.<br><br><b>Dispositivo Legal:</b> X - a remuneração dos servidores públicos e o subsídio de que trata o § 4º do art. 39 somente poderão ser fixados ou alterados por lei específica, observada a iniciativa privativa em cada caso, assegurada revisão geral anual, sempre na mesma data e sem distinção de índices;"
+            },
+            {
+                question: "É facultada a revisão geral anual da remuneração dos servidores públicos, que pode ocorrer em datas distintas para cada carreira.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta em dois pontos. O inciso X do Art. 37 estabelece que a revisão geral anual é \"assegurada\" (um direito), e não facultada. Além disso, determina que ela ocorra \"sempre na mesma data\", e não em datas distintas.<br><br><b>Dispositivo Legal:</b> X - a remuneração dos servidores públicos e o subsídio de que trata o § 4º do art. 39 somente poderão ser fixados ou alterados por lei específica, observada a iniciativa privativa em cada caso, assegurada revisão geral anual, sempre na mesma data e sem distinção de índices;"
+            },
+            {
+                question: "A revisão geral anual da remuneração dos servidores públicos deve ocorrer sem distinção de índices entre as diferentes carreiras.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do inciso X do Art. 37, que veda a aplicação de índices de reajuste diferentes no âmbito da revisão geral, garantindo a isonomia.<br><br><b>Dispositivo Legal:</b> X - a remuneração dos servidores públicos e o subsídio de que trata o § 4º do art. 39 somente poderão ser fixados ou alterados por lei específica, observada a iniciativa privativa em cada caso, assegurada revisão geral anual, sempre na mesma data e sem distinção de índices;"
+            },
+            {
+                question: "A revisão geral anual da remuneração dos servidores públicos pode ocorrer com distinção de índices, a depender da carreira e da disponibilidade orçamentária.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso X do Art. 37 veda expressamente a aplicação de índices diferenciados, ao determinar que a revisão ocorrerá \"sem distinção de índices\".<br><br><b>Dispositivo Legal:</b> X - a remuneração dos servidores públicos e o subsídio de que trata o § 4º do art. 39 somente poderão ser fixados ou alterados por lei específica, observada a iniciativa privativa em cada caso, assegurada revisão geral anual, sempre na mesma data e sem distinção de índices;"
+            },
+            {
+                question: "A remuneração e o subsídio dos ocupantes de cargos, funções e empregos públicos não poderão exceder o subsídio mensal, em espécie, dos Ministros do Supremo Tribunal Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente o teto remuneratório geral do serviço público brasileiro (subteto geral), conforme estabelecido na primeira parte do inciso XI do Art. 37.<br><br><b>Dispositivo Legal:</b> XI - a remuneração e o subsídio dos ocupantes de cargos, funções e empregos públicos da administração direta, autárquica e fundacional, dos membros de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios, dos detentores de mandato eletivo e dos demais agentes políticos e os proventos, pensões ou outra espécie remuneratória, percebidos cumulativamente ou não, incluídas as vantagens pessoais ou de qualquer outra natureza, não poderão exceder o subsídio mensal, em espécie, dos Ministros do Supremo Tribunal Federal..."
+            },
+            {
+                question: "A remuneração e o subsídio dos servidores públicos, incluídas as vantagens pessoais, poderão exceder o subsídio mensal dos Ministros do Supremo Tribunal Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o verbo. O inciso XI do Art. 37 veda expressamente que a remuneração total, incluindo vantagens, exceda o teto, ao dispor que \"não poderão exceder\".<br><br><b>Dispositivo Legal:</b> XI - a remuneração e o subsídio (...) incluídas as vantagens pessoais ou de qualquer outra natureza, não poderão exceder o subsídio mensal, em espécie, dos Ministros do Supremo Tribunal Federal..."
+            },
+            {
+                question: "Nos Municípios, o subsídio do Prefeito aplica-se como limite remuneratório.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte do inciso XI do Art. 37 que estabelece o subteto específico para a esfera municipal.<br><br><b>Dispositivo Legal:</b> XI - (...) aplicando-se como limite, nos Municípios, o subsídio do Prefeito..."
+            },
+            {
+                question: "Nos Municípios, o subsídio do Governador do Estado aplica-se como limite remuneratório.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao indicar o teto errado para a esfera municipal. O inciso XI do Art. 37 estabelece que o limite nos Municípios é o \"subsídio do Prefeito\", e não o do Governador.<br><br><b>Dispositivo Legal:</b> XI - (...) aplicando-se como limite, nos Municípios, o subsídio do Prefeito..."
+            },
+            {
+                question: "Nos Estados e no Distrito Federal, o subsídio mensal do Governador aplica-se como limite no âmbito do Poder Executivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve literalmente a regra do subteto para o Poder Executivo na esfera estadual e distrital, conforme o inciso XI do Art. 37.<br><br><b>Dispositivo Legal:</b> XI - (...) e nos Estados e no Distrito Federal, o subsídio mensal do Governador no âmbito do Poder Executivo..."
+            },
+            {
+                question: "Nos Estados, o subsídio dos Deputados Estaduais e Distritais aplica-se como limite no âmbito do Poder Legislativo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à regra do subteto para o Poder Legislativo estadual e distrital, prevista no inciso XI do Art. 37.<br><br><b>Dispositivo Legal:</b> XI - (...) e nos Estados e no Distrito Federal, (...) o subsídio dos Deputados Estaduais e Distritais no âmbito do Poder Legislativo..."
+            },
+            {
+                question: "No âmbito do Poder Judiciário estadual, o limite remuneratório é o subsídio dos Desembargadores do Tribunal de Justiça, limitado a noventa inteiros e vinte e cinco centésimos por cento do subsídio mensal dos Ministros do Supremo Tribunal Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, descrevendo com precisão o subteto do Judiciário estadual e seu limite percentual em relação ao teto geral, nos termos do inciso XI do Art. 37.<br><br><b>Dispositivo Legal:</b> XI - (...) e o subsidio dos Desembargadores do Tribunal de Justiça, limitado a noventa inteiros e vinte e cinco centésimos por cento do subsídio mensal, em espécie, dos Ministros do Supremo Tribunal Federal, no âmbito do Poder Judiciário..."
+            },
+            {
+                question: "O subsídio dos Desembargadores do Tribunal de Justiça não pode exceder o subsídio mensal dos Ministros do Supremo Tribunal Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao indicar o limite errado. O inciso XI do Art. 37 estabelece que o subsídio dos Desembargadores é limitado a \"noventa inteiros e vinte e cinco centésimos por cento\" (90,25%) do subsídio dos Ministros do STF, não a 100%.<br><br><b>Dispositivo Legal:</b> XI - (...) e o subsidio dos Desembargadores do Tribunal de Justiça, limitado a noventa inteiros e vinte e cinco centésimos por cento do subsídio mensal, em espécie, dos Ministros do Supremo Tribunal Federal, no âmbito do Poder Judiciário..."
+            },
+            {
+                question: "O subteto aplicável aos Desembargadores do Tribunal de Justiça também se aplica aos membros do Ministério Público, aos Procuradores e aos Defensores Públicos.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com a parte final do inciso XI do Art. 37, que estende o subteto do Judiciário estadual às funções essenciais à justiça.<br><br><b>Dispositivo Legal:</b> XI - (...) aplicável este limite aos membros do Ministério Público, aos Procuradores e aos Defensores Públicos;"
+            },
+            {
+                question: "Os vencimentos dos cargos do Poder Legislativo e do Poder Judiciário não poderão ser superiores aos pagos pelo Poder Executivo.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso XII do Art. 37, que estabelece uma isonomia remuneratória entre os Poderes.<br><br><b>Dispositivo Legal:</b> XII - os vencimentos dos cargos do Poder Legislativo e do Poder Judiciário não poderão ser superiores aos pagos pelo Poder Executivo;"
+            },
+            {
+                question: "Os vencimentos dos cargos do Poder Legislativo e do Poder Judiciário deverão ser iguais aos pagos pelo Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XII do Art. 37 estabelece que os vencimentos \"não poderão ser superiores\", o que permite que sejam iguais ou inferiores, mas não impõe a igualdade.<br><br><b>Dispositivo Legal:</b> XII - os vencimentos dos cargos do Poder Legislativo e do Poder Judiciário não poderão ser superiores aos pagos pelo Poder Executivo;"
+            },
+            {
+                question: "É vedada a vinculação ou equiparação de quaisquer espécies remuneratórias para o efeito de remuneração de pessoal do serviço público.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal do inciso XIII do Art. 37, que proíbe o reajuste automático de uma carreira com base no aumento de outra.<br><br><b>Dispositivo Legal:</b> XIII - é vedada a vinculação ou equiparação de quaisquer espécies remuneratórias para o efeito de remuneração de pessoal do serviço público;"
+            },
+            {
+                question: "É permitida a vinculação de espécies remuneratórias para o efeito de remuneração de pessoal do serviço público, desde que prevista em lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso XIII do Art. 37 estabelece uma vedação constitucional absoluta (\"É vedada...\"), que não pode ser afastada por lei ordinária.<br><br><b>Dispositivo Legal:</b> XIII - é vedada a vinculação ou equiparação de quaisquer espécies remuneratórias para o efeito de remuneração de pessoal do serviço público;"
+            },
+            {
+                question: "Os acréscimos pecuniários percebidos por servidor público não serão computados nem acumulados para fins de concessão de acréscimos ulteriores.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso XIV do Art. 37, que veda o chamado \"efeito repique\" ou \"efeito cascata\" nos vencimentos dos servidores.<br><br><b>Dispositivo Legal:</b> XIV - os acréscimos pecuniários percebidos por servidor público não serão computados nem acumulados para fins de concessão de acréscimos ulteriores;"
+            },
+            {
+                question: "Os acréscimos pecuniários percebidos por servidor público serão computados e acumulados para fins de concessão de acréscimos ulteriores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois inverte o sentido da norma. O inciso XIV do Art. 37 proíbe expressamente tal prática ao dispor que os acréscimos \"não serão computados nem acumulados\".<br><br><b>Dispositivo Legal:</b> XIV - os acréscimos pecuniários percebidos por servidor público não serão computados nem acumulados para fins de concessão de acréscimos ulteriores;"
+            },
+            {
+                question: "O subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. A regra da irredutibilidade, prevista no inciso XV do Art. 37, não é absoluta, pois o próprio dispositivo estabelece ressalvas, como a adequação ao teto remuneratório.<br><br><b>Dispositivo Legal:</b> XV - o subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis, ressalvado o disposto nos incisos XI e XIV deste artigo e nos arts. 39, § 4º, 150, II, 153, III, e 153, § 2º, I;"
+            },
+            {
+                question: "O subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis, ressalvado, entre outros, o respeito ao teto remuneratório.",
+                answer: "Certo",
+                rationale: "A questão está correta. A irredutibilidade é a regra, mas o próprio inciso XV do Art. 37 estabelece exceções, entre elas a adequação ao teto remuneratório previsto no inciso XI.<br><br><b>Dispositivo Legal:</b> XV - o subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis, ressalvado o disposto nos incisos XI e XIV deste artigo e nos arts. 39, § 4º, 150, II, 153, III, e 153, § 2º, I;"
+            },
+            {
+                question: "O princípio da irredutibilidade do subsídio e dos vencimentos dos ocupantes de cargos e empregos públicos é absoluto e não comporta exceções.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A irredutibilidade é um princípio relativo, pois o próprio inciso XV do Art. 37, que a consagra, estabelece uma série de \"ressalvas\" constitucionais, como a adequação ao teto (inciso XI) e a incidência de impostos.<br><br><b>Dispositivo Legal:</b> XV - o subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis, ressalvado o disposto nos incisos XI e XIV deste artigo e nos arts. 39, § 4º, 150, II, 153, III, e 153, § 2º, I;"
+            },
+            {
+                question: "A irredutibilidade dos vencimentos não impede a aplicação da vedação ao efeito cascata prevista no inciso XIV.",
+                answer: "Certo",
+                rationale: "A questão está correta. A vedação ao cômputo de acréscimos para fins de acréscimos ulteriores (inciso XIV) é uma das exceções expressamente ressalvadas pelo inciso XV do Art. 37 ao princípio da irredutibilidade.<br><br><b>Dispositivo Legal:</b> XV - o subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis, ressalvado o disposto nos incisos XI e XIV deste artigo e nos arts. 39, § 4º, 150, II, 153, III, e 153, § 2º, I;"
+            },
+            {
+                question: "O subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são redutíveis para se adequarem ao teto remuneratório.",
+                answer: "Certo",
+                rationale: "A questão está correta. O inciso XV do Art. 37 ressalva expressamente o disposto no inciso XI (teto remuneratório). Isso significa que, se a remuneração de um servidor ultrapassar o teto aplicável, ela será reduzida ao limite constitucional (o chamado \"abate-teto\"), relativizando o princípio da irredutibilidade.<br><br><b>Dispositivo Legal:</b> XV - o subsídio e os vencimentos dos ocupantes de cargos e empregos públicos são irredutíveis, ressalvado o disposto nos incisos XI e XIV deste artigo e nos arts. 39, § 4º, 150, II, 153, III, e 153, § 2º, I;"
+            },
+            {
+                question: "Ressalvados os casos especificados na legislação, as obras, serviços, compras e alienações serão contratados mediante processo de licitação pública que assegure igualdade de condições a todos os concorrentes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve fielmente a regra geral da obrigatoriedade da licitação e o princípio da isonomia que a rege, conforme a primeira parte do inciso XXI do Art. 37.<br><br><b>Dispositivo Legal:</b> XXI - ressalvados os casos especificados na legislação, as obras, serviços, compras e alienações serão contratados mediante processo de licitação pública que assegure igualdade de condições a todos os concorrentes..."
+            },
+            {
+                question: "As obras, serviços, compras e alienações serão, em qualquer hipótese, contratados mediante processo de licitação pública.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao tornar a regra absoluta. O inciso XXI do Art. 37 inicia-se com a expressão \"Ressalvados os casos especificados na legislação\", admitindo, portanto, exceções à obrigatoriedade de licitar (casos de dispensa e inexigibilidade).<br><br><b>Dispositivo Legal:</b> XXI - ressalvados os casos especificados na legislação, as obras, serviços, compras e alienações serão contratados mediante processo de licitação pública..."
+            },
+            {
+                question: "O processo de licitação pública somente permitirá as exigências de qualificação técnica e econômica indispensáveis à garantia do cumprimento das obrigações.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal da parte final do inciso XXI do Art. 37, que limita o poder da administração de impor exigências no edital, visando a ampliar a competitividade.<br><br><b>Dispositivo Legal:</b> XXI - ...o qual somente permitirá as exigências de qualificação técnica e econômica indispensáveis à garantia do cumprimento das obrigações."
+            },
+            {
+                question: "O processo de licitação pública permitirá quaisquer exigências de qualificação técnica e econômica, a critério da administração, para garantir o cumprimento das obrigações.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao conferir ampla discricionariedade à administração. O inciso XXI do Art. 37 restringe as exigências àquelas que forem \"indispensáveis\", e não quaisquer exigências.<br><br><b>Dispositivo Legal:</b> XXI - ...o qual somente permitirá as exigências de qualificação técnica e econômica indispensáveis à garantia do cumprimento das obrigações."
+            },
+            {
+                question: "As administrações tributárias da União, dos Estados, do Distrito Federal e dos Municípios são atividades essenciais ao funcionamento do Estado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à qualificação constitucional dada às administrações tributárias de todos os entes federativos, conforme o inciso XXII do Art. 37.<br><br><b>Dispositivo Legal:</b> XXII - as administrações tributárias da União, dos Estados, do Distrito Federal e dos Municípios, atividades essenciais ao funcionamento do Estado..."
+            },
+            {
+                question: "As administrações tributárias terão recursos prioritários para a realização de suas atividades e atuarão de forma integrada, inclusive com o compartilhamento de cadastros e de informações fiscais.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente as prerrogativas e o modo de atuação das administrações tributárias, nos termos da parte final do inciso XXII do Art. 37.<br><br><b>Dispositivo Legal:</b> XXII - ...terão recursos prioritários para a realização de suas atividades e atuarão de forma integrada, inclusive com o compartilhamento de cadastros e de informações fiscais, na forma da lei ou convênio."
+            },
+            {
+                question: "As administrações tributárias atuarão de forma isolada, sendo vedado o compartilhamento de cadastros e de informações fiscais entre os entes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois contraria frontalmente a determinação constitucional. O inciso XXII do Art. 37 estabelece que as administrações tributárias \"atuarão de forma integrada, inclusive com o compartilhamento de cadastros e de informações fiscais\".<br><br><b>Dispositivo Legal:</b> XXII - ...e atuarão de forma integrada, inclusive com o compartilhamento de cadastros e de informações fiscais, na forma da lei ou convênio."
+            },
+            {
+                question: "A publicidade dos atos, programas, obras, serviços e campanhas dos órgãos públicos deverá ter caráter educativo, informativo ou de orientação social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve exatamente as finalidades permitidas para a publicidade governamental, conforme o § 1º do Art. 37.<br><br><b>Dispositivo Legal:</b> § 1º A publicidade dos atos, programas, obras, serviços e campanhas dos órgãos públicos deverá ter caráter educativo, informativo ou de orientação social..."
+            },
+            {
+                question: "Na publicidade dos atos e campanhas dos órgãos públicos não poderão constar nomes, símbolos ou imagens que caracterizem promoção pessoal de autoridades ou servidores públicos.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal da vedação contida no § 1º do Art. 37, que visa a concretizar o princípio da impessoalidade.<br><br><b>Dispositivo Legal:</b> § 1º ...dela não podendo constar nomes, símbolos ou imagens que caracterizem promoção pessoal de autoridades ou servidores públicos."
+            },
+            {
+                question: "A publicidade dos atos e programas dos órgãos públicos poderá ter caráter promocional, desde que com finalidade informativa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A publicidade pode ter caráter informativo, mas o § 1º do Art. 37 veda expressamente que dela constem elementos que caracterizem \"promoção pessoal de autoridades ou servidores públicos\".<br><br><b>Dispositivo Legal:</b> § 1º ...dela não podendo constar nomes, símbolos ou imagens que caracterizem promoção pessoal de autoridades ou servidores públicos."
+            },
+            {
+                question: "A não observância do disposto nos incisos II e III do artigo 37 implicará a nulidade do ato e a punição da autoridade responsável, nos termos da lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente as consequências da não observância das regras de concurso público (inciso II) e do prazo de validade deste (inciso III), conforme o § 2º do Art. 37.<br><br><b>Dispositivo Legal:</b> § 2º A não observância do disposto nos incisos II и III implicará a nulidade do ato e a punição da autoridade responsável, nos termos da lei."
+            },
+            {
+                question: "A não observância do disposto nos incisos II e III do artigo 37 implicará apenas a punição da autoridade responsável, mantendo-se a validade do ato.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. O § 2º do Art. 37 estabelece duas consequências cumulativas: a \"nulidade do ato e a punição da autoridade responsável\".<br><br><b>Dispositivo Legal:</b> § 2º A не observância do disposto nos incisos II и III implicará a nulidade do ato e a punição da autoridade responsável, nos termos da lei."
+            },
+            {
+                question: "A lei disciplinará as formas de participação do usuário na administração pública direta e indireta.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à determinação do caput do § 3º do Art. 37, que prevê a edição de lei para regulamentar a participação popular nos serviços públicos.<br><br><b>Dispositivo Legal:</b> § 3º A lei disciplinará as formas de participação do usuário na administração pública direta e indireta, regulando especialmente:"
+            },
+            {
+                question: "A lei que disciplina a participação do usuário na administração pública regulará as reclamações relativas à prestação dos serviços públicos em geral.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e em conformidade com o inciso I do § 3º do Art. 37, que elenca as reclamações como um dos pontos a serem especialmente regulados pela lei.<br><br><b>Dispositivo Legal:</b> I - as reclamações relativas à prestação dos serviços públicos em geral, asseguradas a manutenção de serviços de atendimento ao usuário e a avaliação periódica, externa e interna, da qualidade dos serviços;"
+            },
+            {
+                question: "A avaliação periódica da qualidade dos serviços públicos, assegurada ao usuário, será exclusivamente interna.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso I do § 3º do Art. 37 determina que a avaliação periódica da qualidade dos serviços será \"externa e interna\", prevendo as duas modalidades.<br><br><b>Dispositivo Legal:</b> I - ...asseguradas a manutenção de serviços de atendimento ao usuário e a avaliação periódica, externa e interna, da qualidade dos serviços;"
+            },
+            {
+                question: "A lei que regula a participação do usuário na administração pública deve disciplinar o acesso dos usuários a registros administrativos e a informações sobre atos de governo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde ao que dispõe o inciso II do § 3º do Art. 37, garantindo o direito à informação e à transparência.<br><br><b>Dispositivo Legal:</b> II - o acesso dos usuários a registros administrativos e a informações sobre atos de governo, observado o disposto no art. 5º, X e XXXIII;"
+            },
+            {
+                question: "O acesso dos usuários a registros administrativos e a informações sobre atos de governo é irrestrito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O próprio inciso II do § 3º do Art. 37 estabelece que o acesso deve ser \"observado o disposto no art. 5º, X e XXXIII\", que tratam, respectivamente, da proteção à intimidade e vida privada (limite) e do direito geral de receber informações (regra).<br><br><b>Dispositivo Legal:</b> II - o acesso dos usuários a registros administrativos e a informações sobre atos de governo, observado o disposto no art. 5º, X e XXXIII;"
+            },
+            {
+                question: "A lei que regula a participação do usuário na administração pública deve disciplinar a representação contra o exercício negligente ou abusivo de cargo, emprego ou função na administração pública.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso III do § 3º do Art. 37, que prevê um mecanismo de controle social sobre a atuação dos agentes públicos.<br><br><b>Dispositivo Legal:</b> III - a disciplina da representação contra o exercício negligente ou abusivo de cargo, emprego ou função na administração pública."
+            },
+            {
+                question: "A lei deve disciplinar a representação contra o exercício negligente de cargo, mas não contra o exercício abusivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. O inciso III do § 3º do Art. 37 abrange as duas condutas, ao prever a representação contra o exercício \"negligente ou abusivo\".<br><br><b>Dispositivo Legal:</b> III - a disciplina da representação contra o exercício negligente ou abusivo de cargo, emprego ou função na administração pública."
+            },
+            {
+                question: "As formas de participação do usuário na administração pública serão disciplinadas por decreto do Chefe do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do § 3º do Art. 37 estabelece que \"A lei disciplinará\" a matéria, exigindo, portanto, um ato normativo do Poder Legislativo.<br><br><b>Dispositivo Legal:</b> § 3º A lei disciplinará as formas de participação do usuário na administração pública direta e indireta, regulando especialmente:"
+            },
+            {
+                question: "Os atos de improbidade administrativa importarão a suspensão dos direitos políticos, a perda da função pública, a indisponibilidade dos bens e o ressarcimento ao erário.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente as sanções de natureza civil e política aplicáveis aos atos de improbidade administrativa, conforme a primeira parte do § 4º do Art. 37.<br><br><b>Dispositivo Legal:</b> § 4º - Os atos de improbidade administrativa importarão a suspensão dos direitos políticos, a perda da função pública, a indisponibilidade dos bens e o ressarcimento ao erário, na forma e gradação previstas em lei, sem prejuízo da ação penal cabível."
+            },
+            {
+                question: "Os atos de improbidade administrativa importarão a cassação dos direitos políticos e a perda da função pública.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o termo \"suspensão\" por \"cassação\". O § 4º do Art. 37 prevê a \"suspensão dos direitos políticos\", que é uma medida temporária, enquanto a cassação é vedada pelo Art. 15 da Constituição.<br><br><b>Dispositivo Legal:</b> § 4º - Os atos de improbidade administrativa importarão a suspensão dos direitos políticos, a perda da função pública, a indisponibilidade dos bens e o ressarcimento ao erário, na forma e gradação previstas em lei, sem prejuízo da ação penal cabível."
+            },
+            {
+                question: "As sanções por atos de improbidade administrativa excluem a possibilidade de propositura da ação penal cabível.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 4º do Art. 37 é explícita ao afirmar que as sanções ocorrerão \"sem prejuízo da ação penal cabível\", consagrando a independência das instâncias.<br><br><b>Dispositivo Legal:</b> § 4º - Os atos de improbidade administrativa importarão a suspensão dos direitos políticos, a perda da função pública, a indisponibilidade dos bens e o ressarcimento ao erário, na forma e gradação previstas em lei, sem prejuízo da ação penal cabível."
+            },
+            {
+                question: "A lei estabelecerá os prazos de prescrição para ilícitos praticados por qualquer agente que causem prejuízos ao erário, ressalvadas as respectivas ações de ressarcimento.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal do § 5º do Art. 37, que estabelece a regra da prescritibilidade para as sanções, mas excetua as ações de ressarcimento de danos ao erário.<br><br><b>Dispositivo Legal:</b> § 5º A lei estabelecerá os prazos de prescrição para ilícitos praticados por qualquer agente, servidor ou não, que causem prejuízos ao erário, ressalvadas as respectivas ações de ressarcimento."
+            },
+            {
+                question: "As ações de ressarcimento por ilícitos que causem prejuízos ao erário são prescritíveis, nos termos da lei.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 5º do Art. 37 estabelece a imprescritibilidade das ações de ressarcimento, ao dispor \"ressalvadas as respectivas ações de ressarcimento\" da regra geral de prescrição.<br><br><b>Dispositivo Legal:</b> § 5º A lei estabelecerá os prazos de prescrição para ilícitos praticados por qualquer agente, servidor ou não, que causem prejuízos ao erário, ressalvadas as respectivas ações de ressarcimento."
+            },
+            {
+                question: "As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a regra da responsabilidade civil objetiva do Estado, conforme a primeira parte do § 6º do Art. 37.<br><br><b>Dispositivo Legal:</b> § 6º As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros, assegurado o direito de regresso contra o responsável nos casos de dolo ou culpa."
+            },
+            {
+                question: "As pessoas jurídicas de direito público responderão pelos danos que seus agentes causarem a terceiros, mas a regra não se aplica às pessoas jurídicas de direito privado prestadoras de serviços públicos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 6º do Art. 37 estende expressamente a responsabilidade objetiva \"às pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos\".<br><br><b>Dispositivo Legal:</b> § 6º As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros, assegurado o direito de regresso contra o responsável nos casos de dolo ou culpa."
+            },
+            {
+                question: "O direito de regresso do Estado contra o agente público responsável pelo dano é assegurado, independentemente da existência de dolo ou culpa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 6º do Art. 37 condiciona o direito de regresso à comprovação da responsabilidade subjetiva do agente, ao dispor \"assegurado o direito de regresso contra o responsável nos casos de dolo ou culpa\".<br><br><b>Dispositivo Legal:</b> § 6º As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros, assegurado o direito de regresso contra o responsável nos casos de dolo ou culpa."
+            },
+            {
+                question: "A lei disporá sobre os requisitos e as restrições ao ocupante de cargo ou emprego da administração direta e indireta que possibilite o acesso a informações privilegiadas.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do § 7º do Art. 37, que prevê a edição de lei para regular a situação de agentes públicos que lidam com informações sensíveis.<br><br><b>Dispositivo Legal:</b> § 7º A lei disporá sobre os requisitos e as restrições ao ocupante de cargo ou emprego da administração direta e indireta que possibilite o acesso a informações privilegiadas."
+            },
+            {
+                question: "A autonomia gerencial, orçamentária e financeira dos órgãos e entidades da administração direta e indireta poderá ser ampliada mediante contrato que tenha por objeto a fixação de metas de desempenho.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois descreve fielmente o mecanismo do contrato de gestão para ampliação da autonomia administrativa, conforme previsto no caput do § 8º do Art. 37.<br><br><b>Dispositivo Legal:</b> § 8º A autonomia gerencial, orçamentária e financeira dos órgãos e entidades da administração direta e indireta poderá ser ampliada mediante contrato, a ser firmado entre seus administradores e o poder público, que tenha por objeto a fixação de metas de desempenho para o órgão ou entidade, cabendo à lei dispor sobre:"
+            },
+            {
+                question: "A autonomia gerencial, orçamentária e financeira dos órgãos da administração direta e indireta deverá ser ampliada mediante contrato de gestão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o verbo, transformando a faculdade em obrigação. O caput do § 8º do Art. 37 utiliza o verbo \"poderá\", indicando uma possibilidade, e não o verbo \"deverá\", que indicaria uma obrigatoriedade.<br><br><b>Dispositivo Legal:</b> § 8º A autonomia gerencial, orçamentária e financeira dos órgãos e entidades da administração direta e indireta poderá ser ampliada mediante contrato..."
+            },
+            {
+                question: "O contrato para ampliação da autonomia gerencial será firmado entre os administradores do órgão ou entidade e o poder público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois identifica corretamente as partes que celebram o contrato de gestão, nos termos do caput do § 8º do Art. 37.<br><br><b>Dispositivo Legal:</b> § 8º ...mediante contrato, a ser firmado entre seus administradores e o poder público..."
+            },
+            {
+                question: "Cabe à lei dispor sobre o prazo de duração do contrato de gestão.",
+                answer: "Certo",
+                rationale: "A questão está correta e em conformidade com o inciso I do § 8º do Art. 37, que delega à lei a definição do prazo de duração do contrato.<br><br><b>Dispositivo Legal:</b> I - o prazo de duração do contrato;"
+            },
+            {
+                question: "Cabe à lei dispor sobre os controles e critérios de avaliação de desempenho, direitos, obrigações e responsabilidade dos dirigentes.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso II do § 8º do Art. 37, que detalha os elementos de controle e responsabilidade a serem definidos em lei.<br><br><b>Dispositivo Legal:</b> II - os controles e critérios de avaliação de desempenho, direitos, obrigações e responsabilidade dos dirigentes;"
+            },
+            {
+                question: "Cabe à lei dispor sobre a remuneração do pessoal do órgão ou entidade que firma o contrato de gestão.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois corresponde à determinação do inciso III do § 8º do Art. 37, que inclui a remuneração do pessoal como matéria a ser tratada na lei que disciplina o contrato de gestão.<br><br><b>Dispositivo Legal:</b> III - a remuneração do pessoal."
+            },
+            {
+                question: "O teto remuneratório do inciso XI do art. 37 aplica-se às empresas públicas e às sociedades de economia mista, e suas subsidiárias, que receberem recursos da União, dos Estados, do Distrito Federal ou dos Municípios para pagamento de despesas de pessoal ou de custeio em geral.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do § 9º do Art. 37, que estende a regra do teto remuneratório às estatais dependentes do tesouro.<br><br><b>Dispositivo Legal:</b> § 9º O disposto no inciso XI aplica-se às empresas públicas e às sociedades de economia mista, e suas subsidiárias, que receberem recursos da União, dos Estados, do Distrito Federal ou dos Municípios para pagamento de despesas de pessoal ou de custeio em geral."
+            },
+            {
+                question: "O teto remuneratório do inciso XI do art. 37 aplica-se a todas as empresas públicas e sociedades de economia mista, independentemente do recebimento de recursos dos entes federativos para custeio.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A aplicação do teto a essas entidades é condicionada. O § 9º do Art. 37 especifica que a regra se aplica àquelas \"que receberem recursos da União, dos Estados, do Distrito Federal ou dos Municípios para pagamento de despesas de pessoal ou de custeio em geral\".<br><br><b>Dispositivo Legal:</b> § 9º O disposto no inciso XI aplica-se às empresas públicas e às sociedades de economia mista, e suas subsidiárias, que receberem recursos da União, dos Estados, do Distrito Federal ou dos Municípios para pagamento de despesas de pessoal ou de custeio em geral."
+            },
+            {
+                question: "É vedada a percepção simultânea de proventos de aposentadoria com a remuneração de cargo, emprego ou função pública.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. Embora essa seja a regra geral, o próprio § 10 do Art. 37 estabelece exceções importantes (cargos acumuláveis, eletivos e em comissão), que não foram mencionadas.<br><br><b>Dispositivo Legal:</b> § 10. É vedada a percepção simultânea de proventos de aposentadoria decorrentes do art. 40 ou dos arts. 42 e 142 com a remuneração de cargo, emprego ou função pública, ressalvados os cargos acumuláveis na forma desta Constituição, os cargos eletivos e os cargos em comissão declarados em lei de livre nomeação e exoneração."
+            },
+            {
+                question: "A vedação à percepção simultânea de proventos de aposentadoria com a remuneração de cargo público não se aplica aos cargos eletivos e aos cargos em comissão de livre nomeação e exoneração.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois menciona duas das exceções expressamente previstas na parte final do § 10 do Art. 37.<br><br><b>Dispositivo Legal:</b> § 10. É vedada a percepção simultânea de proventos de aposentadoria (...) ressalvados os cargos acumuláveis na forma desta Constituição, os cargos eletivos e os cargos em comissão declarados em lei de livre nomeação e exoneração."
+            },
+            {
+                question: "É permitida a percepção simultânea de proventos de aposentadoria com a remuneração de qualquer cargo, emprego ou função pública.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois inverte o sentido da norma. O § 10 do Art. 37 estabelece que, como regra, \"É vedada\" a percepção simultânea, admitindo-a apenas nas hipóteses que ressalva.<br><br><b>Dispositivo Legal:</b> § 10. É vedada a percepção simultânea de proventos de aposentadoria decorrentes do art. 40 ou dos arts. 42 e 142 com a remuneração de cargo, emprego ou função pública, ressalvados os cargos acumuláveis na forma desta Constituição, os cargos eletivos e os cargos em comissão declarados em lei de livre nomeação e exoneração."
+            },
+            {
+                question: "Não serão computadas, para efeito dos limites remuneratórios, as parcelas de caráter indenizatório expressamente previstas em lei ordinária, aprovada pelo Congresso Nacional, de caráter nacional, aplicada a todos os Poderes e órgãos constitucionalmente autônomos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do § 11 do Art. 37, que exclui as verbas indenizatórias do cálculo do teto remuneratório, desde que preenchidos os requisitos legais.<br><br><b>Dispositivo Legal:</b> § 11. Não serão computadas, para efeito dos limites remuneratórios de que trata o inciso XI do caput deste artigo, as parcelas de caráter indenizatório expressamente previstas em lei ordinária, aprovada pelo Congresso Nacional, de caráter nacional, aplicada a todos os Poderes e órgãos constitucionalmente autônomos."
+            },
+            {
+                question: "As parcelas de caráter indenizatório, mesmo que não previstas em lei, não serão computadas para efeito dos limites remuneratórios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 11 do Art. 37 exige que as parcelas indenizatórias, para serem excluídas do teto, sejam \"expressamente previstas em lei\". A ausência de previsão legal impede a exclusão.<br><br><b>Dispositivo Legal:</b> § 11. Não serão computadas, para efeito dos limites remuneratórios de que trata o inciso XI do caput deste artigo, as parcelas de caráter indenizatório expressamente previstas em lei ordinária, aprovada pelo Congresso Nacional, de caráter nacional, aplicada a todos os Poderes e órgãos constitucionalmente autônomos."
+            },
+            {
+                question: "Fica facultado aos Estados e ao Distrito Federal fixar, em seu âmbito, como limite único, o subsídio mensal dos Desembargadores do respectivo Tribunal de Justiça.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve a faculdade conferida aos Estados e ao DF de estabelecerem um subteto único para todos os Poderes locais, conforme a primeira parte do § 12 do Art. 37.<br><br><b>Dispositivo Legal:</b> § 12. Para os fins do disposto no inciso XI do caput deste artigo, fica facultado aos Estados e ao Distrito Federal fixar, em seu âmbito, mediante emenda às respectivas Constituições e Lei Orgânica, como limite único, o subsídio mensal dos Desembargadores do respectivo Tribunal de Justiça..."
+            },
+            {
+                question: "Os Estados e o Distrito Federal devem, obrigatoriamente, fixar como limite único o subsídio mensal dos Desembargadores do respectivo Tribunal de Justiça.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o verbo, transformando a faculdade em obrigação. O § 12 do Art. 37 utiliza a expressão \"fica facultado\", indicando uma opção, e não um dever.<br><br><b>Dispositivo Legal:</b> § 12. Para os fins do disposto no inciso XI do caput deste artigo, fica facultado aos Estados e ao Distrito Federal fixar, em seu âmbito, mediante emenda às respectivas Constituições e Lei Orgânica, como limite único, o subsídio mensal dos Desembargadores do respectivo Tribunal de Justiça..."
+            },
+            {
+                question: "O subsídio mensal dos Desembargadores, quando fixado como limite único nos Estados, não se sujeita a qualquer teto.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O próprio § 12 do Art. 37 estabelece um limite para esse subteto, que é de \"noventa inteiros e vinte e cinco centésimos por cento do subsídio mensal dos Ministros do Supremo Tribunal Federal\".<br><br><b>Dispositivo Legal:</b> § 12. ...o subsídio mensal dos Desembargadores do respectivo Tribunal de Justiça, limitado a noventa inteiros e vinte e cinco centésimos por cento do subsídio mensal dos Ministros do Supremo Tribunal Federal..."
+            },
+            {
+                question: "O limite único baseado no subsídio dos Desembargadores não se aplica aos subsídios dos Deputados Estaduais e Distritais e dos Vereadores.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois é uma transcrição literal da ressalva final do § 12 do Art. 37, que exclui os parlamentares locais da incidência do subteto único.<br><br><b>Dispositivo Legal:</b> § 12. ...não se aplicando o disposto neste parágrafo aos subsídios dos Deputados Estaduais e Distritais e dos Vereadores."
+            },
+            {
+                question: "O servidor público titular de cargo efetivo poderá ser readaptado para exercício de cargo cujas atribuições e responsabilidades sejam compatíveis com a limitação que tenha sofrido em sua capacidade física ou mental.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a figura da readaptação do servidor público, conforme a primeira parte do § 13 do Art. 37.<br><br><b>Dispositivo Legal:</b> § 13. O servidor público titular de cargo efetivo poderá ser readaptado para exercício de cargo cujas atribuições e responsabilidades sejam compatíveis com a limitação que tenha sofrido em sua capacidade física ou mental, enquanto permanecer nesta condição, desde que possua a habilitação e o nível de escolaridade exigidos para o cargo de destino, mantida a remuneração do cargo de origem."
+            },
+            {
+                question: "A readaptação do servidor público titular de cargo efetivo é possível, desde que possua a habilitação e o nível de escolaridade exigidos para o cargo de destino, sendo-lhe paga a remuneração do novo cargo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta quanto à remuneração. A parte final do § 13 do Art. 37 garante ao servidor readaptado a irredutibilidade de vencimentos, ao determinar que será \"mantida a remuneração do cargo de origem\".<br><br><b>Dispositivo Legal:</b> § 13. ...desde que possua a habilitação e o nível de escolaridade exigidos para o cargo de destino, mantida a remuneração do cargo de origem."
+            },
+            {
+                question: "O servidor público titular de cargo efetivo poderá ser readaptado, mesmo que não possua a habilitação e o nível de escolaridade exigidos para o cargo de destino.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 13 do Art. 37 estabelece como condição para a readaptação que o servidor \"possua a habilitação e o nível de escolaridade exigidos para o cargo de destino\".<br><br><b>Dispositivo Legal:</b> § 13. ...desde que possua a habilitação e o nível de escolaridade exigidos para o cargo de destino, mantida a remuneração do cargo de origem."
+            },
+            {
+                question: "A readaptação do servidor público é uma medida definitiva, mantendo-se o servidor no novo cargo mesmo que sua capacidade física ou mental seja restabelecida.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 13 do Art. 37 estabelece o caráter transitório da medida, ao dispor que a readaptação ocorrerá \"enquanto permanecer nesta condição\", indicando que, cessada a limitação, o servidor pode retornar ao cargo original.<br><br><b>Dispositivo Legal:</b> § 13. O servidor público titular de cargo efetivo poderá ser readaptado (...) enquanto permanecer nesta condição..."
+            },
+            {
+                question: "A aposentadoria concedida com a utilização de tempo de contribuição decorrente de cargo, emprego ou função pública, inclusive do Regime Geral de Previdência Social, acarretará o rompimento do vínculo que gerou o referido tempo de contribuição.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do § 14 do Art. 37, que estabelece a extinção do vínculo de trabalho como consequência da aposentadoria voluntária do servidor.<br><br><b>Dispositivo Legal:</b> § 14. A aposentadoria concedida com a utilização de tempo de contribuição decorrente de cargo, emprego ou função pública, inclusive do Regime Geral de Previdência Social, acarretará o rompimento do vínculo que gerou o referido tempo de contribuição."
+            },
+            {
+                question: "A aposentadoria concedida com a utilização de tempo de contribuição decorrente de cargo público acarretará a manutenção do vínculo que gerou o referido tempo de contribuição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o termo \"rompimento\" por \"manutenção\". A norma constitucional determina expressamente o rompimento do vínculo.<br><br><b>Dispositivo Legal:</b> § 14. A aposentadoria concedida com a utilização de tempo de contribuição decorrente de cargo, emprego ou função pública, inclusive do Regime Geral de Previdência Social, acarretará o rompimento do vínculo que gerou o referido tempo de contribuição."
+            },
+            {
+                question: "A regra do rompimento do vínculo após a aposentadoria não se aplica quando o tempo de contribuição utilizado for decorrente do Regime Geral de Previdência Social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 14 do Art. 37 é explícito ao determinar que a regra se aplica \"inclusive do Regime Geral de Previdência Social\", abrangendo também o tempo de contribuição averbado do INSS.<br><br><b>Dispositivo Legal:</b> § 14. A aposentadoria concedida com a utilização de tempo de contribuição decorrente de cargo, emprego ou função pública, inclusive do Regime Geral de Previdência Social, acarretará o rompimento do vínculo que gerou o referido tempo de contribuição."
+            },
+            {
+                question: "É vedada a complementação de aposentadorias de servidores públicos e de pensões por morte a seus dependentes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por ser incompleta. Embora a vedação seja a regra, o próprio § 15 do Art. 37 estabelece exceções, como a complementação decorrente do regime de previdência complementar ou prevista em lei que extinga regime próprio. A omissão das ressalvas torna a afirmação absoluta e falsa.<br><br><b>Dispositivo Legal:</b> § 15. É vedada a complementação de aposentadorias de servidores públicos e de pensões por morte a seus dependentes que не seja decorrente do disposto nos §§ 14 a 16 do art. 40 ou que não seja prevista em lei que extinga regime próprio de previdência social."
+            },
+            {
+                question: "É permitida a complementação de aposentadorias de servidores públicos que seja decorrente do disposto nos parágrafos 14 a 16 do artigo 40 da Constituição.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve uma das exceções expressamente previstas no § 15 do Art. 37, que permite a complementação vinculada ao regime de previdência complementar dos servidores.<br><br><b>Dispositivo Legal:</b> § 15. É vedada a complementação de aposentadorias de servidores públicos e de pensões por morte a seus dependentes que não seja decorrente do disposto nos §§ 14 a 16 do art. 40 ou que não seja prevista em lei que extinga regime próprio de previdência social."
+            },
+            {
+                question: "É vedada a complementação de aposentadorias de servidores públicos, ainda que prevista em lei que extinga regime próprio de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois nega uma das exceções expressas à regra. O § 15 do Art. 37 permite a complementação de aposentadorias \"que não seja prevista em lei que extinga regime próprio de previdência social\", admitindo-a, portanto, nessa hipótese.<br><br><b>Dispositivo Legal:</b> § 15. É vedada a complementação de aposentadorias de servidores públicos e de pensões por morte a seus dependentes que não seja decorrente do disposto nos §§ 14 a 16 do art. 40 ou que não seja prevista em lei que extinga regime próprio de previdência social."
+            },
+            {
+                question: "Os órgãos e entidades da administração pública, individual ou conjuntamente, devem realizar avaliação das políticas públicas, na forma da lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve a obrigação imposta aos entes da administração pública pelo § 16 do Art. 37, consagrando o princípio da avaliação como um dever.<br><br><b>Dispositivo Legal:</b> § 16. Os órgãos e entidades da administração pública, individual ou conjuntamente, devem realizar avaliação das políticas públicas, inclusive com divulgação do objeto a ser avaliado e dos resultados alcançados, na forma da lei."
+            },
+            {
+                question: "Os órgãos e entidades da administração pública poderão, a seu critério, realizar avaliação das políticas públicas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao trocar o verbo, transformando a obrigação em faculdade. O § 16 do Art. 37 utiliza o verbo \"devem\", que tem natureza impositiva (um dever), e não \"poderão\" (uma faculdade).<br><br><b>Dispositivo Legal:</b> § 16. Os órgãos e entidades da administração pública, individual ou conjuntamente, devem realizar avaliação das políticas públicas, inclusive com divulgação do objeto a ser avaliado e dos resultados alcançados, na forma da lei."
+            },
+            {
+                question: "Na avaliação das políticas públicas, a administração deve divulgar os resultados alcançados, mas não o objeto a ser avaliado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 16 do Art. 37 exige a publicidade de ambas as informações, ao determinar a \"divulgação do objeto a ser avaliado e dos resultados alcançados\".<br><br><b>Dispositivo Legal:</b> § 16. Os órgãos e entidades da administração pública, individual ou conjuntamente, devem realizar avaliação das políticas públicas, inclusive com divulgação do objeto a ser avaliado e dos resultados alcançados, na forma da lei."
+            },
+            {
+                question: "Ao servidor público da administração direta, autárquica e fundacional, no exercício de mandato eletivo, aplicam-se as disposições do artigo 38 da Constituição Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma paráfrase fiel do caput do Art. 38, que delimita o escopo de aplicação de suas regras aos servidores da administração direta, autárquica e fundacional.<br><br><b>Dispositivo Legal:</b> Art. 38. Ao servidor público da administração direta, autárquica e fundacional, no exercício de mandato eletivo, aplicam-se as seguintes disposições:"
+            },
+            {
+                question: "As disposições do artigo 38 da Constituição aplicam-se a todo servidor público, inclusive os de empresas públicas e sociedades de economia mista, no exercício de mandato eletivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao ampliar o alcance da norma. O caput do Art. 38 restringe sua aplicação \"ao servidor público da administração direta, autárquica e fundacional\", não incluindo, em seu texto, os empregados de empresas públicas e sociedades de economia mista (administração indireta).<br><br><b>Dispositivo Legal:</b> Art. 38. Ao servidor público da administração direta, autárquica e fundacional, no exercício de mandato eletivo, aplicam-se as seguintes disposições:"
+            },
+            {
+                question: "Tratando-se de mandato eletivo federal, estadual ou distrital, o servidor público ficará afastado de seu cargo, emprego ou função.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do inciso I do Art. 38, que determina o afastamento obrigatório do servidor nesses casos.<br><br><b>Dispositivo Legal:</b> I - tratando-se de mandato eletivo federal, estadual ou distrital, ficará afastado de seu cargo, emprego ou função;"
+            },
+            {
+                question: "Tratando-se de mandato eletivo federal, estadual ou distrital, o servidor público poderá optar por permanecer em seu cargo, emprego ou função, se houver compatibilidade de horários.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Para os mandatos federal, estadual ou distrital, o afastamento é obrigatório e incondicional. O inciso I do Art. 38 determina que o servidor \"ficará afastado\", não prevendo a possibilidade de acumulação.<br><br><b>Dispositivo Legal:</b> I - tratando-se de mandato eletivo federal, estadual ou distrital, ficará afastado de seu cargo, emprego ou função;"
+            },
+            {
+                question: "O servidor público investido no mandato de Prefeito será afastado do cargo, emprego ou função, sendo-lhe facultado optar pela sua remuneração.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente a regra do inciso II do Art. 38, que prevê o afastamento obrigatório do cargo de origem, mas com a opção de escolha pela remuneração mais vantajosa.<br><br><b>Dispositivo Legal:</b> II - investido no mandato de Prefeito, será afastado do cargo, emprego ou função, sendo-lhe facultado optar pela sua remuneração;"
+            },
+            {
+                question: "O servidor público investido no mandato de Prefeito será afastado do cargo, sendo-lhe vedado optar pela sua remuneração de origem.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso II do Art. 38 estabelece expressamente que, embora afastado, será \"facultado\" ao servidor \"optar pela sua remuneração\".<br><br><b>Dispositivo Legal:</b> II - investido no mandato de Prefeito, será afastado do cargo, emprego ou função, sendo-lhe facultado optar pela sua remuneração;"
+            },
+            {
+                question: "O servidor público investido no mandato de Prefeito poderá acumular o exercício de seu cargo efetivo com o mandato eletivo, se houver compatibilidade de horários.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A regra para o Prefeito, conforme o inciso II do Art. 38, é o afastamento obrigatório. A possibilidade de acumulação com compatibilidade de horários aplica-se apenas ao mandato de Vereador.<br><br><b>Dispositivo Legal:</b> II - investido no mandato de Prefeito, será afastado do cargo, emprego ou função, sendo-lhe facultado optar pela sua remuneração;"
+            },
+            {
+                question: "Investido no mandato de Vereador, havendo compatibilidade de horários, o servidor perceberá as vantagens de seu cargo, emprego ou função, sem prejuízo da remuneração do cargo eletivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve exatamente a regra para a acumulação de cargo efetivo com o mandato de Vereador, quando há compatibilidade de horários, conforme o inciso III do Art. 38.<br><br><b>Dispositivo Legal:</b> III - investido no mandato de Vereador, havendo compatibilidade de horários, perceberá as vantagens de seu cargo, emprego ou função, sem prejuízo da remuneração do cargo eletivo, e, não havendo compatibilidade, será aplicada a norma do inciso anterior;"
+            },
+            {
+                question: "Investido no mandato de Vereador, não havendo compatibilidade de horários, o servidor será afastado do cargo, sendo-lhe facultado optar pela sua remuneração.",
+                answer: "Certo",
+                rationale: "A questão está correta. A parte final do inciso III do Art. 38 determina que, em caso de incompatibilidade de horários para o Vereador, \"será aplicada a norma do inciso anterior\", que é a regra do Prefeito (afastamento com opção de remuneração).<br><br><b>Dispositivo Legal:</b> III - investido no mandato de Vereador, havendo compatibilidade de horários, perceberá as vantagens de seu cargo, emprego ou função, sem prejuízo da remuneração do cargo eletivo, e, não havendo compatibilidade, será aplicada a norma do inciso anterior;"
+            },
+            {
+                question: "Investido no mandato de Vereador, havendo compatibilidade de horários, o servidor deverá optar entre a remuneração de seu cargo efetivo e a do cargo eletivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Havendo compatibilidade, o inciso III do Art. 38 permite a acumulação das remunerações, ao dispor que o servidor perceberá as vantagens de seu cargo \"sem prejuízo da remuneração do cargo eletivo\". A opção só ocorre se não houver compatibilidade.<br><br><b>Dispositivo Legal:</b> III - investido no mandato de Vereador, havendo compatibilidade de horários, perceberá as vantagens de seu cargo, emprego ou função, sem prejuízo da remuneração do cargo eletivo, e, não havendo compatibilidade, será aplicada a norma do inciso anterior;"
+            },
+            {
+                question: "Em qualquer caso que exija o afastamento para o exercício de mandato eletivo, o tempo de serviço do servidor será contado para todos os efeitos legais, exceto para promoção por merecimento.",
+                answer: "Certo",
+                rationale: "A assertiva é uma transcrição literal e correta do inciso IV do Art. 38, que trata da contagem do tempo de serviço do servidor afastado para exercer mandato eletivo.<br><br><b>Dispositivo Legal:</b> IV - em qualquer caso que exija o afastamento para o exercício de mandato eletivo, seu tempo de serviço será contado para todos os efeitos legais, exceto para promoção por merecimento;"
+            },
+            {
+                question: "Em qualquer caso de afastamento para exercício de mandato eletivo, o tempo de serviço do servidor será contado para todos os efeitos legais, inclusive para promoção por merecimento.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta ao incluir a promoção por merecimento. O inciso IV do Art. 38 estabelece uma exceção expressa, ao dispor \"exceto para promoção por merecimento\".<br><br><b>Dispositivo Legal:</b> IV - em qualquer caso que exija o afastamento para o exercício de mandato eletivo, seu tempo de serviço será contado para todos os efeitos legais, exceto para promoção por merecimento;"
+            },
+            {
+                question: "O tempo de serviço do servidor afastado para exercício de mandato eletivo não será contado para nenhum efeito legal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta, pois inverte o sentido da norma. O inciso IV do Art. 38 garante que o tempo de serviço \"será contado para todos os efeitos legais\", com uma única exceção (promoção por merecimento).<br><br><b>Dispositivo Legal:</b> IV - em qualquer caso que exija o afastamento para o exercício de mandato eletivo, seu tempo de serviço será contado para todos os efeitos legais, exceto para promoção por merecimento;"
+            },
+            {
+                question: "Na hipótese de o servidor ser segurado de regime próprio de previdência social, ele permanecerá filiado a esse regime no ente federativo de origem, mesmo quando afastado para o exercício de mandato eletivo.",
+                answer: "Certo",
+                rationale: "A questão está correta, pois reproduz fielmente a regra de manutenção do vínculo previdenciário com o regime de origem, conforme o inciso V do Art. 38.<br><br><b>Dispositivo Legal:</b> V - na hipótese de ser segurado de regime próprio de previdência social, permanecerá filiado a esse regime, no ente federativo de origem."
+            },
+            {
+                question: "O servidor público afastado para o exercício de mandato eletivo deverá se filiar ao Regime Geral de Previdência Social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso V do Art. 38 determina justamente o contrário: caso o servidor seja segurado de regime próprio, ele \"permanecerá filiado a esse regime, no ente federativo de origem\".<br><br><b>Dispositivo Legal:</b> V - na hipótese de ser segurado de regime próprio de previdência social, permanecerá filiado a esse regime, no ente federativo de origem."
+            }
+        ];
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
