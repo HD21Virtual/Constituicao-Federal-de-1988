@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dos Servidores Públicos</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal</h1>
+            <p>Administração Pública - Dos Servidores Públicos</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Artigo 39
+            {
+                question: "A União, os Estados, o Distrito Federal e os Municípios instituirão, de forma facultativa, um conselho de política de administração e remuneração de pessoal, integrado por servidores designados pelos respectivos Poderes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 39 estabelece que os entes federativos \"instituirão\" o conselho, tratando-se de um dever, uma obrigação, e não de uma faculdade."
+            },
+            {
+                question: "O conselho de política de administração e remuneração de pessoal, a ser instituído pela União, pelos Estados, pelo Distrito Federal e pelos Municípios, deverá ser integrado exclusivamente por servidores designados pelo Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme a parte final do caput do Art. 39, o conselho será integrado por servidores designados pelos \"respectivos Poderes\", o que inclui o Legislativo e o Judiciário, além do Executivo."
+            },
+            {
+                question: "A fixação dos padrões de vencimento e dos demais componentes do sistema remuneratório dos servidores públicos observará a natureza, o grau de responsabilidade e a complexidade dos cargos componentes de cada carreira.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz literalmente o texto do Art. 39, § 1º, inciso I, que elenca este como um dos critérios obrigatórios para a definição da remuneração."
+            },
+            {
+                question: "Entre os critérios para a fixação dos padrões de vencimento, a legislação determina a observância dos requisitos para a investidura no cargo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O Art. 39, § 1º, inciso II, estabelece que \"os requisitos para a investidura\" são um dos elementos a serem considerados na fixação do sistema remuneratório."
+            },
+            {
+                question: "As peculiaridades dos cargos são um dos fatores que, segundo a Constituição, devem ser observados na fixação dos padrões de vencimento e dos demais componentes do sistema remuneratório.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e corresponde exatamente ao disposto no Art. 39, § 1º, inciso III, que menciona \"as peculiaridades dos cargos\" como um critério norteador do sistema remuneratório."
+            },
+            {
+                question: "A fixação dos padrões de vencimento dos servidores públicos observará, além de outros critérios, a dotação orçamentária do respectivo ente federativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora a dotação orçamentária seja um fator prático essencial, o § 1º do Art. 39 elenca um rol específico e taxativo de critérios (natureza do cargo, requisitos de investidura e peculiaridades), não mencionando diretamente a questão orçamentária nesse dispositivo."
+            },
+            {
+                question: "A União, os Estados, o Distrito Federal e os Municípios manterão escolas de governo para a formação e o aperfeiçoamento dos servidores públicos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. De acordo com o Art. 39, § 2º, a obrigação de manter escolas de governo é atribuída à União, aos Estados e ao Distrito Federal. Os Municípios não foram incluídos nesse dever constitucional."
+            },
+            {
+                question: "A participação nos cursos oferecidos pelas escolas de governo constitui-se um dos requisitos para a promoção na carreira do servidor público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente o que dispõe o Art. 39, § 2º, ao afirmar que \"constituindo-se a participação nos cursos um dos requisitos para a promoção na carreira\"."
+            },
+            {
+                question: "A celebração de convênios ou contratos entre os entes federados para a manutenção de escolas de governo é obrigatória.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 39, § 2º, utiliza a expressão \"facultada, para isso, a celebração de convênios ou contratos\", indicando que tal cooperação é uma possibilidade, e não uma imposição."
+            },
+            {
+                question: "A formação e o aperfeiçoamento dos servidores públicos são os objetivos das escolas de governo mantidas pela União, pelos Estados e pelo Distrito Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e alinhada com o texto do Art. 39, § 2º, que expressamente menciona que tais escolas se destinam \"para a formação e o aperfeiçoamento dos servidores públicos\"."
+            },
+            {
+                question: "Aplica-se aos servidores ocupantes de cargo público a integralidade dos direitos sociais previstos no art. 7º da Constituição Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 3º do Art. 39 é claro ao elencar um rol taxativo de incisos do art. 7º (IV, VII, VIII, IX, XII, XIII, XV, XVI, XVII, XVIII, XIX, XX, XXII e XXX) que se aplicam aos servidores, e não a totalidade dos direitos ali previstos."
+            },
+            {
+                question: "O direito ao gozo de férias anuais remuneradas com, pelo menos, um terço a mais do que o salário normal, previsto no inciso XVII do art. 7º, é aplicável aos servidores ocupantes de cargo público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso XVII está expressamente listado no § 3º do Art. 39 como um dos direitos dos trabalhadores que se estendem aos servidores públicos."
+            },
+            {
+                question: "Entre os direitos estendidos aos servidores ocupantes de cargo público, está a proteção do salário na forma da lei, constituindo crime sua retenção dolosa, conforme o inciso X do art. 7º.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora a proteção salarial seja um direito importante, o inciso X do art. 7º não está incluído na lista de direitos aplicáveis aos servidores públicos, conforme o rol taxativo apresentado no § 3º do Art. 39."
+            },
+            {
+                question: "A lei pode estabelecer, incondicionalmente, requisitos diferenciados de admissão para qualquer cargo público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 3º do Art. 39 estabelece uma condição para a diferenciação dos requisitos de admissão: isso só é possível \"quando a natureza do cargo o exigir\", não se tratando de uma permissão incondicional."
+            },
+            {
+                question: "A legislação pode prever requisitos de admissão distintos para determinados cargos, desde que essa diferenciação seja justificada pela natureza das atribuições do cargo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à exata permissão contida na parte final do § 3º do Art. 39, que autoriza o estabelecimento de requisitos diferenciados de admissão \"quando a natureza do cargo o exigir\"."
+            },
+            {
+                question: "O direito ao salário mínimo, fixado em lei, nacionalmente unificado, capaz de atender às suas necessidades vitais básicas e às de sua família com moradia, alimentação, educação, saúde, lazer, vestuário, higiene, transporte e previdência social, com reajustes periódicos que lhe preservem o poder aquisitivo, sendo vedada sua vinculação para qualquer fim, é aplicável aos servidores ocupantes de cargo público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso IV do Art. 7º, que descreve o direito ao salário mínimo, está expressamente incluído no rol do § 3º do Art. 39, sendo, portanto, um direito estendido aos servidores públicos."
+            },
+            {
+                question: "Aplica-se aos servidores ocupantes de cargo público a garantia de salário, nunca inferior ao mínimo, para os que percebem remuneração variável.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente ao direito previsto no inciso VII do Art. 7º, que está listado como aplicável aos servidores públicos no § 3º do Art. 39."
+            },
+            {
+                question: "O décimo terceiro salário com base na remuneração integral ou no valor da aposentadoria é um direito garantido aos servidores ocupantes de cargo público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O § 3º do Art. 39 estende aos servidores o direito previsto no inciso VIII do Art. 7º, que trata do décimo terceiro salário."
+            },
+            {
+                question: "É garantida aos servidores públicos a remuneração do trabalho noturno superior à do diurno.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o direito à remuneração superior para o trabalho noturno, previsto no inciso IX do Art. 7º, é expressamente aplicável aos servidores públicos por força do § 3º do Art. 39."
+            },
+            {
+                question: "O Fundo de Garantia do Tempo de Serviço (FGTS), previsto no inciso III do Art. 7º, é um direito aplicável a todos os servidores ocupantes de cargo público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso III do Art. 7º, que institui o FGTS, não consta no rol taxativo de direitos estendidos aos servidores públicos pelo § 3º do Art. 39."
+            },
+            {
+                question: "Os servidores públicos ocupantes de cargo público têm direito a salário-família pago em razão do dependente do trabalhador de baixa renda nos termos da lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O direito ao salário-família, conforme o inciso XII do Art. 7º, é um dos direitos sociais estendidos aos servidores públicos pelo § 3º do Art. 39."
+            },
+            {
+                question: "A duração do trabalho normal dos servidores públicos não poderá ser superior a oito horas diárias e quarenta e quatro semanais, facultada a compensação de horários e a redução da jornada, mediante acordo ou convenção coletiva de trabalho.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O § 3º do Art. 39 aplica aos servidores o disposto no inciso XIII do Art. 7º, que estabelece os limites da jornada de trabalho."
+            },
+            {
+                question: "O repouso semanal remunerado, preferencialmente aos domingos, é um direito constitucionalmente assegurado aos servidores ocupantes de cargo público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso XV do Art. 7º, que garante o repouso semanal remunerado, está incluído na lista de direitos aplicáveis aos servidores contida no § 3º do Art. 39."
+            },
+            {
+                question: "É garantida aos servidores públicos a remuneração do serviço extraordinário superior, no mínimo, em cinquenta por cento à do normal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. Este direito, previsto no inciso XVI do Art. 7º, é estendido aos servidores públicos ocupantes de cargo público por expressa determinação do § 3º do Art. 39."
+            },
+            {
+                question: "Aos servidores públicos aplica-se o direito ao gozo de férias anuais remuneradas com, pelo menos, um terço a mais do que o salário normal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O direito a férias remuneradas com acréscimo de um terço (inciso XVII do Art. 7º) é um dos direitos listados no § 3º do Art. 39 como aplicáveis aos servidores."
+            },
+            {
+                question: "A licença à gestante, sem prejuízo do emprego e do salário, com a duração de cento e vinte dias, é um direito que se aplica às servidoras ocupantes de cargo público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o direito à licença-maternidade, nos termos do inciso XVIII do Art. 7º, é expressamente garantido às servidoras públicas pelo § 3º do Art. 39."
+            },
+            {
+                question: "Aplica-se aos servidores públicos ocupantes de cargo público o direito à licença-paternidade, nos termos fixados em lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O § 3º do Art. 39 estende aos servidores o direito previsto no inciso XIX do Art. 7º, que trata da licença-paternidade."
+            },
+            {
+                question: "É direito dos servidores públicos a redução dos riscos inerentes ao trabalho, por meio de normas de saúde, higiene e segurança.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso XXII do Art. 7º, que versa sobre a redução dos riscos no ambiente de trabalho, está incluído no rol de direitos aplicáveis aos servidores públicos, conforme o § 3º do Art. 39."
+            },
+            {
+                question: "A proibição de diferença de salários, de exercício de funções e de critério de admissão por motivo de sexo, idade, cor ou estado civil é aplicável aos servidores ocupantes de cargo público.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete o conteúdo do inciso XXX do Art. 7º, o qual está expressamente listado no § 3º do Art. 39 como um direito dos servidores públicos."
+            },
+            {
+                question: "A lei está impedida, em qualquer hipótese, de estabelecer requisitos diferenciados de admissão para os ocupantes de cargo público, em observância ao princípio da isonomia.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 3º do Art. 39 autoriza expressamente que a lei estabeleça requisitos diferenciados de admissão, com uma condição: \"quando a natureza do cargo o exigir\"."
+            },
+            {
+                question: "O membro de Poder, o detentor de mandato eletivo, os Ministros de Estado e os Secretários Estaduais e Municipais serão remunerados exclusivamente por subsídio fixado em parcela única.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz literalmente a parte inicial do § 4º do Art. 39, que estabelece o subsídio em parcela única como forma de remuneração para as autoridades mencionadas."
+            },
+            {
+                question: "Ao subsídio fixado em parcela única para membros de Poder e detentores de mandato eletivo, é permitido o acréscimo de verba de representação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 4º do Art. 39 veda expressamente o acréscimo de qualquer gratificação, adicional, abono, prêmio, verba de representação ou outra espécie remuneratória ao subsídio."
+            },
+            {
+                question: "A remuneração por subsídio dos Ministros de Estado e Secretários Estaduais e Municipais deve obedecer, em qualquer caso, ao disposto no art. 37, incisos X e XI.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. A parte final do § 4º do Art. 39 determina de forma explícita que a regra do subsídio deve obedecer, em qualquer caso, ao que está disposto nos incisos X (revisão geral anual) e XI (teto remuneratório) do art. 37."
+            },
+            {
+                question: "É de competência exclusiva da União estabelecer, por meio de lei, a relação entre a maior e a menor remuneração dos servidores públicos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 5º do Art. 39 concede essa competência legislativa à União, aos Estados, ao Distrito Federal e aos Municípios, de forma concorrente dentro de suas respectivas esferas."
+            },
+            {
+                question: "Lei da União, dos Estados, do Distrito Federal e dos Municípios poderá estabelecer a relação entre a maior e a menor remuneração dos servidores públicos, obedecido, em qualquer caso, o disposto no art. 37, XI.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à redação do § 5º do Art. 39, que autoriza a criação da referida lei e impõe a observância do teto remuneratório constitucional (art. 37, XI)."
+            },
+            {
+                question: "Os Poderes Executivo, Legislativo e Judiciário publicarão semestralmente os valores do subsídio e da remuneração dos cargos e empregos públicos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o § 6º do Art. 39, a publicação dos valores do subsídio e da remuneração deve ser feita \"anualmente\", e não semestralmente."
+            },
+            {
+                question: "A obrigação de publicar anualmente os valores do subsídio e da remuneração dos cargos e empregos públicos recai sobre os Poderes Executivo, Legislativo e Judiciário.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete com exatidão os entes responsáveis pela publicação, conforme listado no § 6º do Art. 39."
+            },
+            {
+                question: "Lei federal, estadual, distrital ou municipal disciplinará a aplicação de recursos orçamentários provenientes da economia com despesas correntes em cada órgão, autarquia e fundação.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O § 7º do Art. 39 atribui à \"Lei da União, dos Estados, do Distrito Federal e dos Municípios\" a competência para disciplinar o uso desses recursos, o que corresponde ao conteúdo da assertiva."
+            },
+            {
+                question: "Os recursos provenientes da economia com despesas correntes devem ser aplicados exclusivamente em treinamento e desenvolvimento de pessoal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 7º do Art. 39 apresenta um rol mais amplo de finalidades, que inclui, além de treinamento e desenvolvimento, programas de qualidade e produtividade, modernização, reaparelhamento e racionalização do serviço público."
+            },
+            {
+                question: "A aplicação de recursos economizados com despesas correntes pode se dar, inclusive, sob a forma de adicional ou prêmio de produtividade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a parte final do § 7º do Art. 39 prevê expressamente essa possibilidade ao mencionar \"inclusive sob a forma de adicional ou prêmio de produtividade\"."
+            },
+            {
+                question: "A remuneração de todos os servidores públicos, sem exceção, poderá ser fixada por subsídio nos termos do § 4º.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 8º do Art. 39 especifica que a remuneração por subsídio poderá ser fixada para os \"servidores públicos organizados em carreira\", não se aplicando a todos indistintamente."
+            },
+            {
+                question: "A remuneração dos servidores públicos organizados em carreira será obrigatoriamente fixada nos termos do § 4º, por meio de subsídio.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O texto do § 8º utiliza o verbo \"poderá\", indicando uma faculdade, uma possibilidade, e não uma obrigatoriedade na fixação da remuneração por subsídio para as carreiras."
+            },
+            {
+                question: "É permitida a incorporação de vantagens de caráter permanente à remuneração do cargo efetivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta por interpretação a contrário sensu. O § 9º do Art. 39 veda a incorporação de vantagens de caráter \"temporário\". Consequentemente, a incorporação de vantagens de caráter permanente não é vedada por este dispositivo."
+            },
+            {
+                question: "É vedada a incorporação de vantagens vinculadas ao exercício de função de confiança à remuneração do cargo efetivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à vedação literal contida na parte final do § 9º do Art. 39, que proíbe a incorporação de vantagens \"vinculadas ao exercício de função de confiança ou de cargo em comissão\"."
+            },
+            {
+                question: "É vedada a incorporação de vantagens de caráter temporário à remuneração do cargo efetivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve fielmente a proibição expressa na parte inicial do § 9º do Art. 39."
+            },
+            // Artigo 40
+            {
+                question: "O regime próprio de previdência social dos servidores públicos, sejam eles titulares de cargos efetivos ou ocupantes de cargos em comissão, terá caráter contributivo e solidário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 40 especifica que o regime próprio de previdência social se destina aos \"servidores titulares de cargos efetivos\", não abrangendo, por esta regra, os ocupantes exclusivamente de cargos em comissão."
+            },
+            {
+                question: "O regime próprio de previdência social dos servidores titulares de cargos efetivos terá caráter meramente contributivo, mediante contribuição do respectivo ente federativo e dos servidores ativos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por duas razões. Primeiro, o regime tem caráter \"contributivo e solidário\". Segundo, a lista de contribuintes inclui o respectivo ente federativo, os servidores ativos, os aposentados e os pensionistas, e não apenas os dois primeiros."
+            },
+            {
+                question: "O regime próprio de previdência social dos servidores titulares de cargos efetivos observará critérios que preservem o equilíbrio financeiro e atuarial.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à parte final do caput do Art. 40, que estabelece a preservação do equilíbrio financeiro e atuarial como um dos nortes do regime."
+            },
+            {
+                question: "O servidor abrangido por regime próprio de previdência social será aposentado por incapacidade permanente para o trabalho, no cargo em que estiver investido, mesmo que seja suscetível de readaptação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso I do § 1º do Art. 40 é claro ao condicionar a aposentadoria por incapacidade à hipótese em que o servidor seja \"insuscetível de readaptação\"."
+            },
+            {
+                question: "Na aposentadoria por incapacidade permanente para o trabalho, é facultativa a realização de avaliações periódicas para verificação da continuidade das condições que ensejaram a concessão do benefício.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O texto do inciso I do § 1º do Art. 40 afirma que, nessa hipótese, \"será obrigatória a realização de avaliações periódicas\"."
+            },
+            {
+                question: "A aposentadoria por incapacidade permanente ocorrerá quando o servidor estiver inapto para o trabalho em geral, independentemente do cargo em que estiver investido.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso I do § 1º do Art. 40 especifica que a incapacidade permanente para o trabalho deve ser aferida \"no cargo em que estiver investido\"."
+            },
+            {
+                question: "A aposentadoria compulsória se dará aos 70 anos de idade, ou aos 75 anos, na forma de lei complementar, com proventos integrais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso II do § 1º do Art. 40 estabelece que, na aposentadoria compulsória, os proventos serão \"proporcionais ao tempo de contribuição\", e não integrais."
+            },
+            {
+                question: "O servidor será aposentado compulsoriamente, com proventos proporcionais ao tempo de contribuição, aos 70 anos de idade, podendo esta idade ser estendida para 75 anos por meio de lei ordinária.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso II do § 1º do Art. 40 exige expressamente a edição de \"lei complementar\" para que a idade da aposentadoria compulsória seja de 75 anos, não bastando uma lei ordinária."
+            },
+            {
+                question: "A aposentadoria compulsória ocorrerá aos 75 (setenta e cinco) anos de idade, sendo esta a única idade prevista no texto constitucional para tal modalidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso II do § 1º do Art. 40 prevê duas idades possíveis: aos 70 anos, como regra geral, ou aos 75 anos, na forma de lei complementar."
+            },
+            {
+                question: "No âmbito da União, a servidora será aposentada voluntariamente aos 62 (sessenta e dois) anos de idade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete exatamente a idade mínima para a aposentadoria voluntária da mulher no âmbito da União, conforme o inciso III do § 1º do Art. 40."
+            },
+            {
+                question: "O servidor homem, no âmbito da União, será aposentado voluntariamente aos 65 (sessenta e cinco) anos de idade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à idade mínima para a aposentadoria voluntária do homem no âmbito da União, estabelecida no inciso III do § 1º do Art. 40."
+            },
+            {
+                question: "No âmbito dos Estados, do Distrito Federal e dos Municípios, a idade mínima para aposentadoria voluntária é a mesma estabelecida para os servidores da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso III do § 1º do Art. 40 determina que, para os Estados, o Distrito Federal e os Municípios, a idade mínima será \"estabelecida mediante emenda às respectivas Constituições e Leis Orgânicas\", não sendo uma aplicação automática da regra federal."
+            },
+            {
+                question: "A idade mínima de aposentadoria para servidores dos Estados e Municípios é fixada por lei complementar do respectivo ente federativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso III do § 1º do Art. 40 é claro ao determinar que a idade mínima para esses entes deve ser estabelecida por \"emenda às respectivas Constituições e Leis Orgânicas\", e não por lei complementar. A lei complementar tratará dos demais requisitos."
+            },
+            {
+                question: "Para a aposentadoria voluntária, tanto na União quanto nos demais entes, basta o cumprimento do requisito da idade mínima.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do inciso III do § 1º do Art. 40 exige a observância do \"tempo de contribuição e os demais requisitos estabelecidos em lei complementar do respectivo ente federativo\", além da idade mínima."
+            },
+            {
+                question: "Lei complementar do respectivo ente federativo estabelecerá o tempo de contribuição e os demais requisitos para a aposentadoria voluntária, além da idade mínima fixada na Constituição Federal ou nas Constituições e Leis Orgânicas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois sintetiza fielmente a repartição de competências normativas estabelecida no inciso III do § 1º do Art. 40, onde a idade mínima é constitucional e os demais requisitos são definidos por lei complementar."
+            },
+            {
+                question: "Os proventos de aposentadoria poderão ser inferiores ao valor mínimo a que se refere o § 2º do art. 201, que trata do salário mínimo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 2º do Art. 40 estabelece expressamente que os proventos de aposentadoria \"não poderão ser inferiores\" ao valor mínimo de referência, garantindo assim um piso para o benefício."
+            },
+            {
+                question: "Os proventos de aposentadoria não possuem um teto, podendo ser superiores ao limite máximo estabelecido para o Regime Geral de Previdência Social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 2º do Art. 40 é claro ao determinar que os proventos não poderão ser \"superiores ao limite máximo estabelecido para o Regime Geral de Previdência Social\", fixando um teto para o valor do benefício."
+            },
+            {
+                question: "As regras para cálculo de proventos de aposentadoria dos servidores públicos são disciplinadas em lei federal de caráter nacional, aplicável a todos os entes federativos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 3º do Art. 40 confere a cada ente a competência para legislar sobre o tema, afirmando que as regras serão disciplinadas em \"lei do respectivo ente federativo\"."
+            },
+            {
+                question: "Conforme a Constituição Federal, as regras para cálculo de proventos de aposentadoria serão disciplinadas em lei do respectivo ente federativo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz com fidelidade o texto do § 3º do Art. 40, que atribui a competência normativa a cada um dos entes (União, Estados, DF e Municípios)."
+            },
+            {
+                question: "É vedada, de forma absoluta, a adoção de requisitos ou critérios diferenciados para concessão de benefícios em regime próprio de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora o § 4º do Art. 40 estabeleça essa vedação como regra geral, ele mesmo ressalva as exceções previstas nos §§ 4º-A, 4º-B, 4º-C e 5º. Portanto, a vedação não é absoluta."
+            },
+            {
+                question: "A regra geral no regime próprio de previdência social é a vedação à adoção de requisitos ou critérios diferenciados para a concessão de benefícios, com ressalvas expressas no próprio texto constitucional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve precisamente o comando do § 4º do Art. 40, que estabelece a proibição como regra e, ao mesmo tempo, aponta as exceções permitidas."
+            },
+            {
+                question: "Poderão ser estabelecidos por lei ordinária do respectivo ente federativo idade e tempo de contribuição diferenciados para aposentadoria de servidores com deficiência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 4º-A do Art. 40 exige expressamente \"lei complementar\" para o estabelecimento de regras diferenciadas para servidores com deficiência, não sendo suficiente uma lei ordinária."
+            },
+            {
+                question: "Para a concessão de aposentadoria com idade e tempo de contribuição diferenciados para servidores com deficiência, é obrigatória a submissão prévia a uma avaliação biopsicossocial realizada por equipe multiprofissional e interdisciplinar.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve literalmente a condição imposta pela parte final do § 4º-A do Art. 40 para a concessão desse tipo de aposentadoria especial."
+            },
+            {
+                question: "Poderão ser estabelecidos por lei complementar do respectivo ente federativo idade e tempo de contribuição diferenciados para aposentadoria de ocupantes do cargo de agente penitenciário.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O cargo de \"agente penitenciário\" está expressamente listado no rol do § 4º-B do Art. 40 como um dos que podem ter regras de aposentadoria diferenciadas."
+            },
+            {
+                question: "A Constituição Federal permite que lei complementar estabeleça regras de aposentadoria diferenciadas para policiais dos órgãos de que tratam os incisos I a IV do caput do art. 144.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o § 4º-B do Art. 40 menciona explicitamente os policiais dos órgãos de segurança pública listados no art. 144 (Polícia Federal, Polícia Rodoviária Federal, Polícia Ferroviária Federal, Polícias Civis, Polícias Militares e Corpos de Bombeiros Militares)."
+            },
+            {
+                question: "A aposentadoria com critérios diferenciados para ocupantes do cargo de agente socioeducativo pode ser estabelecida por meio de lei ordinária do respectivo ente federativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Assim como as outras hipóteses do parágrafo, o § 4º-B do Art. 40 exige a forma de \"lei complementar\" para disciplinar a matéria."
+            },
+            {
+                question: "É possível estabelecer, por lei complementar, idade e tempo de contribuição diferenciados para servidores cujas atividades sejam exercidas com efetiva exposição a agentes químicos, físicos e biológicos prejudiciais à saúde.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à permissão contida na primeira parte do § 4º-C do Art. 40."
+            },
+            {
+                question: "Na aposentadoria especial de servidores expostos a agentes prejudiciais à saúde, é permitida a caracterização por categoria profissional ou ocupação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 4º-C do Art. 40 veda expressamente \"a caracterização por categoria profissional ou ocupação\", exigindo a comprovação da efetiva exposição."
+            },
+            {
+                question: "Para aposentadoria de servidores cujas atividades sejam exercidas com efetiva exposição a agentes prejudiciais à saúde, é vedada a associação desses agentes para fins de concessão do benefício.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O texto do § 4º-C do Art. 40 permite a concessão do benefício tanto pela exposição a um agente quanto pela \"associação desses agentes\", contrariando o que afirma o enunciado."
+            },
+            {
+                question: "A Constituição veda a aposentadoria especial por categoria profissional, mas permite a diferenciação para servidores cujas atividades impliquem efetiva exposição a agentes químicos, físicos e biológicos prejudiciais à saúde, ou associação desses agentes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois sintetiza adequadamente o conteúdo do § 4º-C do Art. 40, que veda a caracterização por categoria, mas autoriza o benefício diferenciado mediante comprovação da exposição efetiva."
+            },
+            {
+                question: "Os ocupantes do cargo de professor terão idade mínima reduzida em 5 (cinco) anos em relação às idades de aposentadoria voluntária, independentemente da comprovação de tempo de efetivo exercício em funções de magistério.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 5º do Art. 40 condiciona a redução da idade à comprovação de \"tempo de efetivo exercício das funções de magistério na educação infantil e no ensino fundamental e médio\"."
+            },
+            {
+                question: "A redução de 5 (cinco) anos na idade mínima para aposentadoria dos professores aplica-se àqueles que comprovem tempo de efetivo exercício das funções de magistério exclusivamente no ensino superior.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O texto do § 5º do Art. 40 é específico ao determinar que o exercício do magistério deve ocorrer \"na educação infantil e no ensino fundamental e médio\"."
+            },
+            {
+                question: "O tempo de efetivo exercício das funções de magistério para fins de redução da idade de aposentadoria dos professores será fixado em lei complementar do respectivo ente federativo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à parte final do § 5º do Art. 40, que atribui à lei complementar de cada ente federativo a fixação desse requisito."
+            },
+            {
+                question: "É permitida, sem exceções, a percepção de mais de uma aposentadoria à conta de regime próprio de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 6º do Art. 40 estabelece como regra a vedação (\"é vedada a percepção de mais de uma aposentadoria\"), ressalvando apenas as aposentadorias decorrentes de cargos acumuláveis na forma da Constituição."
+            },
+            {
+                question: "Ressalvadas as aposentadorias decorrentes dos cargos acumuláveis na forma desta Constituição, é vedada a percepção de mais de uma aposentadoria à conta de regime próprio de previdência social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve literalmente a regra e a exceção previstas na primeira parte do § 6º do Art. 40."
+            },
+            {
+                question: "As vedações, regras e condições para a acumulação de benefícios previdenciários estabelecidas no Regime Geral de Previdência Social não se aplicam aos regimes próprios de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 6º do Art. 40 determina expressamente o contrário, afirmando que se aplicam aos regimes próprios \"outras vedações, regras e condições para a acumulação de benefícios previdenciários estabelecidas no Regime Geral de Previdência Social.\""
+            },
+            {
+                question: "O benefício de pensão por morte será concedido nos termos de lei do respectivo ente federativo, a qual tratará de forma idêntica todas as hipóteses de morte de servidores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 7º do Art. 40 exige que a lei \"tratará de forma diferenciada a hipótese de morte dos servidores de que trata o § 4º-B decorrente de agressão sofrida no exercício ou em razão da função\"."
+            },
+            {
+                question: "O benefício de pensão por morte, quando se tratar da única fonte de renda formal auferida pelo dependente, deve observar o valor mínimo previsto no § 2º do art. 201.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O § 7º do Art. 40 inicia com a determinação \"Observado o disposto no § 2º do art. 201\", vinculando o piso da pensão por morte, nesta hipótese, ao valor mínimo do RGPS."
+            },
+            {
+                question: "É assegurado o reajustamento dos benefícios para preservar-lhes, em caráter permanente, o valor real, conforme critérios estabelecidos em lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz de forma literal e integral o texto do § 8º do Art. 40, que garante a preservação do valor real dos benefícios."
+            },
+            {
+                question: "O reajustamento dos benefícios para preservar seu valor real será feito conforme critérios definidos exclusivamente por decreto do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 8º do Art. 40 determina que os critérios para o reajustamento serão estabelecidos \"em lei\", e não por meio de decreto."
+            },
+            {
+                question: "O tempo de contribuição federal, estadual, distrital ou municipal será contado para fins de aposentadoria e também para fins de disponibilidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 9º do Art. 40 faz uma distinção clara: o \"tempo de contribuição\" será contado para fins de aposentadoria, enquanto o \"tempo de serviço correspondente\" será contado para fins de disponibilidade."
+            },
+            {
+                question: "O tempo de serviço correspondente à contribuição federal, estadual, distrital ou municipal será contado para fins de disponibilidade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a parte final do § 9º do Art. 40, que atribui a contagem do tempo de serviço para fins de disponibilidade."
+            },
+            {
+                question: "A contagem do tempo de contribuição entre os diferentes regimes (federal, estadual, distrital ou municipal) para fins de aposentadoria não precisa observar as regras do art. 201 da Constituição.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 9º do Art. 40 determina expressamente que a contagem do tempo de contribuição deve observar \"o disposto nos §§ 9º e 9º-A do art. 201\", que tratam da contagem recíproca entre o RGPS e os RPPS."
+            },
+            {
+                question: "A lei não poderá estabelecer qualquer forma de contagem de tempo de contribuição fictício.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da vedação contida no § 10 do Art. 40."
+            },
+            {
+                question: "A lei poderá, em casos excepcionais, estabelecer formas de contagem de tempo de contribuição fictício para compensar atividades insalubres.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A vedação do § 10 do Art. 40 é categórica e não prevê exceções, ao afirmar que a lei \"não poderá estabelecer qualquer forma de contagem de tempo de contribuição fictício\"."
+            },
+            {
+                question: "O limite remuneratório fixado no art. 37, XI, aplica-se à soma total dos proventos de inatividade, excluindo-se, porém, os valores decorrentes da acumulação de cargos ou empregos públicos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 11 do Art. 40 é explícito ao determinar que o teto se aplica à soma total dos proventos, \"inclusive quando decorrentes da acumulação de cargos ou empregos públicos\"."
+            },
+            {
+                question: "A soma dos proventos de inatividade com a remuneração de um cargo eletivo está sujeita ao limite remuneratório fixado no art. 37, XI.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete literalmente a parte final do § 11 do Art. 40, que inclui no cálculo do teto \"o montante resultante da adição de proventos de inatividade com remuneração de [...] cargo eletivo\"."
+            },
+            {
+                question: "O teto remuneratório constitucional não se aplica aos proventos de inatividade quando estes são somados a rendimentos de outras atividades sujeitas a contribuição para o regime geral de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 11 do Art. 40 estabelece que o limite se aplica à soma total dos proventos, \"bem como de outras atividades sujeitas a contribuição para o regime geral de previdência social\"."
+            },
+            {
+                question: "Além do disposto no artigo 40, serão observados, em regime próprio de previdência social, no que couber, os requisitos e critérios fixados para o Regime Geral de Previdência Social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do § 12 do Art. 40, que estabelece a aplicação subsidiária das normas do RGPS ao RPPS."
+            },
+            {
+                question: "Os requisitos e critérios do Regime Geral de Previdência Social devem ser aplicados de forma integral e irrestrita ao regime próprio de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 12 do Art. 40 condiciona a aplicação das normas do RGPS pela expressão \"no que couber\", indicando que a aplicação não é irrestrita, mas sim naquilo que for compatível."
+            },
+            {
+                question: "O agente público ocupante, exclusivamente, de cargo em comissão declarado em lei de livre nomeação e exoneração está vinculado ao regime próprio de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 13 do Art. 40 determina expressamente que o ocupante exclusivo de cargo em comissão se vincula ao \"Regime Geral de Previdência Social\"."
+            },
+            {
+                question: "O detentor de mandato eletivo, que não possua outro vínculo como servidor efetivo, é segurado do Regime Geral de Previdência Social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O § 13 do Art. 40 inclui o ocupante de \"mandato eletivo\" no rol de agentes públicos vinculados ao Regime Geral de Previdência Social."
+            },
+            {
+                question: "O servidor titular de cargo efetivo que também ocupe um cargo em comissão será filiado ao Regime Geral de Previdência Social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A regra do § 13 do Art. 40 aplica-se ao agente público ocupante \"exclusivamente\" de cargo em comissão. Se o agente já é titular de cargo efetivo, ele permanece vinculado ao regime próprio de previdência social (RPPS)."
+            },
+            {
+                question: "A instituição de regime de previdência complementar é facultativa para os Estados, o Distrito Federal e os Municípios.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 14 do Art. 40 utiliza o verbo no imperativo \"instituirão\", indicando uma obrigação, um dever, para a União, os Estados, o Distrito Federal e os Municípios."
+            },
+            {
+                question: "A lei que institui o regime de previdência complementar para servidores públicos deve ser de iniciativa do respectivo Poder Executivo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete a determinação expressa do § 14 do Art. 40, que estabelece a competência privativa de iniciativa do chefe do Poder Executivo para a referida lei."
+            },
+            {
+                question: "O regime de previdência complementar se destina a todos os servidores públicos, incluindo os ocupantes de cargo em comissão e os de cargo temporário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 14 do Art. 40 especifica que o regime de previdência complementar é para \"servidores públicos ocupantes de cargo efetivo\"."
+            },
+            {
+                question: "Após a instituição do regime de previdência complementar, o valor das aposentadorias e pensões em regime próprio observará o limite máximo dos benefícios do Regime Geral de Previdência Social, sem qualquer exceção.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora essa seja a regra geral, a parte final do § 14 do Art. 40 expressamente aponta uma exceção ao afirmar \"ressalvado o disposto no § 16\"."
+            },
+            {
+                question: "O regime de previdência complementar oferecerá plano de benefícios nas modalidades de contribuição definida e de benefício definido.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 15 do Art. 40 é taxativo ao afirmar que o plano de benefícios será \"somente na modalidade contribuição definida\"."
+            },
+            {
+                question: "O regime de previdência complementar de que trata o § 14 observará o disposto no art. 202 da Constituição Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o § 15 do Art. 40 determina expressamente a observância ao art. 202, que trata das normas gerais da previdência complementar."
+            },
+            {
+                question: "O regime de previdência complementar será efetivado exclusivamente por intermédio de entidade fechada de previdência complementar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 15 do Art. 40 estabelece que o regime será efetivado \"por intermédio de entidade fechada de previdência complementar ou de entidade aberta de previdência complementar\", prevendo as duas possibilidades."
+            },
+            {
+                question: "O disposto nos §§ 14 e 15, sobre o regime de previdência complementar, será aplicado automaticamente ao servidor que tiver ingressado no serviço público até a data da publicação do ato de instituição do correspondente regime.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 16 do Art. 40 exige a \"prévia e expressa opção\" do servidor para que as regras da previdência complementar lhe sejam aplicadas, não havendo, portanto, aplicação automática para quem ingressou antes da instituição do regime."
+            },
+            {
+                question: "Somente mediante sua prévia e expressa opção, o disposto nos §§ 14 e 15 poderá ser aplicado ao servidor que tiver ingressado no serviço público até a data da publicação do ato de instituição do correspondente regime de previdência complementar.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve com exatidão o conteúdo do § 16 do Art. 40, que condiciona a aplicação das regras da previdência complementar à manifestação explícita do servidor antigo."
+            },
+            {
+                question: "Todos os valores de remuneração considerados para o cálculo do benefício previsto no § 3° serão devidamente atualizados, na forma de decreto do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 17 do Art. 40 determina que a atualização dos valores de remuneração será feita \"na forma da lei\", e não por meio de decreto."
+            },
+            {
+                question: "Conforme a Constituição, todos os valores de remuneração considerados para o cálculo do benefício de aposentadoria serão devidamente atualizados, na forma da lei.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à redação literal do § 17 do Art. 40, que assegura a atualização monetária das remunerações que compõem a base de cálculo dos proventos."
+            },
+            {
+                question: "Incidirá contribuição sobre o valor total dos proventos de aposentadorias e pensões concedidas pelo regime próprio de previdência social.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 18 do Art. 40 especifica que a contribuição incidirá apenas sobre a parcela dos proventos e pensões \"que superem o limite máximo estabelecido para os benefícios do regime geral de previdência social\", e não sobre o valor total."
+            },
+            {
+                question: "A contribuição incidente sobre os proventos de aposentadorias e pensões que superem o teto do RGPS terá um percentual igual ao estabelecido para os servidores titulares de cargos efetivos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente a parte final do § 18 do Art. 40, que estabelece a isonomia do percentual de contribuição entre servidores ativos e inativos/pensionistas (nesta faixa de valor)."
+            },
+            {
+                question: "O servidor titular de cargo efetivo que tenha completado as exigências para a aposentadoria voluntária e que opte por permanecer em atividade deverá, obrigatoriamente, receber um abono de permanência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 19 do Art. 40 utiliza a expressão \"poderá fazer jus\", indicando uma possibilidade, uma faculdade, e não uma obrigatoriedade na concessão do abono."
+            },
+            {
+                question: "O abono de permanência a que pode fazer jus o servidor que opta por continuar em atividade será equivalente, no mínimo, ao valor da sua contribuição previdenciária.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O texto do § 19 do Art. 40 estabelece um teto para o benefício, afirmando que ele será \"equivalente, no máximo, ao valor da sua contribuição previdenciária\"."
+            },
+            {
+                question: "Observados critérios a serem estabelecidos em lei do respectivo ente federativo, o servidor que preencheu os requisitos para aposentadoria voluntária e opta por permanecer em atividade pode receber um abono de permanência até completar a idade para aposentadoria compulsória.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois sintetiza de forma precisa o conteúdo do § 19 do Art. 40, incluindo a necessidade de lei, o caráter facultativo, o público-alvo e o limite temporal do benefício."
+            },
+            {
+                question: "É permitida a existência de mais de um regime próprio de previdência social em cada ente federativo, desde que haja um órgão gestor único.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 20 do Art. 40 é categórico ao vedar \"a existência de mais de um regime próprio de previdência social [...] em cada ente federativo\". A unicidade do regime é a regra."
+            },
+            {
+                question: "É vedada a existência de mais de um órgão ou entidade gestora do regime próprio de previdência social em cada ente federativo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à vedação expressa na parte inicial do § 20 do Art. 40, que impõe a existência de uma única entidade gestora por ente federativo."
+            },
+            {
+                question: "O regime próprio de previdência social de cada ente federativo abrangerá apenas os servidores do Poder Executivo, podendo os demais Poderes ter seus próprios regimes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 20 do Art. 40 é claro ao afirmar que o regime único abrangerá \"todos os poderes, órgãos e entidades autárquicas e fundacionais\"."
+            },
+            {
+                question: "Os poderes, órgãos e entidades autárquicas e fundacionais de um ente federativo serão responsáveis pelo financiamento do respectivo regime próprio de previdência social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz literalmente a atribuição de responsabilidade pelo financiamento do regime, conforme disposto no § 20 do Art. 40."
+            },
+            {
+                question: "A natureza jurídica do órgão ou entidade gestora do regime próprio de previdência será definida em lei ordinária de cada ente federativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte final do § 20 do Art. 40 estabelece que a natureza jurídica e outros parâmetros serão definidos na \"lei complementar de que trata o § 22\", indicando a necessidade de uma norma federal de caráter geral."
+            },
+            {
+                question: "É vedada a existência de mais de um regime próprio de previdência social e de mais de um órgão ou entidade gestora desse regime em cada ente federativo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve fielmente a dupla vedação imposta pelo § 20 do Art. 40, assegurando a unicidade do regime (RPPS) e da entidade gestora em cada esfera federativa (União, cada Estado, o DF e cada Município)."
+            },
+            {
+                question: "É permitida a instituição de novos regimes próprios de previdência social, desde que por meio de lei complementar federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. A parte inicial do § 22 do Art. 40 estabelece uma vedação expressa: \"Vedada a instituição de novos regimes próprios de previdência social\"."
+            },
+            {
+                question: "Lei ordinária federal estabelecerá, para os regimes próprios de previdência já existentes, normas gerais de organização, de funcionamento e de responsabilidade em sua gestão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 22 do Art. 40 exige que a normatização geral seja feita por \"lei complementar federal\", que possui um quórum de aprovação mais rigoroso que o de uma lei ordinária."
+            },
+            {
+                question: "A lei complementar federal que trata dos regimes próprios de previdência social disporá, entre outros aspectos, sobre normas gerais de organização, de funcionamento e de responsabilidade em sua gestão.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz com fidelidade o escopo da lei complementar federal, conforme descrito no caput do § 22 do Art. 40."
+            },
+            {
+                question: "A lei complementar federal estabelecerá os requisitos para a extinção dos regimes próprios existentes e a consequente migração para o Regime Geral de Previdência Social.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O inciso I do § 22 do Art. 40 lista expressamente este como um dos temas a serem tratados pela lei complementar."
+            },
+            {
+                question: "O modelo de arrecadação, de aplicação e de utilização dos recursos dos regimes próprios de previdência social será tema da lei complementar federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente ao conteúdo do inciso II do § 22 do Art. 40."
+            },
+            {
+                question: "A lei complementar federal disporá sobre a fiscalização pela União e o controle externo e social dos regimes próprios de previdência.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete literalmente o disposto no inciso III do § 22 do Art. 40."
+            },
+            {
+                question: "A definição de equilíbrio financeiro e atuarial para os regimes próprios de previdência social será estabelecida por lei ordinária de cada ente federativo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Conforme o inciso IV do § 22 do Art. 40, a \"definição de equilíbrio financeiro e atuarial\" é matéria a ser tratada na lei complementar federal de normas gerais."
+            },
+            {
+                question: "A lei complementar federal disporá sobre as condições para instituição do fundo com finalidade previdenciária de que trata o art. 249.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois a matéria está expressamente prevista como um dos objetos da lei complementar, de acordo com o inciso V do § 22 do Art. 40."
+            },
+            {
+                question: "Os mecanismos de equacionamento do deficit atuarial dos regimes próprios de previdência social serão definidos pela lei complementar federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à competência normativa estabelecida pelo inciso VI do § 22 do Art. 40."
+            },
+            {
+                question: "A lei complementar federal disporá sobre a estruturação do órgão ou entidade gestora do regime, sem a necessidade de observar princípios relacionados com governança, controle interno e transparência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VII do § 22 do Art. 40 determina que a estruturação do órgão gestor deve observar \"os princípios relacionados com governança, controle interno e transparência\"."
+            },
+            {
+                question: "As condições e hipóteses para responsabilização daqueles que desempenhem atribuições relacionadas com a gestão do regime serão tratadas na lei complementar federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete fielmente o conteúdo do inciso VIII do § 22 do Art. 40."
+            },
+            {
+                question: "A responsabilização pela gestão do regime próprio de previdência social alcançará apenas aqueles que desempenhem atribuições diretas, excluindo os com atribuições indiretas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso VIII do § 22 do Art. 40 é claro ao abranger aqueles que desempenhem atribuições relacionadas \"direta ou indiretamente\" com a gestão do regime."
+            },
+            {
+                question: "A lei complementar federal tratará das condições para a adesão dos entes federativos a consórcio público para a gestão de seus regimes previdenciários.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o inciso IX do § 22 do Art. 40 prevê expressamente que a lei disporá sobre as \"condições para adesão a consórcio público\"."
+            },
+            {
+                question: "A lei complementar federal estabelecerá os parâmetros para apuração da base de cálculo e definição de alíquota de contribuições ordinárias, mas não das extraordinárias.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso X do § 22 do Art. 40 é explícito ao incluir na competência da lei complementar a definição de parâmetros para alíquotas de contribuições \"ordinárias e extraordinárias\"."
+            },
+            {
+                question: "Os parâmetros para apuração da base de cálculo e definição de alíquota de contribuições ordinárias e extraordinárias são matérias a serem dispostas em lei complementar federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde de forma literal ao que estabelece o inciso X do § 22 do Art. 40."
+            },
+            // Artigo 41
+            {
+                question: "São estáveis após dois anos de efetivo exercício os servidores nomeados para cargo de provimento efetivo em virtude de concurso público.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 41 estabelece que o prazo para a aquisição da estabilidade é de \"três anos de efetivo exercício\", e não dois."
+            },
+            {
+                question: "A estabilidade no serviço público é adquirida pelos servidores nomeados para cargo de provimento efetivo em virtude de concurso público, após três anos de efetivo exercício.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente as três condições cumulativas para a aquisição da estabilidade, conforme o caput do Art. 41: nomeação para cargo efetivo, aprovação em concurso público e o cumprimento de três anos de efetivo exercício."
+            },
+            {
+                question: "O servidor público estável, uma vez adquirida a estabilidade, não poderá perder o cargo em nenhuma hipótese.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 1º do Art. 41, embora garanta a estabilidade, estabelece um rol taxativo de hipóteses em que o servidor estável poderá, sim, perder o cargo."
+            },
+            {
+                question: "O servidor público estável poderá perder o cargo em virtude de sentença judicial, ainda que esta não tenha transitado em julgado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso I do § 1º do Art. 41 exige, para a perda do cargo por essa via, uma \"sentença judicial transitada em julgado\", ou seja, da qual não caiba mais recurso."
+            },
+            {
+                question: "O servidor público estável perderá o cargo mediante processo administrativo em que lhe seja assegurada ampla defesa.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde literalmente a uma das hipóteses de perda do cargo previstas no inciso II do § 1º do Art. 41."
+            },
+            {
+                question: "O servidor estável poderá perder o cargo mediante procedimento de avaliação periódica de desempenho, na forma de lei ordinária, assegurada ampla defesa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O inciso III do § 1º do Art. 41 exige que o procedimento de avaliação de desempenho seja regulado por \"lei complementar\", que tem um processo de aprovação mais rigoroso que o da lei ordinária."
+            },
+            {
+                question: "Uma das formas de perda do cargo pelo servidor estável é o procedimento de avaliação periódica de desempenho, no qual é assegurada a ampla defesa.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete com exatidão a hipótese prevista no inciso III do § 1º do Art. 41, que condiciona a perda do cargo por essa via à garantia da ampla defesa."
+            },
+            {
+                question: "Invalidada por sentença judicial a demissão do servidor estável, será ele reintegrado, e o eventual ocupante da vaga, mesmo que não seja estável, será reconduzido ao cargo de origem.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 2º do Art. 41 condiciona a recondução do eventual ocupante da vaga ao fato de ele também ser estável (\"se estável, reconduzido...\")."
+            },
+            {
+                question: "Na hipótese de reintegração de servidor estável cuja demissão foi invalidada judicialmente, o eventual ocupante da vaga, se estável, será reconduzido ao cargo de origem, com direito a indenização.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 2º do Art. 41 é explícito ao determinar que a recondução do ocupante estável ao cargo de origem ocorrerá \"sem direito a indenização\"."
+            },
+            {
+                question: "Quando um servidor estável é reintegrado por decisão judicial, o eventual ocupante da vaga, se estável, poderá ser aproveitado em outro cargo ou posto em disponibilidade com remuneração proporcional ao tempo de serviço.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve as alternativas à recondução ao cargo de origem para o ocupante estável da vaga, conforme a parte final do § 2º do Art. 41."
+            },
+            {
+                question: "Extinto o cargo ou declarada a sua desnecessidade, o servidor estável ficará em disponibilidade, com remuneração integral, até seu adequado aproveitamento em outro cargo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 3º do Art. 41 estabelece que a remuneração do servidor em disponibilidade será \"proporcional ao tempo de serviço\", e não integral."
+            },
+            {
+                question: "O servidor estável, cujo cargo foi extinto ou declarado desnecessário, ficará em disponibilidade até seu adequado aproveitamento em outro cargo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete exatamente a consequência jurídica para o servidor estável nessa situação, conforme previsto no § 3º do Art. 41."
+            },
+            {
+                question: "Como condição para a aquisição da estabilidade, é facultativa a avaliação especial de desempenho por comissão instituída para essa finalidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 4º do Art. 41 define a avaliação especial de desempenho como \"obrigatória\" para a aquisição da estabilidade."
+            },
+            {
+                question: "A avaliação especial de desempenho, condição para a aquisição da estabilidade, pode ser realizada por qualquer superior hierárquico.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O § 4º do Art. 41 exige que a avaliação seja feita \"por comissão instituída para essa finalidade\", indicando a necessidade de um colegiado específico para tal ato."
+            },
+            {
+                question: "É obrigatória, como condição para a aquisição da estabilidade, a avaliação especial de desempenho por comissão instituída para essa finalidade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do conteúdo do § 4º do Art. 41."
+            }
+        ];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
