@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Das Atribuições do Congresso Nacional</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Das Atribuições do Congresso Nacional</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Art. 48
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre todas as matérias de competência da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reflete a regra geral de competência legislativa do Congresso Nacional, que depende da sanção presidencial, conforme o caput do Art. 48."
+            },
+            {
+                question: "Cabe ao Congresso Nacional dispor sobre todas as matérias de competência da União, sendo a sanção do Presidente da República, como regra geral, dispensada.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que a sanção é dispensada como regra geral. O caput do Art. 48 estabelece que o Congresso Nacional dispõe sobre as matérias \"com a sanção do Presidente da República\", sendo a dispensa da sanção a exceção."
+            },
+            {
+                question: "A sanção do Presidente da República não é exigida para as matérias especificadas como de competência exclusiva do Congresso Nacional, de competência privativa da Câmara dos Deputados e de competência privativa do Senado Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. O caput do Art. 48 estabelece a regra geral da sanção, mas ressalva (ou seja, não exige a sanção) para as matérias especificadas nos arts. 49 (competência exclusiva do Congresso), 51 (competência privativa da Câmara) e 52 (competência privativa do Senado)."
+            },
+            {
+                question: "A sanção do Presidente da República é exigida para todas as matérias de competência da União, inclusive para as matérias de competência exclusiva do Congresso Nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O caput do Art. 48 é explícito ao determinar que a sanção presidencial \"não é exigida\" para o especificado nas matérias de competência exclusiva do Congresso Nacional (Art. 49), competência privativa da Câmara (Art. 51) e competência privativa do Senado (Art. 52)."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor especialmente sobre sistema tributário, arrecadação e distribuição de rendas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal de uma das matérias de competência do Congresso Nacional, sujeita à sanção presidencial, conforme o Art. 48, inciso I."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre o sistema tributário, mas a arrecadação e a distribuição de rendas são de competência privativa do Senado Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 48, inciso I, atribui ao Congresso Nacional (ambas as casas), com sanção presidencial, a competência para dispor sobre \"sistema tributário, arrecadação e distribuição de rendas\"."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre plano plurianual, diretrizes orçamentárias e orçamento anual.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois elenca corretamente as leis orçamentárias (PPA, LDO e LOA) como matérias de competência do Congresso Nacional, com sanção, conforme o Art. 48, inciso II."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre operações de crédito, dívida pública e emissões de curso forçado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois elenca fielmente as matérias de natureza financeira sobre as quais o Congresso Nacional deve dispor, com sanção, nos termos do Art. 48, inciso II."
+            },
+            {
+                question: "Compete ao Congresso Nacional dispor sobre plano plurianual, diretrizes orçamentárias e orçamento anual, não sendo exigida, nestes casos, a sanção do Presidente da República.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. As matérias orçamentárias, listadas no Art. 48, inciso II, seguem a regra geral do caput e exigem a sanção do Presidente da República."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre a fixação e modificação do efetivo das Forças Armadas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência prevista no Art. 48, inciso III."
+            },
+            {
+                question: "Compete ao Presidente da República, como Comandante Supremo das Forças Armadas, fixar e modificar o efetivo militar, não dependendo de sanção do Congresso Nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 48, inciso III, estabelece que a \"fixação e modificação do efetivo das Forças Armadas\" é matéria sobre a qual \"Cabe ao Congresso Nacional\" dispor, com a sanção do Presidente."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre planos e programas nacionais, regionais e setoriais de desenvolvimento.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a competência legislativa descrita no Art. 48, inciso IV."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre planos e programas nacionais, mas os programas regionais e setoriais são de competência legislativa dos Estados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 48, inciso IV, atribui expressamente ao Congresso Nacional (com sanção) a competência para dispor sobre programas \"nacionais, regionais e setoriais de desenvolvimento\"."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre limites do território nacional, espaço aéreo e marítimo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e corresponde a uma parte da competência elencada no Art. 48, inciso V."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre bens do domínio da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta e corresponde à parte final da competência elencada no Art. 48, inciso V."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre incorporação, subdivisão ou desmembramento de áreas de Territórios ou Estados, ouvidas as respectivas Assembléias Legislativas.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional, sujeita à sanção e à oitiva das Assembleias, conforme o Art. 48, inciso VI."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre incorporação, subdivisão ou desmembramento de áreas de Territórios ou Estados, independentemente da oitiva das respectivas Assembléias Legislativas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que a oitiva é desnecessária. O Art. 48, inciso VI, condiciona essa competência a que sejam \"ouvidas as respectivas Assembléias Legislativas\"."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre incorporação, subdivisão ou desmembramento de áreas de Municípios, ouvidas as respectivas Câmaras Municipais.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro reside na troca dos entes federativos. O Art. 48, inciso VI, refere-se a \"Territórios ou Estados\", e não a Municípios."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre a transferência temporária da sede do Governo Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a competência legislativa prevista no Art. 48, inciso VII."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre a transferência definitiva da sede do Governo Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na troca da natureza da transferência. O Art. 48, inciso VII, especifica que a competência é para dispor sobre a transferência \"temporária\", e não \"definitiva\"."
+            },
+            {
+                question: "Compete ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre a concessão de anistia.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência prevista no Art. 48, inciso VIII."
+            },
+            {
+                question: "Compete ao Congresso Nacional, sem a sanção do Presidente da República, dispor sobre a concessão de anistia.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em dispensar a sanção presidencial. A concessão de anistia, conforme o Art. 48, inciso VIII, segue a regra geral do caput, exigindo a sanção do Presidente da República."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre a organização administrativa, judiciária, do Ministério Público e da Defensoria Pública da União e dos Territórios.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois elenca fielmente as matérias de organização da União e dos Territórios sobre as quais o Congresso Nacional deve legislar, mediante sanção, conforme o Art. 48, inciso IX."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre a organização judiciária e do Ministério Público do Distrito Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à parte final da competência legislativa prevista no Art. 48, inciso IX, referente ao Distrito Federal."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre a organização administrativa e da Defensoria Pública do Distrito Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em incluir a organização \"administrativa\" e da \"Defensoria Pública\" do Distrito Federal nesta competência. O Art. 48, inciso IX, especifica que, em relação ao DF, a competência é para dispor sobre a \"organização judiciária e do Ministério Público\"."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre a organização judiciária e do Ministério Público da União, dos Territórios e do Distrito Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois agrupa de forma fiel as competências previstas no Art. 48, inciso IX, sobre a organização judiciária e do MP em todos os âmbitos mencionados."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre criação, transformação e extinção de cargos, empregos e funções públicas, observado o que estabelece a competência privativa do Presidente da República para dispor, mediante decreto, sobre a extinção de funções ou cargos públicos, quando vagos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta. Ela transcreve a competência do Art. 48, inciso X, e aplica corretamente a regra de remissão, substituindo a citação ao \"art. 84, VI, b\" pela descrição de sua matéria (extinção de cargos vagos por decreto presidencial)."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre criação, transformação e extinção de cargos, empregos e funções públicas, sem ressalvas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que não há ressalvas. O Art. 48, inciso X, é explícito ao determinar que a competência do Congresso deve observar o que estabelece a competência do Presidente da República para dispor, mediante decreto, sobre a extinção de funções ou cargos públicos, quando vagos."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com sanção presidencial, dispor sobre a criação e transformação de cargos, mas a extinção de cargos, empregos e funções públicas é de competência privativa do Presidente da República.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste em generalizar a competência do Presidente. O Congresso Nacional dispõe sobre a extinção de cargos, com sanção (Art. 48, X). A competência do Presidente, mencionada na ressalva, é restrita à extinção de cargos ou funções \"quando vagos\" e é feita \"mediante decreto\"."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, por meio de ato de competência exclusiva (sem sanção), dispor sobre a criação, transformação e extinção de cargos, empregos e funções públicas.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em dispensar a sanção. A matéria do Art. 48, inciso X, segue a regra geral do caput e exige a sanção do Presidente da República."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre todas as matérias de competência da União, não exigida esta sanção para o especificado nas matérias de competência exclusiva do Congresso Nacional, de competência privativa da Câmara dos Deputados e de competência privativa do Senado Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma paráfrase fiel do Art. 48, caput, que estabelece a regra geral (dependência de sanção) e suas exceções. A questão substituiu corretamente a menção aos artigos 49, 51 e 52 por suas respectivas matérias (competência exclusiva do Congresso, privativa da Câmara e privativa do Senado)."
+            },
+            {
+                question: "Cabe ao Congresso Nacional dispor sobre todas as matérias de competência da União, sendo a sanção do Presidente da República sempre exigida, sem exceções.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que a sanção é \"sempre exigida\". O próprio caput do Art. 48 estabelece que a sanção \"não é exigida\" para as matérias de competência exclusiva do Congresso (art. 49), privativa da Câmara (art. 51) e privativa do Senado (art. 52)."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre criação e extinção de Ministérios e órgãos da administração pública.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional, sujeita à sanção presidencial, conforme o Art. 48, inciso XI."
+            },
+            {
+                question: "Compete ao Congresso Nacional dispor sobre criação e extinção de Ministérios e órgãos da administração pública, não sendo exigida, neste caso, a sanção do Presidente da República.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste em dispensar a sanção. A matéria de criação e extinção de Ministérios (Art. 48, XI) segue a regra geral do caput do Art. 48, exigindo a sanção do Presidente da República."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre telecomunicações e radiodifusão.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a competência legislativa prevista no Art. 48, inciso XII, que está sujeita à sanção presidencial."
+            },
+            {
+                question: "Compete ao Congresso Nacional dispor sobre telecomunicações e radiodifusão, matéria esta que é de sua competência exclusiva, não exigindo sanção.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em classificar a matéria como de competência exclusiva (Art. 49). A competência para dispor sobre telecomunicações e radiodifusão está no Art. 48, inciso XII, seguindo a regra geral do caput, que exige a sanção do Presidente da República."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre matéria financeira, cambial e monetária.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois elenca fielmente as matérias de natureza financeira sobre as quais o Congresso Nacional deve legislar, mediante sanção, conforme a primeira parte do Art. 48, inciso XIII."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre instituições financeiras e suas operações.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde à parte final da competência elencada no Art. 48, inciso XIII, que também exige sanção presidencial."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre matéria financeira, cambial e monetária, mas a competência para dispor sobre instituições financeiras e suas operações é privativa do Senado Federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em dividir a competência. O Art. 48, inciso XIII, atribui ao Congresso Nacional (com sanção) a competência sobre todas essas matérias (matéria financeira, cambial, monetária, instituições financeiras e suas operações)."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre moeda, seus limites de emissão, e montante da dívida mobiliária federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência prevista no Art. 48, inciso XIV."
+            },
+            {
+                question: "Compete privativamente ao Senado Federal dispor sobre moeda, seus limites de emissão, e montante da dívida mobiliária federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em atribuir a competência ao órgão errado. Embora o Senado Federal tenha competências privativas sobre limites da dívida (art. 52), a competência para \"dispor\" sobre moeda, limites de emissão e montante da dívida mobiliária federal é do Congresso Nacional, com sanção, conforme o Art. 48, inciso XIV."
+            },
+            {
+                question: "Compete ao Congresso Nacional dispor sobre moeda e seus limites de emissão, mas a fixação do montante da dívida mobiliária federal independe de sanção presidencial.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 48, inciso XIV, inclui todas essas matérias (moeda, limites de emissão e montante da dívida mobiliária federal) sob a regra geral do caput, que exige a sanção do Presidente da República."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, dispor sobre a fixação do subsídio dos Ministros do Supremo Tribunal Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional, sujeita à sanção presidencial, conforme o Art. 48, inciso XV."
+            },
+            {
+                question: "Compete ao Congresso Nacional dispor sobre a fixação do subsídio dos Ministros do Supremo Tribunal Federal, por meio de ato de competência exclusiva, que não exige sanção.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em dispensar a sanção. A fixação do subsídio dos Ministros do STF (Art. 48, XV) é matéria de lei de iniciativa do Judiciário, mas depende de deliberação do Congresso Nacional e da sanção do Presidente da República (regra geral do caput)."
+            },
+            {
+                question: "Compete ao Supremo Tribunal Federal, por ato interno, fixar o subsídio de seus Ministros.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O Art. 48, inciso XV, estabelece que \"Cabe ao Congresso Nacional [...] dispor\" sobre a fixação do subsídio. Embora a proposta seja de iniciativa do STF, a fixação se dá por lei."
+            },
+            // Art. 49
+            {
+                question: "As matérias de competência exclusiva do Congresso Nacional, listadas no Art. 49, dependem de sanção do Presidente da República.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em exigir a sanção. O Art. 49 trata da \"competência exclusiva\" do Congresso Nacional. Diferente das matérias do Art. 48, estas são promulgadas pelo próprio Presidente do Senado Federal, não dependendo de sanção ou veto presidencial."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional resolver definitivamente sobre tratados, acordos ou atos internacionais que acarretem encargos ou compromissos gravosos ao patrimônio nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional prevista no Art. 49, inciso I."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional opinar sobre quaisquer tratados, acordos ou atos internacionais, independentemente de acarretarem encargos ao patrimônio nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta por dois motivos. Primeiro, a competência é para \"resolver definitivamente\", e não apenas \"opinar\". Segundo, a competência se restringe aos atos \"que acarretem encargos ou compromissos gravosos ao patrimônio nacional\", e não a \"quaisquer\" tratados, conforme o Art. 49, inciso I."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o Presidente da República a declarar guerra e a celebrar a paz.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente parte da competência exclusiva do Congresso Nacional, conforme estabelecido no Art. 49, inciso II."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o Presidente da República a permitir que forças estrangeiras transitem pelo território nacional ou nele permaneçam temporariamente, ressalvados os casos previstos em lei complementar.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz com exatidão a competência do Congresso para autorizar a presença de forças estrangeiras, incluindo a ressalva à lei complementar, nos termos do Art. 49, inciso II."
+            },
+            {
+                question: "Compete ao Presidente da República permitir que forças estrangeiras transitem pelo território nacional, devendo apenas comunicar o ato ao Congresso Nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que o Presidente apenas comunica. O Art. 49, inciso II, estabelece que é da competência exclusiva do Congresso Nacional \"autorizar\" (ato prévio) o Presidente a permitir o trânsito dessas forças."
+            },
+            {
+                question: "A autorização do Congresso Nacional para que forças estrangeiras permaneçam temporariamente no território nacional não admite exceções previstas em lei complementar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste em negar a exceção. A parte final do Art. 49, inciso II, é clara ao determinar que esta autorização é \"ressalvados os casos previstos em lei complementar\"."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o Presidente e o Vice-Presidente da República a se ausentarem do País, quando a ausência exceder a quinze dias.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional para autorizar a ausência dos chefes do Executivo, conforme o Art. 49, inciso III."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o Presidente e o Vice-Presidente da República a se ausentarem do País, independentemente do prazo da ausência.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em ignorar o requisito do prazo. O Art. 49, inciso III, estabelece que a autorização só é necessária \"quando a ausência exceder a quinze dias\"."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o Presidente e o Vice-Presidente da República a se ausentarem do País, quando a ausência for superior a dez dias.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro reside na alteração do prazo. O Art. 49, inciso III, fixa o prazo em \"quinze dias\", e não dez."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional aprovar o estado de defesa e a intervenção federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve com precisão a competência do Congresso Nacional em relação ao estado de defesa e à intervenção federal, que são \"aprovados\" (ato posterior à decretação), conforme o Art. 49, inciso IV."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o estado de sítio, ou suspender qualquer uma dessas medidas (estado de defesa, intervenção federal ou estado de sítio).",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve a competência do Congresso para \"autorizar\" (ato prévio) o estado de sítio e para \"suspender\" qualquer das medidas de exceção, nos termos do Art. 49, inciso IV."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar o estado de defesa e a intervenção federal.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no verbo utilizado. Para o estado de defesa e a intervenção federal, a competência do Congresso Nacional é de \"aprovar\" (controle *a posteriori*). A autorização (*a priori*) é exigida apenas para o estado de sítio, conforme o Art. 49, inciso IV."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional sustar os atos normativos do Poder Executivo que exorbitem do poder regulamentar ou dos limites de delegação legislativa.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do instrumento de controle legislativo previsto no Art. 49, inciso V, utilizado para coibir excessos do Poder Executivo."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional anular os atos normativos do Poder Executivo que exorbitem do poder regulamentar.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no verbo utilizado. A competência do Congresso Nacional, conforme o Art. 49, inciso V, é de \"sustar\" (suspender os efeitos), e não de \"anular\" (ato com efeitos retroativos, típico do Poder Judiciário ou da própria Administração)."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional mudar temporariamente sua sede.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência exclusiva do Congresso Nacional, conforme o Art. 49, inciso VI."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional mudar definitivamente sua sede.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste na troca da natureza da mudança. O Art. 49, inciso VI, especifica que a competência é para mudar \"temporariamente\" a sede, e não \"definitivamente\"."
+            },
+            {
+                question: "Cabe ao Congresso Nacional, com a sanção do Presidente da República, mudar temporariamente sua sede.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em exigir a sanção do Presidente da República. O Art. 49 trata da \"competência exclusiva\" do Congresso Nacional, cujos atos independem de sanção ou veto presidencial."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fixar idêntico subsídio para os Deputados Federais e os Senadores.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz fielmente a competência do Congresso Nacional para estabelecer a isonomia remuneratória (subsídios idênticos) entre os membros das duas casas legislativas, nos termos do Art. 49, inciso VII."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fixar subsídios distintos para os Deputados Federais e os Senadores, observando a relevância de cada Casa.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que os subsídios podem ser distintos. O Art. 49, inciso VII, determina expressamente que o Congresso deve fixar \"idêntico subsídio\" para ambas as categorias de parlamentares."
+            },
+            {
+                question: "Compete ao Congresso Nacional, com sanção presidencial, fixar idêntico subsídio para os Deputados Federais e os Senadores.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em exigir a sanção presidencial. A fixação de subsídios dos parlamentares, conforme o Art. 49, inciso VII, é matéria de \"competência exclusiva\" do Congresso Nacional, não sujeita à sanção."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fixar os subsídios do Presidente e do Vice-Presidente da República e dos Ministros de Estado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência exclusiva do Congresso Nacional para definir a remuneração dos chefes do Poder Executivo e de seus auxiliares diretos, conforme o Art. 49, inciso VIII."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fixar os subsídios do Presidente e do Vice-Presidente da República, mas os subsídios dos Ministros de Estado são fixados por decreto presidencial.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste em excluir os Ministros de Estado da competência do Congresso. O Art. 49, inciso VIII, é claro ao incluir \"os Ministros de Estado\" no rol daqueles cujo subsídio é fixado pelo Congresso."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional julgar anualmente as contas prestadas pelo Presidente da República e apreciar os relatórios sobre a execução dos planos de governo.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve com exatidão a competência de controle do Congresso Nacional sobre as contas presidenciais (que são julgadas) e sobre os relatórios de planos de governo (que são apreciados), nos termos do Art. 49, inciso IX."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional apreciar anualmente as contas prestadas pelo Presidente da República.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no verbo utilizado. Em relação às contas do Presidente, o Tribunal de Contas da União as *aprecia* (emitindo parecer prévio), mas o Congresso Nacional as \"julga\", conforme o Art. 49, inciso IX."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional julgar anualmente as contas prestadas pelo Presidente da República, mas a apreciação dos relatórios sobre a execução dos planos de governo compete ao Tribunal de Contas da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em atribuir a apreciação dos relatórios ao TCU. O Art. 49, inciso IX, atribui ao Congresso Nacional ambas as competências: \"julgar\" as contas e \"apreciar os relatórios\"."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fiscalizar e controlar, diretamente, ou por qualquer de suas Casas, os atos do Poder Executivo, incluídos os da administração indireta.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência de fiscalização e controle do Congresso Nacional, que pode ser exercida pelo plenário ou por qualquer das Casas, abrangendo a administração direta e indireta, conforme o Art. 49, inciso X."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fiscalizar e controlar, diretamente, os atos do Poder Executivo, excluídos os da administração indireta.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste na troca da palavra \"incluídos\" por \"excluídos\". O Art. 49, inciso X, deixa claro que o controle do Congresso abrange também os atos \"da administração indireta\"."
+            },
+            {
+                question: "A fiscalização e o controle dos atos do Poder Executivo, de competência exclusiva do Congresso Nacional, devem ser exercidos apenas pelas duas Casas em conjunto, vedada a atuação isolada da Câmara ou do Senado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em vedar a atuação isolada das Casas. O Art. 49, inciso X, estabelece que o controle pode ser feito \"diretamente [pelo Congresso], ou por qualquer de suas Casas\"."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional fiscalizar e controlar, apenas indiretamente, por meio do Tribunal de Contas da União, os atos do Poder Executivo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em restringir o controle ao modo indireto (via TCU). O Art. 49, inciso X, estabelece que o Congresso pode fiscalizar \"diretamente, ou por qualquer de suas Casas\"."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional zelar pela preservação de sua competência legislativa em face da atribuição normativa dos outros Poderes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional, prevista no Art. 49, inciso XI."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional zelar pela preservação de sua competência normativa em face da atribuição legislativa dos outros Poderes.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste na inversão dos termos. O Art. 49, inciso XI, estabelece que o Congresso deve zelar por sua competência \"legislativa\" em face da atribuição \"normativa\" dos outros Poderes, e não o contrário."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional apreciar os atos de concessão e renovação de concessão de emissoras de rádio e televisão.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz com exatidão a competência exclusiva do Congresso Nacional para analisar os atos de outorga de radiodifusão, conforme o Art. 49, inciso XII."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar os atos de concessão e renovação de concessão de emissoras de rádio e televisão.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no verbo utilizado. O Art. 49, inciso XII, estabelece que a competência do Congresso é de \"apreciar\" (ato *a posteriori*), e não \"autorizar\" (ato *a priori*). Quem outorga a concessão é o Poder Executivo, e o Congresso aprecia esse ato."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional apreciar os atos de concessão de emissoras de rádio e televisão, mas a renovação da concessão independe de sua apreciação.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em excluir a renovação da competência do Congresso. O Art. 49, inciso XII, é claro ao determinar que a apreciação recai sobre \"os atos de concessão e renovação de concessão\"."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional escolher dois terços dos membros do Tribunal de Contas da União.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da regra de composição do TCU, que define a cota de escolha do Congresso Nacional, conforme o Art. 49, inciso XIII."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional escolher um terço dos membros do Tribunal de Contas da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na proporção. O Art. 49, inciso XIII, estabelece que o Congresso Nacional deve escolher \"dois terços\" dos membros do TCU. O outro terço é de escolha do Presidente da República."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional escolher a totalidade dos membros do Tribunal de Contas da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na proporção. O Art. 49, inciso XIII, limita a escolha do Congresso a \"dois terços\" dos membros, e não à totalidade."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional aprovar iniciativas do Poder Executivo referentes a atividades nucleares.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a competência exclusiva do Congresso para autorizar atividades nucleares propostas pelo Executivo, nos termos do Art. 49, inciso XIV."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional propor e aprovar iniciativas referentes a atividades nucleares.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em atribuir a iniciativa ao Congresso. O Art. 49, inciso XIV, estabelece que o Congresso deve \"aprovar iniciativas do Poder Executivo\", indicando que a proposta parte de outro Poder."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar referendo e convocar plebiscito.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional para autorizar os instrumentos de consulta popular, conforme o Art. 49, inciso XV."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional convocar referendo e autorizar plebiscito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste na inversão dos verbos. O Art. 49, inciso XV, estabelece que o Congresso deve \"autorizar referendo\" (que é *a posteriori*) e \"convocar plebiscito\" (que é *a priori*)."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional convocar tanto o referendo quanto o plebiscito.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em usar o mesmo verbo para os dois institutos. O Art. 49, inciso XV, diferencia as ações: o Congresso \"autoriza\" o referendo e \"convoca\" o plebiscito."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar, em terras indígenas, a exploração e o aproveitamento de recursos hídricos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve parte da competência exclusiva do Congresso Nacional para autorizar atividades econômicas em terras indígenas, conforme o Art. 49, inciso XVI."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional autorizar, em terras indígenas, a pesquisa e lavra de riquezas minerais.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve a outra parte da competência exclusiva do Congresso Nacional para autorizar atividades de mineração em terras indígenas, conforme o Art. 49, inciso XVI."
+            },
+            {
+                question: "Compete ao Poder Executivo autorizar, em terras indígenas, a exploração e o aproveitamento de recursos hídricos e a pesquisa e lavra de riquezas minerais, devendo apenas comunicar ao Congresso Nacional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em atribuir a competência ao Poder Executivo. O Art. 49, inciso XVI, é claro ao determinar que é da \"competência exclusiva do Congresso Nacional autorizar\" (ato prévio) tais atividades."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional aprovar, previamente, a alienação ou concessão de terras públicas com área superior a dois mil e quinhentos hectares.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência do Congresso Nacional para controlar a destinação de grandes áreas de terras públicas, conforme o Art. 49, inciso XVII."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional aprovar, previamente, a alienação ou concessão de terras públicas com área superior a quinhentos hectares.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro reside na alteração do limite da área. O Art. 49, inciso XVII, estabelece que a autorização prévia é necessária para áreas \"superior a dois mil e quinhentos hectares\", e não quinhentos."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional aprovar, posteriormente, a alienação ou concessão de terras públicas com área superior a dois mil e quinhentos hectares.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no momento da aprovação. O Art. 49, inciso XVII, exige que a aprovação seja \"previamente\" à alienação ou concessão."
+            },
+            {
+                question: "É da competência exclusiva do Congresso Nacional decretar o estado de calamidade pública de âmbito nacional.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal da competência exclusiva do Congresso Nacional prevista no Art. 49, inciso XVIII."
+            },
+            // Art. 50
+            {
+                question: "A Câmara dos Deputados e o Senado Federal, ou qualquer de suas Comissões, poderão convocar Ministro de Estado para prestar, pessoalmente, informações sobre assunto previamente determinado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição fiel da primeira parte do caput do Art. 50, que estabelece a competência do Legislativo para convocar Ministros de Estado."
+            },
+            {
+                question: "Apenas a Câmara dos Deputados e o Senado Federal, em sessão conjunta do Congresso Nacional, poderão convocar Ministro de Estado, sendo vedado às Comissões fazê-lo.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em vedar a competência das Comissões. O caput do Art. 50 é claro ao afirmar que a convocação pode partir \"da Câmara dos Deputados e do Senado Federal, ou qualquer de suas Comissões\"."
+            },
+            {
+                question: "As Comissões da Câmara dos Deputados poderão convocar quaisquer titulares de órgãos diretamente subordinados à Presidência da República para prestarem, pessoalmente, informações.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a competência das Comissões para convocar os titulares de órgãos ligados diretamente à Presidência, conforme o caput do Art. 50."
+            },
+            {
+                question: "O Congresso Nacional poderá convocar o Presidente do Comitê Gestor do Imposto sobre Bens e Serviços para prestar, pessoalmente, informações sobre assunto previamente determinado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois o \"Presidente do Comitê Gestor do Imposto sobre Bens e Serviços\" é uma das autoridades expressamente listadas no caput do Art. 50 como passível de convocação."
+            },
+            {
+                question: "As Comissões do Senado Federal poderão convocar o Advogado-Geral da União para prestar informações, importando sua ausência em crime de responsabilidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em incluir o Advogado-Geral da União no rol de autoridades. O caput do Art. 50 lista \"Ministro de Estado\", \"titulares de órgãos diretamente subordinados à Presidência\" e o \"Presidente do Comitê Gestor do IBS\", não mencionando o AGU."
+            },
+            {
+                question: "A ausência sem justificação adequada de Ministro de Estado convocado por Comissão da Câmara dos Deputados importa crime de responsabilidade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois corresponde exatamente à sanção prevista na parte final do caput do Art. 50 para a ausência injustificada de uma autoridade convocada."
+            },
+            {
+                question: "A ausência sem justificação adequada de Ministro de Estado convocado pelo Congresso Nacional importa infração político-administrativa, mas não crime de responsabilidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste em classificar a sanção de forma errada. A parte final do caput do Art. 50 tipifica expressamente a conduta como \"crime de responsabilidade\"."
+            },
+            {
+                question: "Os Ministros de Estado poderão comparecer ao Senado Federal, à Câmara dos Deputados, ou a qualquer de suas Comissões, por sua iniciativa e mediante entendimentos com a Mesa respectiva.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do Art. 50, § 1º, que trata do comparecimento voluntário do Ministro ao Legislativo."
+            },
+            {
+                question: "Os Ministros de Estado poderão comparecer ao Congresso Nacional, por sua iniciativa, para expor assunto de relevância de seu Ministério, independentemente de entendimentos com a Mesa respectiva.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em dispensar a comunicação prévia. O Art. 50, § 1º, condiciona o comparecimento voluntário à existência de \"entendimentos com a Mesa respectiva\"."
+            },
+            {
+                question: "Os Ministros de Estado e quaisquer titulares de órgãos diretamente subordinados à Presidência poderão comparecer ao Congresso Nacional por sua iniciativa para expor assunto de relevância.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro consiste em ampliar o rol de autoridades que podem comparecer voluntariamente. O Art. 50, § 1º, refere-se apenas aos \"Ministros de Estado\", não incluindo os \"titulares de órgãos diretamente subordinados à Presidência\"."
+            },
+            {
+                question: "As Mesas da Câmara dos Deputados e do Senado Federal poderão encaminhar pedidos escritos de informações a Ministros de Estado.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente a competência das Mesas Diretoras para solicitar informações por escrito, conforme o Art. 50, § 2º."
+            },
+            {
+                question: "As Mesas da Câmara dos Deputados e do Senado Federal, bem como qualquer de suas Comissões, poderão encaminhar pedidos escritos de informações a Ministros de Estado.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em incluir as Comissões nesta competência específica. O Art. 50, § 2º, atribui a competência para encaminhar \"pedidos escritos de informações\" apenas às \"Mesas da Câmara dos Deputados e do Senado Federal\"."
+            },
+            {
+                question: "A recusa ou o não-atendimento, no prazo de trinta dias, a pedido escrito de informações das Mesas do Congresso, bem como a prestação de informações falsas, importam em crime de responsabilidade.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição fiel das condutas e do prazo que caracterizam crime de responsabilidade no tocante aos pedidos de informação por escrito, conforme o Art. 50, § 2º."
+            },
+            {
+                question: "A recusa ou o não-atendimento, no prazo de sessenta dias, a pedido escrito de informações das Mesas do Congresso, importa em crime de responsabilidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro reside na alteração do prazo. O Art. 50, § 2º, estabelece o prazo de \"trinta dias\" para o atendimento, e não sessenta."
+            },
+            {
+                question: "A prestação de informações falsas a pedido escrito das Mesas do Congresso importa em ato de improbidade administrativa, mas não em crime de responsabilidade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na classificação da sanção. O Art. 50, § 2º, tipifica expressamente a \"prestação de informações falsas\" como \"crime de responsabilidade\"."
+            }
+        ];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do Congresso Nacional</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #005a9c;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --neutral-color: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .quiz-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .quiz-header p {
+            margin: 5px 0 0;
+            color: var(--neutral-color);
+        }
+        #question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            background-color: var(--primary-bg);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .answer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-bg);
+            color: var(--primary-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: var(--secondary-bg);
+            border-color: var(--primary-color);
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+        .btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        .btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+        #feedback.correct-feedback {
+            background-color: #e9f6ec;
+            border-left: 5px solid var(--correct-color);
+            color: #1e4620;
+        }
+        #feedback.incorrect-feedback {
+            background-color: #fdecea;
+            border-left: 5px solid var(--incorrect-color);
+            color: #5c1a1a;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #next-btn, #restart-btn, #prev-btn, #restart-wrong-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #prev-btn {
+            background-color: var(--neutral-color);
+        }
+        #prev-btn:hover {
+            background-color: #5a6268;
+        }
+        #restart-wrong-btn {
+            background-color: var(--incorrect-color);
+            margin-left: 10px;
+        }
+        #restart-wrong-btn:hover {
+            background-color: #c82333;
+        }
+
+        #results-container {
+            text-align: center;
+        }
+        #results-container h2 {
+            color: var(--primary-color);
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Constituição Federal de 1988</h1>
+            <p>Do Congresso Nacional</p>
+        </div>
+
+        <div id="quiz-body">
+            <p><span id="question-number"></span> de <span id="total-questions"></span></p>
+            <div id="question-text"></div>
+            <div class="answer-options">
+                <button class="btn" id="btn-certo" onclick="selectAnswer('Certo')">Certo</button>
+                <button class="btn" id="btn-errado" onclick="selectAnswer('Errado')">Errado</button>
+            </div>
+            <div id="feedback"></div>
+            <div class="navigation">
+                <button id="prev-btn" onclick="prevQuestion()">&larr; Anterior</button>
+                <button id="next-btn" onclick="nextQuestion()">Próxima &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: none;">
+            <h2>Caderno Concluído!</h2>
+            <p id="score"></p>
+            <p id="score-message"></p>
+            <button id="restart-btn" onclick="restartQuiz('all')">Refazer Todas</button>
+            <button id="restart-wrong-btn" onclick="restartQuiz('wrong')">Refazer Erradas</button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // Artigo 44
+            {
+                question: "O Poder Legislativo é exercido pelo Congresso Nacional, que se compõe da Câmara dos Deputados e do Senado Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do caput do Art. 44 da Constituição Federal, que estabelece o sistema bicameral do Poder Legislativo federal."
+            },
+            {
+                question: "O Poder Legislativo é exercido pelo Congresso Nacional, que se compõe da Câmara dos Deputados, do Senado Federal e do Tribunal de Contas da União.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. Embora o Tribunal de Contas da União auxilie o Congresso Nacional no controle externo, ele não compõe o Poder Legislativo. O Art. 44, caput, é claro ao limitar a composição à \"Câmara dos Deputados e do Senado Federal\"."
+            },
+            {
+                question: "O Poder Legislativo é exercido pelo Congresso Nacional, que adota o sistema unicameral.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O sistema adotado no Brasil é o bicameral, pois o Art. 44, caput, estabelece que o Congresso Nacional \"se compõe da Câmara dos Deputados e do Senado Federal\"."
+            },
+            {
+                question: "Cada legislatura terá a duração de quatro anos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz exatamente o texto do parágrafo único do Art. 44, que define o período da legislatura."
+            },
+            {
+                question: "Cada legislatura terá a duração de cinco anos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro reside na alteração do prazo. O parágrafo único do Art. 44 estabelece que a duração da legislatura é de \"quatro anos\"."
+            },
+            // Artigo 45
+            {
+                question: "A Câmara dos Deputados compõe-se de representantes do povo, eleitos, pelo sistema proporcional, em cada Estado, em cada Território e no Distrito Federal.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do caput do Art. 45, definindo a representação (povo), o sistema eleitoral (proporcional) e a circunscrição da eleição."
+            },
+            {
+                question: "A Câmara dos Deputados compõe-se de representantes do povo, eleitos pelo sistema majoritário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no sistema eleitoral. O caput do Art. 45 estabelece que os deputados são eleitos \"pelo sistema proporcional\", e não majoritário."
+            },
+            {
+                question: "A Câmara dos Deputados compõe-se de representantes dos Estados e do Distrito Federal, eleitos pelo sistema proporcional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em quem é representado. A Câmara dos Deputados compõe-se de \"representantes do povo\". Quem representa os Estados e o Distrito Federal é o Senado Federal (conforme Art. 46)."
+            },
+            {
+                question: "O número total de Deputados, bem como a representação por Estado e pelo Distrito Federal, será estabelecido por lei complementar, proporcionalmente à população.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente o instrumento normativo (lei complementar) e o critério (proporcionalidade populacional) para a fixação do número de deputados, conforme o § 1º do Art. 45."
+            },
+            {
+                question: "O número total de Deputados será estabelecido por lei ordinária, proporcionalmente à população.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no tipo de norma. O § 1º do Art. 45 exige expressamente \"lei complementar\" para estabelecer o número de Deputados, e não lei ordinária."
+            },
+            {
+                question: "Os ajustes necessários no número de deputados por Estado, para adequação à população, devem ser feitos no ano das eleições.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no momento do ajuste. O § 1º do Art. 45 determina que os ajustes devem ser feitos \"no ano anterior às eleições\"."
+            },
+            {
+                question: "Nenhuma unidade da Federação terá menos de oito ou mais de setenta Deputados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois transcreve literalmente os limites mínimo (oito) e máximo (setenta) de deputados por unidade da Federação, conforme a parte final do § 1º do Art. 45."
+            },
+            {
+                question: "Nenhuma daquelas unidades da Federação terá menos de três ou mais de oitenta Deputados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está nos limites fixados. O § 1º do Art. 45 estabelece o mínimo de \"oito\" (e não três, que é o número de Senadores) e o máximo de \"setenta\" (e não oitenta) Deputados."
+            },
+            {
+                question: "Cada Território elegerá quatro Deputados.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do § 2º do Art. 45, que fixa o número de deputados para os Territórios Federais."
+            },
+            {
+                question: "Cada Território elegerá oito Deputados.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no número de deputados. O § 2º do Art. 45 fixa o número em \"quatro\" Deputados. O número \"oito\" é o mínimo para os Estados e o Distrito Federal (conforme § 1º)."
+            },
+            // Artigo 46
+            {
+                question: "O Senado Federal compõe-se de representantes dos Estados e do Distrito Federal, eleitos segundo o princípio majoritário.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do caput do Art. 46 da Constituição Federal, que define a representação (Estados e DF) e o sistema eleitoral (majoritário) do Senado."
+            },
+            {
+                question: "O Senado Federal compõe-se de representantes do povo, eleitos segundo o princípio majoritário.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em quem é representado. O Art. 46, caput, estabelece que o Senado compõe-se de \"representantes dos Estados e do Distrito Federal\". Quem representa o povo é a Câmara dos Deputados (Art. 45)."
+            },
+            {
+                question: "O Senado Federal compõe-se de representantes dos Estados e do Distrito Federal, eleitos segundo o princípio proporcional.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro reside no sistema eleitoral. O Art. 46, caput, é claro ao determinar que os senadores são eleitos \"segundo o princípio majoritário\", e não proporcional."
+            },
+            {
+                question: "Cada Estado e o Distrito Federal elegerão três Senadores, com mandato de oito anos.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois reproduz exatamente o texto do Art. 46, § 1º, que define o número de senadores por ente federativo e a duração do mandato."
+            },
+            {
+                question: "Cada Estado e o Distrito Federal elegerão quatro Senadores, com mandato de oito anos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no número de representantes. O Art. 46, § 1º, estabelece que serão eleitos \"três Senadores\", e não quatro."
+            },
+            {
+                question: "Cada Estado e o Distrito Federal elegerão três Senadores, com mandato de quatro anos.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na duração do mandato. O Art. 46, § 1º, define o mandato do Senador como sendo de \"oito anos\", e não quatro."
+            },
+            {
+                question: "A representação de cada Estado e do Distrito Federal no Senado será renovada de quatro em quatro anos, alternadamente, por um e dois terços.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois descreve fielmente o mecanismo de renovação parcial do Senado Federal, conforme o Art. 46, § 2º."
+            },
+            {
+                question: "A representação de cada Estado e do Distrito Federal no Senado será renovada de oito em oito anos, integralmente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na frequência e na forma da renovação. O Art. 46, § 2º, estabelece que a renovação ocorre \"de quatro em quatro anos\" e de forma alternada (\"por um e dois terços\"), e não integralmente a cada oito anos."
+            },
+            {
+                question: "A representação de cada Estado e do Distrito Federal será renovada de quatro em quatro anos, alternadamente, pela metade.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está na proporção da renovação. O Art. 46, § 2º, especifica que a renovação é alternada \"por um e dois terços\", e não pela metade."
+            },
+            {
+                question: "Cada Senador será eleito com dois suplentes.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do Art. 46, § 3º, que define o número de suplentes eleitos juntamente com o Senador."
+            },
+            {
+                question: "Cada Senador será eleito com um suplente.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no número de suplentes. O Art. 46, § 3º, determina que cada Senador será eleito com \"dois suplentes\"."
+            },
+            // Artigo 47
+            {
+                question: "Salvo disposição constitucional em contrário, as deliberações de cada Casa e de suas Comissões serão tomadas por maioria dos votos, presente a maioria absoluta de seus membros.",
+                answer: "Certo",
+                rationale: "A assertiva está correta, pois é uma transcrição literal do Art. 47, caput, que estabelece a regra geral para as deliberações legislativas (maioria simples de votos, desde que presente a maioria absoluta dos membros)."
+            },
+            {
+                question: "As deliberações de cada Casa e de suas Comissões serão tomadas por maioria absoluta dos votos, presente a maioria absoluta de seus membros.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no quórum de aprovação. O Art. 47, caput, exige \"maioria dos votos\" (maioria simples), e não maioria absoluta dos votos. A maioria absoluta é o quórum para *iniciar* a votação (presença)."
+            },
+            {
+                question: "As deliberações de cada Casa e de suas Comissões serão tomadas por maioria dos votos, presente a maioria simples de seus membros.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está no quórum de presença (instalação). O Art. 47, caput, exige que esteja \"presente a maioria absoluta de seus membros\" para que a deliberação possa ocorrer."
+            },
+            {
+                question: "As deliberações de cada Casa e de suas Comissões serão tomadas por maioria dos votos, presente a maioria absoluta de seus membros, não havendo exceções a esta regra.",
+                answer: "Errado",
+                rationale: "A assertiva está incorreta. O erro está em afirmar que não há exceções. O Art. 47, caput, inicia-se justamente com a ressalva \"Salvo disposição constitucional em contrário\" (como, por exemplo, a aprovação de Lei Complementar, que exige maioria absoluta)."
+            }
+        ];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const btnCerto = document.getElementById('btn-certo');
+        const btnErrado = document.getElementById('btn-errado');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartWrongBtn = document.getElementById('restart-wrong-btn');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultsContainerEl = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const scoreMessageEl = document.getElementById('score-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let wrongAnswersList = []; 
+        let currentQuizData = [...quizData];
+
+        function loadQuestion() {
+            resetState();
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionNumberEl.innerText = currentQuestionIndex + 1;
+            totalQuestionsEl.innerText = currentQuizData.length;
+            questionTextEl.innerText = currentQuestion.question;
+
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function resetState() {
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            btnCerto.disabled = false;
+            btnErrado.disabled = false;
+            btnCerto.className = 'btn';
+            btnErrado.className = 'btn';
+        }
+
+        function selectAnswer(selectedAnswer) {
+            btnCerto.disabled = true;
+            btnErrado.disabled = true;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<strong>Correto!</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'correct-feedback';
+            } else {
+                feedbackEl.innerHTML = `<strong>Incorreto.</strong> ${currentQuestion.rationale}`;
+                feedbackEl.className = 'incorrect-feedback';
+                
+                if (!wrongAnswersList.includes(currentQuestion)) {
+                     wrongAnswersList.push(currentQuestion);
+                }
+            }
+            
+            if (currentQuestion.answer === 'Certo') {
+                btnCerto.classList.add('correct');
+                if (!isCorrect) btnErrado.classList.add('incorrect');
+            } else {
+                btnErrado.classList.add('correct');
+                if (!isCorrect) btnCerto.classList.add('incorrect');
+            }
+
+            feedbackEl.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentQuestionIndex > 0) {
+                prevBtn.style.display = 'inline-block';
+            }
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizBodyEl.style.display = 'none';
+            resultsContainerEl.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+            
+            if (wrongAnswersList.length > 0) {
+                restartWrongBtn.style.display = 'inline-block';
+            }
+            
+            const percentage = Math.round((score / currentQuizData.length) * 100);
+            scoreEl.innerText = `Você acertou ${score} de ${currentQuizData.length} questões (${percentage}%).`;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excelente desempenho! Você domina o assunto.';
+            } else if (percentage >= 70) {
+                message = 'Ótimo resultado! Continue revisando os detalhes.';
+            } else if (percentage >= 50) {
+                message = 'Bom esforço. Foco nos pontos que errou para melhorar.';
+            } else {
+                message = 'Continue estudando. A repetição leva à perfeição.';
+            }
+            scoreMessageEl.innerText = message;
+        }
+
+        function restartQuiz(mode) {
+            currentQuestionIndex = 0;
+            score = 0;
+
+            if (mode === 'wrong' && wrongAnswersList.length > 0) {
+                currentQuizData = [...wrongAnswersList];
+            } else {
+                currentQuizData = [...quizData];
+            }
+            
+            wrongAnswersList = [];
+            
+            resultsContainerEl.style.display = 'none';
+            restartWrongBtn.style.display = 'none';
+            quizBodyEl.style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
